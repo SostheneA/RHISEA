@@ -1,0 +1,36 @@
+Package: Rhisea
+Type: Package
+Title: R Implementation of HISEA for Mixed Stock Analysis
+Version: 0.1.0
+Authors@R: 
+    person("Sosthene", "Akia", email = "akia@example.com", role = c("aut", "cre"))
+Description: R implementation of the HISEA method for mixed stock analysis, 
+    supporting multiple classifiers (LDA, RF, MCLUST, etc.) and estimators 
+    (COOK, EM, ML). Includes simulation, bootstrap, and full analysis routines.
+License: GPL-3
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Config/roxygenNote: 7.3.2
+Depends: R (>= 3.6.0)
+Imports:
+    stats,
+    utils,
+    MASS,
+    caret,
+    xgboost,
+    randomForest,
+    nnet,
+    e1071,
+    mclust,
+    class,
+    kknn,
+    ggplot2,
+    tidyr,
+    data.table
+Suggests:
+    testthat,
+    roxygen2,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
