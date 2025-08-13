@@ -26,7 +26,7 @@ Rhisea modernizes and extends HISEA with flexible, robust classification framewo
         -   [Step-by-Step Overview (see diagram)](#step-by-step-overview-see-diagram)
 -   [Conclusion: The Rhisea Advantage](#conclusion-the-rhisea-advantage)
 
-## Installation {#installation}
+## Installation
 
 Rhisea can be installed from GitHub:
 
@@ -35,7 +35,7 @@ library(devtools)
 install_github("SostheneA/Rhisea", dependencies = TRUE)
 ```
 
-## Citation {#citation}
+## Citation
 
 To cite Rhisea in publications use:
 
