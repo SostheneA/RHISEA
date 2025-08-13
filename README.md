@@ -43,17 +43,17 @@ To cite Rhisea in publications use:
 citation("Rhisea")
 ```
 
-# From HISEA FORTRAN to Rhisea: Modern Mixed-Stock Analysis in R {#from-hisea-fortran-to-rhisea-modern-mixed-stock-analysis-in-r}
+# From HISEA FORTRAN to Rhisea: Modern Mixed-Stock Analysis in R
 
 Mixed-stock analysis is a fundamental tool for fisheries science, allowing estimation of the contributions of source populations to mixture samples (e.g., fisheries catches). The original HISEA program, implemented in FORTRAN, pioneered this approach with a robust statistical framework and introduced several estimators (Θ₁ to Θ₅) for stock proportion inference.
 
-### However, the classical HISEA had important limitations: {#however-the-classical-hisea-had-important-limitations}
+### However, the classical HISEA had important limitations:
 
 -   Only a single built-in classifier (LDA/discriminant analysis), requiring the variables to be approximately multivariate normal with constant covariance matrices.
 -   Limited flexibility for integrating modern statistical learning approaches.
 -   Rigid input/output based on text files (*.std,* .mix, \*.ctl), and no option to save intermediate or diagnostic results for downstream analysis.
 
-## The Modern Workflow: Rhisea in R {#the-modern-workflow-rhisea-in-r}
+## The Modern Workflow: Rhisea in R
 
 Rhisea builds on the foundation of HISEA and brings mixed-stock analysis into the present:
 
@@ -99,7 +99,7 @@ You can work directly with R data frames---no need for fixed-format text files. 
 
 Each step of the process is transparent: from baseline/mixture data ingestion → classifier choice and fitting → estimation with all classical HISEA estimators (Θ₁: Raw, Θ₂: Cook & Lord, Θ₃: Cook Constrained, Θ₄: EM MillarC, Θ₅: EM ML) → summary and report. You control every aspect or automate it all.
 
-## Step-by-Step Overview (see diagram) {#step-by-step-overview-see-diagram}
+## Step-by-Step Overview (see diagram)
 
 1.  Start: Specify your inputs---choose between R data frames or HISEA .std/.mix control files.
 2.  Classifier Selection: Easily select or define your choice of classification model for stock assignment.
@@ -111,7 +111,7 @@ Each step of the process is transparent: from baseline/mixture data ingestion �
 
 ![](images/HISEA%20_%20Mermaid.png)
 
-## Conclusion: The Rhisea Advantage {#conclusion-the-rhisea-advantage}
+## Conclusion: The Rhisea Advantage 
 
 With Rhisea, you retain all the statistical rigor of original HISEA - including compatibility and reproducibility with legacy workflows - while gaining the flexibility, transparency, and analytic power of modern R. Advanced users can plug in custom classifiers, automate cross-validation, and leverage the full R ecosystem for further statistical or graphical analysis. All intermediate steps are traceable and archivable for robust, audit-friendly science.
 
