@@ -57,7 +57,7 @@ Mixed-stock analysis is a fundamental tool for fisheries science, allowing estim
 
 Rhisea builds on the foundation of HISEA and brings mixed-stock analysis into the present:
 
-### Key Innovations {#key-innovations}
+### Key Innovations
 
 #### 1- Flexible Classifier Choice
 
