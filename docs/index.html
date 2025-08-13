@@ -18,7 +18,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="index.html">Rhisea</a>
 
@@ -32,7 +32,15 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="articles/index.html">Articles</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/Custom_Classification_Models.html">Applying HISEA estimators to custom classification models with run_hisea_estimates</a></li>
+    <li><a class="dropdown-item" href="articles/Multiple_Classifiers.html">Comparing built-in classification methods in Rhisea for mixed-stock analysis</a></li>
+    <li><a class="dropdown-item" href="articles/Rhisea_data_type.html">Two input paths in Rhisea: run_hisea_all with HISEA-style files or Dataframes</a></li>
+    <li><a class="dropdown-item" href="articles/Rhisea_vs_Fortran.html">Verifying compatibility: Rhisea (R) vs FORTRAN HISEA</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="nav-link" href="https://github.com/SostheneA/Rhisea" aria-label="GitHub repository"><span class="fa fa-github"></span></a></li>
@@ -43,9 +51,47 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><p>Title: Rhisea: R Package for Mixed-Stock Analysis Extending HISEA with Flexible and Robust Classification Frameworks</p>
-<p>Abstract: Mixed-stock analysis (MSA) plays a critical role in fisheries science by quantifying the relative contributions of distinct populations to mixed catches. The historical HISEA program, written in Fortran, has been widely used for this purpose but remains limited by its legacy design, reliance on LDA, and lack of extensibility. To address these constraints, we introduce Rhisea, a modern and modular R package that faithfully reproduces HISEA’s core estimators while significantly enhancing its functionality. Rhisea offers support for multiple classification algorithms—including linear discriminant analysis, model-based clustering (MclustDA), decision trees, random forests, support vector machines, and neural networks, within a unified and user-friendly interface. The package functions enables seamless application of analysis, simulation, or bootstrap scenarios with fine-tuned control over classifier selection and parameterization. Simulation studies confirm Rhisea’s consistency with the original HISEA under standard settings, while demonstrating improved robustness under model violations. This package provides a flexible framework for modern mixed-stock estimation, facilitating transparency, reproducibility, and methodological comparisons within the R ecosystem.</p>
-
+  <main id="main" class="col-md-9"><div class="section level1">
+<div class="page-header"><h1 id="rhisea">Rhisea<a class="anchor" aria-label="anchor" href="#rhisea"></a>
+</h1></div>
+<blockquote>
+<p>R Package for Mixed-Stock Analysis Extending HISEA with Flexible and Robust Classification Frameworks</p>
+</blockquote>
+<p>Rhisea modernizes and extends HISEA with flexible, robust classification frameworks to estimate source contributions and assign individuals to their stock of origin, with rigorous uncertainty quantification.</p>
+<div class="section level2">
+<h2 id="key-features">Key features:<a class="anchor" aria-label="anchor" href="#key-features"></a>
+</h2>
+<ul>
+<li>Drop-in compatibility with classic HISEA (FORTRAN) workflows, plus modern extensions</li>
+<li>Multiple classification approaches (parametric and nonparametric), or use your own model and apply HISEA estimators</li>
+<li>Estimation of stock proportions and individual assignment with uncertainty via bootstrap, cross-validation, and simulations</li>
+<li>Built-in diagnostics for transparent interpretation Designed for fisheries biologists, ecologists, managers, and analysts seeking robust, reproducible inferences to support decision-making</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="table-of-contents">Table of contents<a class="anchor" aria-label="anchor" href="#table-of-contents"></a>
+</h2>
+<ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#citation">Citation</a></li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Rhisea can be installed from GitHub:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"SostheneA/Rhisea"</span>, dependencies <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
+</h2>
+<p>To cite Rhisea in publications use:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"Rhisea"</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">

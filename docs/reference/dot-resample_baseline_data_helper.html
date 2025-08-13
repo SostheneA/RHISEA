@@ -23,7 +23,7 @@ Includes integrated 10-fold cross-validation and model quality evaluation (accur
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">Rhisea</a>
 
@@ -36,7 +36,13 @@ Includes integrated 10-fold cross-validation and model quality evaluation (accur
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/Custom_Classification_Models.html">Applying HISEA estimators to custom classification models with run_hisea_estimates</a></li>
+    <li><a class="dropdown-item" href="../articles/Multiple_Classifiers.html">Comparing built-in classification methods in Rhisea for mixed-stock analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/Rhisea_data_type.html">Two input paths in Rhisea: run_hisea_all with HISEA-style files or Dataframes</a></li>
+    <li><a class="dropdown-item" href="../articles/Rhisea_vs_Fortran.html">Verifying compatibility: Rhisea (R) vs FORTRAN HISEA</a></li>
+  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="https://github.com/SostheneA/Rhisea" aria-label="GitHub repository"><span class="fa fa-github"></span></a></li>
       </ul></div>
 

@@ -1,5 +1,34 @@
-Title:
-Rhisea: R Package for Mixed-Stock Analysis Extending HISEA with Flexible and Robust Classification Frameworks
+# Rhisea
 
-Abstract:
-Mixed-stock analysis (MSA) plays a critical role in fisheries science by quantifying the relative contributions of distinct populations to mixed catches. The historical HISEA program, written in Fortran, has been widely used for this purpose but remains limited by its legacy design, reliance on LDA, and lack of extensibility. To address these constraints, we introduce Rhisea, a modern and modular R package that faithfully reproduces HISEA’s core estimators while significantly enhancing its functionality. Rhisea offers support for multiple classification algorithms—including linear discriminant analysis, model-based clustering (MclustDA), decision trees, random forests, support vector machines, and neural networks, within a unified and user-friendly interface. The package functions enables seamless application of analysis, simulation, or bootstrap scenarios with fine-tuned control over classifier selection and parameterization. Simulation studies confirm Rhisea's consistency with the original HISEA under standard settings, while demonstrating improved robustness under model violations. This package provides a flexible framework for modern mixed-stock estimation, facilitating transparency, reproducibility, and methodological comparisons within the R ecosystem.
+> R Package for Mixed-Stock Analysis Extending HISEA with Flexible and Robust Classification Frameworks
+
+Rhisea modernizes and extends HISEA with flexible, robust classification frameworks to estimate source contributions and assign individuals to their stock of origin, with rigorous uncertainty quantification.
+
+## Key features:
+
+-   Drop-in compatibility with classic HISEA (FORTRAN) workflows, plus modern extensions
+-   Multiple classification approaches (parametric and nonparametric), or use your own model and apply HISEA estimators
+-   Estimation of stock proportions and individual assignment with uncertainty via bootstrap, cross-validation, and simulations
+-   Built-in diagnostics for transparent interpretation Designed for fisheries biologists, ecologists, managers, and analysts seeking robust, reproducible inferences to support decision-making
+
+## Table of contents
+
+-   [Installation](#installation)
+-   [Citation](#citation)
+
+## Installation {#installation}
+
+Rhisea can be installed from GitHub:
+
+``` r
+library(devtools)
+install_github("SostheneA/Rhisea", dependencies = TRUE)
+```
+
+## Citation {#citation}
+
+To cite Rhisea in publications use:
+
+``` r
+citation("Rhisea")
+```
