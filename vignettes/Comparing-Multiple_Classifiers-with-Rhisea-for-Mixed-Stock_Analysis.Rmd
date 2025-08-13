@@ -1,12 +1,12 @@
 ---
-title: "Comparing Multiple Classifiers with Rhisea for Mixed-Stock Analysis"
+title: "Comparing-Multiple_Classifiers-with-Rhisea-for-Mixed-Stock_Analysis"
 author: "Your Name"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Comparing Multiple Classifiers with Rhisea}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\\VignetteIndexEntry{Comparing-Multiple_Classifiers-with-Rhisea-for-Mixed-Stock_Analysis}
+  %\\VignetteEngine{knitr::rmarkdown}
+  %\\VignetteEncoding{UTF-8}
 ---
 
 # Introduction

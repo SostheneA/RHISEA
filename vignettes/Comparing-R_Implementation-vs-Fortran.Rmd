@@ -4,9 +4,9 @@ author: "Sosthene AKIA"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Comparing HISEA Estimators: R vs Fortran}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\\VignetteIndexEntry{Comparing HISEA Estimators: R Implementation vs Fortran}
+  %\\VignetteEngine{knitr::rmarkdown}
+  %\\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}

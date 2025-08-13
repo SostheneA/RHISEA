@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Using run_hisea_estimates() with Custom Classification Models</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Using <code>run_hisea_estimates()</code>
+with Custom Classification Models</h1>
+
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The <code>run_hisea_estimates()</code> function is a core component
+of the <strong>Rhisea</strong> package that allows users to
+<strong>build their own classification models</strong> and seamlessly
+integrate these results into the classical mixed-stock analysis
+framework originally implemented by the HISEA program.</p>
+<p>HISEA is widely used to estimate the proportions of different source
+populations (stocks) within a mixed sample based on known baseline data.
+It does so by combining classification outputs with sophisticated
+estimators and bootstrap procedures to provide robust stock composition
+estimates along with measures of uncertainty.</p>
+<div id="purpose-of-run_hisea_estimates" class="section level3">
+<h3>Purpose of <code>run_hisea_estimates()</code></h3>
+<p>This function facilitates the application of <strong>any
+classification algorithm</strong> that outputs:</p>
+<ul>
+<li><strong>Pseudo-class assignments</strong> for each mixture sample
+(i.e., predicted class labels),</li>
+<li><strong>Class likelihoods or posterior probabilities</strong> for
+each mixture sample (probability of belonging to each stock),</li>
+<li>The <strong>confusion matrix or phi matrix</strong> derived from
+cross-validation on the baseline data, representing classification
+accuracy and error rates.</li>
+</ul>
+<p>By accepting these key inputs, <code>run_hisea_estimates()</code>
+replicates the five classical HISEA estimators:</p>
+<p>From Raw estimator (based directly on pseudo-classes) to ML
+estimator.</p>
+<p>This allows users to <strong>combine modern or custom classifiers
+with the trusted HISEA estimation framework</strong>, obtaining stock
+proportion estimates and associated confidence measures that are
+directly comparable to the original HISEA output.</p>
+</div>
+<div id="what-you-need-to-provide" class="section level3">
+<h3>What you need to provide</h3>
+<p>To use <code>run_hisea_estimates()</code>, you need to supply the
+following:</p>
+<ul>
+<li><code>pseudo_classes</code>: An integer vector of predicted classes
+(one per mixture individual), as produced by your classifier.</li>
+<li><code>likelihoods</code>: A numeric matrix of posterior
+probabilities or class likelihoods for each mixture individual across
+all stocks (columns correspond to stocks).</li>
+<li><code>phi_matrix</code>: The phi matrix (classification error
+matrix) computed from cross-validation on your baseline data. This
+matrix captures how often each stock is classified as each other stock,
+accounting for misclassification rates.</li>
+<li><code>np</code>: Number of populations or stocks in your baseline
+data.</li>
+<li><code>stocks_names</code>: Character vector naming each stock in
+order.</li>
+<li><code>type</code>: Estimation type, typically
+<code>&quot;BOOTSTRAP&quot;</code> for bootstrap confidence intervals or
+<code>&quot;ANALYSIS&quot;</code>.</li>
+<li>Additional arguments for output control, such as
+<code>export_csv</code> and <code>output_dir</code>.</li>
+</ul>
+</div>
+<div id="how-it-works-internally" class="section level3">
+<h3>How it works internally</h3>
+<p>The function uses the provided pseudo-classes and likelihoods as
+inputs to the five estimators implemented in HISEA, incorporating the
+phi matrix to adjust for classification uncertainty and errors. It runs
+bootstrap replicates to compute confidence intervals and standard
+deviations for the estimated stock proportions, enabling statistically
+sound inference.</p>
+<hr />
+</div>
+</div>
+<div id="linear-discriminant-analysis-lda" class="section level2">
+<h2>1. Linear Discriminant Analysis (LDA)</h2>
+<p>We start with a classical parametric classifier, LDA, to illustrate
+the workflow.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co"># Load required packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(MASS)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="fu">library</span>(Rhisea)</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a><span class="co"># Load baseline and mixture data</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>baseline_file <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;baseline.rda&quot;</span>, <span class="at">package =</span> <span class="st">&quot;Rhisea&quot;</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>mixture_file  <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;extdata&quot;</span>, <span class="st">&quot;mixture.rda&quot;</span>,  <span class="at">package =</span> <span class="st">&quot;Rhisea&quot;</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="fu">load</span>(baseline_file)  <span class="co"># loads `baseline` data.frame</span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="fu">load</span>(mixture_file)   <span class="co"># loads `mixture` data.frame</span></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a><span class="co"># Prepare baseline data</span></span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>baseline<span class="sc">$</span>population <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(baseline<span class="sc">$</span>population)</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>stocks_names <span class="ot">&lt;-</span> <span class="fu">levels</span>(baseline<span class="sc">$</span>population)</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>np <span class="ot">&lt;-</span> <span class="fu">length</span>(stocks_names)</span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a><span class="co"># Define formula for classification</span></span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>formula <span class="ot">&lt;-</span> population <span class="sc">~</span> d13c <span class="sc">+</span> d18o</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a><span class="co"># Function to perform stratified k-fold CV and compute phi matrix for LDA</span></span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>get_cv_results_lda <span class="ot">&lt;-</span> <span class="cf">function</span>(data, formula, <span class="at">k =</span> <span class="dv">10</span>) {</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>  folds <span class="ot">&lt;-</span> <span class="fu">createFolds</span>(data<span class="sc">$</span>population, <span class="at">k =</span> k, <span class="at">list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>  </span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>  all_predictions <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="cn">NA</span>, <span class="fu">nrow</span>(data)), <span class="at">levels =</span> <span class="fu">levels</span>(data<span class="sc">$</span>population))</span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a>  all_probabilities <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> <span class="fu">nrow</span>(data), <span class="at">ncol =</span> <span class="fu">length</span>(<span class="fu">levels</span>(data<span class="sc">$</span>population)),</span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a>                              <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">levels</span>(data<span class="sc">$</span>population)))</span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a>  </span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="fu">seq_along</span>(folds)) {</span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a>    test_idx <span class="ot">&lt;-</span> folds[[i]]</span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a>    train_data <span class="ot">&lt;-</span> data[<span class="sc">-</span>test_idx, ]</span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a>    test_data <span class="ot">&lt;-</span> data[test_idx, ]</span>
+<span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a>    </span>
+<span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a>    model <span class="ot">&lt;-</span> <span class="fu">lda</span>(formula, <span class="at">data =</span> train_data)</span>
+<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a>    pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, test_data)</span>
+<span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a>    all_predictions[test_idx] <span class="ot">&lt;-</span> pred<span class="sc">$</span>class</span>
+<span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a>    all_probabilities[test_idx, ] <span class="ot">&lt;-</span> pred<span class="sc">$</span>posterior</span>
+<span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a>  }</span>
+<span id="cb1-42"><a href="#cb1-42" tabindex="-1"></a>  </span>
+<span id="cb1-43"><a href="#cb1-43" tabindex="-1"></a>  conf_matrix <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="at">Predicted =</span> all_predictions, <span class="at">Actual =</span> data<span class="sc">$</span>population)</span>
+<span id="cb1-44"><a href="#cb1-44" tabindex="-1"></a>  phi_matrix <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(conf_matrix, <span class="at">margin =</span> <span class="dv">2</span>)</span>
+<span id="cb1-45"><a href="#cb1-45" tabindex="-1"></a>  </span>
+<span id="cb1-46"><a href="#cb1-46" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">confusion_matrix =</span> conf_matrix,</span>
+<span id="cb1-47"><a href="#cb1-47" tabindex="-1"></a>       <span class="at">phi_matrix =</span> phi_matrix,</span>
+<span id="cb1-48"><a href="#cb1-48" tabindex="-1"></a>       <span class="at">predictions =</span> all_predictions,</span>
+<span id="cb1-49"><a href="#cb1-49" tabindex="-1"></a>       <span class="at">probabilities =</span> all_probabilities)</span>
+<span id="cb1-50"><a href="#cb1-50" tabindex="-1"></a>}</span>
+<span id="cb1-51"><a href="#cb1-51" tabindex="-1"></a></span>
+<span id="cb1-52"><a href="#cb1-52" tabindex="-1"></a><span class="co"># Run CV and get phi matrix</span></span>
+<span id="cb1-53"><a href="#cb1-53" tabindex="-1"></a>lda_cv <span class="ot">&lt;-</span> <span class="fu">get_cv_results_lda</span>(baseline, formula)</span>
+<span id="cb1-54"><a href="#cb1-54" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" tabindex="-1"></a><span class="co"># Train full LDA model on baseline</span></span>
+<span id="cb1-56"><a href="#cb1-56" tabindex="-1"></a>lda_model <span class="ot">&lt;-</span> <span class="fu">lda</span>(formula, <span class="at">data =</span> baseline)</span>
+<span id="cb1-57"><a href="#cb1-57" tabindex="-1"></a></span>
+<span id="cb1-58"><a href="#cb1-58" tabindex="-1"></a><span class="co"># Prepare mixture data for prediction</span></span>
+<span id="cb1-59"><a href="#cb1-59" tabindex="-1"></a>mix_data_prepared <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-60"><a href="#cb1-60" tabindex="-1"></a>  <span class="at">d13c =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(mixture<span class="sc">$</span>d13c_ukn)),</span>
+<span id="cb1-61"><a href="#cb1-61" tabindex="-1"></a>  <span class="at">d18o =</span> <span class="fu">as.numeric</span>(<span class="fu">as.character</span>(mixture<span class="sc">$</span>d18o_ukn))</span>
+<span id="cb1-62"><a href="#cb1-62" tabindex="-1"></a>)</span>
+<span id="cb1-63"><a href="#cb1-63" tabindex="-1"></a></span>
+<span id="cb1-64"><a href="#cb1-64" tabindex="-1"></a><span class="co"># Predict classes and posterior probabilities for mixture</span></span>
+<span id="cb1-65"><a href="#cb1-65" tabindex="-1"></a>lda_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(lda_model, mix_data_prepared)</span>
+<span id="cb1-66"><a href="#cb1-66" tabindex="-1"></a>lda_classes <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(lda_pred<span class="sc">$</span>class)</span>
+<span id="cb1-67"><a href="#cb1-67" tabindex="-1"></a>lda_probs <span class="ot">&lt;-</span> lda_pred<span class="sc">$</span>posterior</span>
+<span id="cb1-68"><a href="#cb1-68" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" tabindex="-1"></a><span class="co"># Convert phi matrix to numeric matrix if needed</span></span>
+<span id="cb1-70"><a href="#cb1-70" tabindex="-1"></a>phi_matrix_numeric <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(lda_cv<span class="sc">$</span>phi_matrix)</span>
+<span id="cb1-71"><a href="#cb1-71" tabindex="-1"></a>phi_matrix_numeric <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">as.numeric</span>(phi_matrix_numeric), <span class="at">nrow =</span> <span class="fu">nrow</span>(phi_matrix_numeric), <span class="at">ncol =</span> <span class="fu">ncol</span>(phi_matrix_numeric))</span>
+<span id="cb1-72"><a href="#cb1-72" tabindex="-1"></a></span>
+<span id="cb1-73"><a href="#cb1-73" tabindex="-1"></a><span class="co"># Run HISEA estimates with LDA results</span></span>
+<span id="cb1-74"><a href="#cb1-74" tabindex="-1"></a>lda_results <span class="ot">&lt;-</span> <span class="fu">run_hisea_estimates</span>(</span>
+<span id="cb1-75"><a href="#cb1-75" tabindex="-1"></a>  <span class="at">pseudo_classes =</span> lda_classes,</span>
+<span id="cb1-76"><a href="#cb1-76" tabindex="-1"></a>  <span class="at">likelihoods =</span> lda_probs,</span>
+<span id="cb1-77"><a href="#cb1-77" tabindex="-1"></a>  <span class="at">phi_matrix =</span> phi_matrix_numeric,</span>
+<span id="cb1-78"><a href="#cb1-78" tabindex="-1"></a>  <span class="at">np =</span> np,</span>
+<span id="cb1-79"><a href="#cb1-79" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;BOOTSTRAP&quot;</span>,</span>
+<span id="cb1-80"><a href="#cb1-80" tabindex="-1"></a>  <span class="at">stocks_names =</span> stocks_names,</span>
+<span id="cb1-81"><a href="#cb1-81" tabindex="-1"></a>  <span class="at">export_csv =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-82"><a href="#cb1-82" tabindex="-1"></a>  <span class="at">output_dir =</span> <span class="st">&quot;results_lda&quot;</span>,</span>
+<span id="cb1-83"><a href="#cb1-83" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb1-84"><a href="#cb1-84" tabindex="-1"></a>)</span>
+<span id="cb1-85"><a href="#cb1-85" tabindex="-1"></a></span>
+<span id="cb1-86"><a href="#cb1-86" tabindex="-1"></a><span class="co"># Display results</span></span>
+<span id="cb1-87"><a href="#cb1-87" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">LDA Results - Mean Estimates:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+## LDA Results - Mean Estimates:</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">print</span>(lda_results<span class="sc">$</span>mean_estimates)</span></code></pre></div>
+<pre><code>##            RAW      COOK     COOKC        EM        ML
+## East 0.3769222 0.3399873 0.3399873 0.3399875 0.3215246
+## West 0.6230778 0.6600127 0.6600127 0.6600125 0.6784754</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">LDA Results - Standard Deviations:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+## LDA Results - Standard Deviations:</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">print</span>(lda_results<span class="sc">$</span>sd_estimates)</span></code></pre></div>
+<pre><code>##              RAW        COOK       COOKC          EM          ML
+## East 0.007109503 0.008140653 0.008140653 0.008140603 0.008542696
+## West 0.007109503 0.008140653 0.008140653 0.008140603 0.008542696</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Visualization of results</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>results_long <span class="ot">&lt;-</span> <span class="fu">melt</span>(lda_results<span class="sc">$</span>mean_estimates)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="fu">colnames</span>(results_long) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Stock&quot;</span>, <span class="st">&quot;Method&quot;</span>, <span class="st">&quot;Proportion&quot;</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="fu">ggplot</span>(results_long, <span class="fu">aes</span>(<span class="at">x =</span> Method, <span class="at">y =</span> Proportion, <span class="at">fill =</span> Stock)) <span class="sc">+</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>) <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;LDA Stock Proportion Estimates&quot;</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Estimated Proportion&quot;</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Estimation Method&quot;</span>) <span class="sc">+</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<hr />
+</div>
+<div id="random-forest-rf" class="section level2">
+<h2>2. Random Forest (RF)</h2>
+<p>Next, we apply Random Forest, a powerful ensemble learning
+method.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co"># Function to perform stratified k-fold CV and compute phi matrix for RF</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>get_cv_results_rf <span class="ot">&lt;-</span> <span class="cf">function</span>(data, formula, <span class="at">k =</span> <span class="dv">10</span>, <span class="at">ntree =</span> <span class="dv">500</span>) {</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  folds <span class="ot">&lt;-</span> <span class="fu">createFolds</span>(data<span class="sc">$</span>population, <span class="at">k =</span> k, <span class="at">list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>  </span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a>  all_predictions <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="cn">NA</span>, <span class="fu">nrow</span>(data)), <span class="at">levels =</span> <span class="fu">levels</span>(data<span class="sc">$</span>population))</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a>  all_probabilities <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> <span class="fu">nrow</span>(data), <span class="at">ncol =</span> <span class="fu">length</span>(<span class="fu">levels</span>(data<span class="sc">$</span>population)),</span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a>                              <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">levels</span>(data<span class="sc">$</span>population)))</span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a>  </span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="fu">seq_along</span>(folds)) {</span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a>    test_idx <span class="ot">&lt;-</span> folds[[i]]</span>
+<span id="cb10-14"><a href="#cb10-14" tabindex="-1"></a>    train_data <span class="ot">&lt;-</span> data[<span class="sc">-</span>test_idx, ]</span>
+<span id="cb10-15"><a href="#cb10-15" tabindex="-1"></a>    test_data <span class="ot">&lt;-</span> data[test_idx, ]</span>
+<span id="cb10-16"><a href="#cb10-16" tabindex="-1"></a>    </span>
+<span id="cb10-17"><a href="#cb10-17" tabindex="-1"></a>    model <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(formula, <span class="at">data =</span> train_data, <span class="at">ntree =</span> ntree)</span>
+<span id="cb10-18"><a href="#cb10-18" tabindex="-1"></a>    all_predictions[test_idx] <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, test_data)</span>
+<span id="cb10-19"><a href="#cb10-19" tabindex="-1"></a>    all_probabilities[test_idx, ] <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, test_data, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)</span>
+<span id="cb10-20"><a href="#cb10-20" tabindex="-1"></a>  }</span>
+<span id="cb10-21"><a href="#cb10-21" tabindex="-1"></a>  </span>
+<span id="cb10-22"><a href="#cb10-22" tabindex="-1"></a>  conf_matrix <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="at">Predicted =</span> all_predictions, <span class="at">Actual =</span> data<span class="sc">$</span>population)</span>
+<span id="cb10-23"><a href="#cb10-23" tabindex="-1"></a>  phi_matrix <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(conf_matrix, <span class="at">margin =</span> <span class="dv">2</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" tabindex="-1"></a>  </span>
+<span id="cb10-25"><a href="#cb10-25" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">confusion_matrix =</span> conf_matrix,</span>
+<span id="cb10-26"><a href="#cb10-26" tabindex="-1"></a>       <span class="at">phi_matrix =</span> phi_matrix,</span>
+<span id="cb10-27"><a href="#cb10-27" tabindex="-1"></a>       <span class="at">predictions =</span> all_predictions,</span>
+<span id="cb10-28"><a href="#cb10-28" tabindex="-1"></a>       <span class="at">probabilities =</span> all_probabilities)</span>
+<span id="cb10-29"><a href="#cb10-29" tabindex="-1"></a>}</span>
+<span id="cb10-30"><a href="#cb10-30" tabindex="-1"></a></span>
+<span id="cb10-31"><a href="#cb10-31" tabindex="-1"></a><span class="co"># Run CV and get phi matrix</span></span>
+<span id="cb10-32"><a href="#cb10-32" tabindex="-1"></a>rf_cv <span class="ot">&lt;-</span> <span class="fu">get_cv_results_rf</span>(baseline, formula, <span class="at">ntree =</span> <span class="dv">500</span>)</span>
+<span id="cb10-33"><a href="#cb10-33" tabindex="-1"></a></span>
+<span id="cb10-34"><a href="#cb10-34" tabindex="-1"></a><span class="co"># Train full RF model on baseline</span></span>
+<span id="cb10-35"><a href="#cb10-35" tabindex="-1"></a>rf_model <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(formula, <span class="at">data =</span> baseline, <span class="at">ntree =</span> <span class="dv">500</span>)</span>
+<span id="cb10-36"><a href="#cb10-36" tabindex="-1"></a></span>
+<span id="cb10-37"><a href="#cb10-37" tabindex="-1"></a><span class="co"># Predict classes and posterior probabilities for mixture</span></span>
+<span id="cb10-38"><a href="#cb10-38" tabindex="-1"></a>rf_probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_model, mix_data_prepared, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)</span>
+<span id="cb10-39"><a href="#cb10-39" tabindex="-1"></a>rf_classes <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">predict</span>(rf_model, mix_data_prepared))</span>
+<span id="cb10-40"><a href="#cb10-40" tabindex="-1"></a></span>
+<span id="cb10-41"><a href="#cb10-41" tabindex="-1"></a><span class="co"># Run HISEA estimates with RF results</span></span>
+<span id="cb10-42"><a href="#cb10-42" tabindex="-1"></a>rf_results <span class="ot">&lt;-</span> <span class="fu">run_hisea_estimates</span>(</span>
+<span id="cb10-43"><a href="#cb10-43" tabindex="-1"></a>  <span class="at">pseudo_classes =</span> rf_classes,</span>
+<span id="cb10-44"><a href="#cb10-44" tabindex="-1"></a>  <span class="at">likelihoods =</span> rf_probs,</span>
+<span id="cb10-45"><a href="#cb10-45" tabindex="-1"></a>  <span class="at">phi_matrix =</span> rf_cv<span class="sc">$</span>phi_matrix,</span>
+<span id="cb10-46"><a href="#cb10-46" tabindex="-1"></a>  <span class="at">np =</span> np,</span>
+<span id="cb10-47"><a href="#cb10-47" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;BOOTSTRAP&quot;</span>,</span>
+<span id="cb10-48"><a href="#cb10-48" tabindex="-1"></a>  <span class="at">stocks_names =</span> stocks_names,</span>
+<span id="cb10-49"><a href="#cb10-49" tabindex="-1"></a>  <span class="at">export_csv =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb10-50"><a href="#cb10-50" tabindex="-1"></a>  <span class="at">output_dir =</span> <span class="st">&quot;results_rf&quot;</span>,</span>
+<span id="cb10-51"><a href="#cb10-51" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb10-52"><a href="#cb10-52" tabindex="-1"></a>)</span>
+<span id="cb10-53"><a href="#cb10-53" tabindex="-1"></a></span>
+<span id="cb10-54"><a href="#cb10-54" tabindex="-1"></a><span class="co"># Display results</span></span>
+<span id="cb10-55"><a href="#cb10-55" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Random Forest Results - Mean Estimates:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+## Random Forest Results - Mean Estimates:</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="fu">print</span>(rf_results<span class="sc">$</span>mean_estimates)</span></code></pre></div>
+<pre><code>##            RAW      COOK     COOKC        EM        ML
+## East 0.3804471 0.3790505 0.3790505 0.3790505 0.3514208
+## West 0.6195529 0.6209495 0.6209495 0.6209495 0.6485792</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Random Forest Results - Standard Deviations:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+## Random Forest Results - Standard Deviations:</code></pre>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="fu">print</span>(rf_results<span class="sc">$</span>sd_estimates)</span></code></pre></div>
+<pre><code>##              RAW        COOK       COOKC          EM          ML
+## East 0.007404837 0.007933754 0.007933754 0.007933747 0.008880836
+## West 0.007404837 0.007933754 0.007933754 0.007933747 0.008880836</code></pre>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># Visualization of results</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>results_long <span class="ot">&lt;-</span> <span class="fu">melt</span>(rf_results<span class="sc">$</span>mean_estimates)</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a><span class="fu">colnames</span>(results_long) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Stock&quot;</span>, <span class="st">&quot;Method&quot;</span>, <span class="st">&quot;Proportion&quot;</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="fu">ggplot</span>(results_long, <span class="fu">aes</span>(<span class="at">x =</span> Method, <span class="at">y =</span> Proportion, <span class="at">fill =</span> Stock)) <span class="sc">+</span></span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>) <span class="sc">+</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Random Forest Stock Proportion Estimates&quot;</span>,</span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Estimated Proportion&quot;</span>,</span>
+<span id="cb18-10"><a href="#cb18-10" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Estimation Method&quot;</span>) <span class="sc">+</span></span>
+<span id="cb18-11"><a href="#cb18-11" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<hr />
+</div>
+<div id="conditional-inference-tree-ctree" class="section level2">
+<h2>3. Conditional Inference Tree (CTREE)</h2>
+<p>Finally, we demonstrate a non-parametric tree method based on
+permutation tests.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">library</span>(party)</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="co"># Function to perform stratified k-fold CV and compute phi matrix for CTREE</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>get_cv_results_ctree <span class="ot">&lt;-</span> <span class="cf">function</span>(data, formula, <span class="at">k =</span> <span class="dv">10</span>) {</span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a>  <span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" tabindex="-1"></a>  folds <span class="ot">&lt;-</span> <span class="fu">createFolds</span>(data<span class="sc">$</span>population, <span class="at">k =</span> k, <span class="at">list =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" tabindex="-1"></a>  </span>
+<span id="cb19-8"><a href="#cb19-8" tabindex="-1"></a>  all_predictions <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="cn">NA</span>, <span class="fu">nrow</span>(data)), <span class="at">levels =</span> <span class="fu">levels</span>(data<span class="sc">$</span>population))</span>
+<span id="cb19-9"><a href="#cb19-9" tabindex="-1"></a>  all_probabilities <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">nrow =</span> <span class="fu">nrow</span>(data), <span class="at">ncol =</span> <span class="fu">length</span>(<span class="fu">levels</span>(data<span class="sc">$</span>population)),</span>
+<span id="cb19-10"><a href="#cb19-10" tabindex="-1"></a>                              <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, <span class="fu">levels</span>(data<span class="sc">$</span>population)))</span>
+<span id="cb19-11"><a href="#cb19-11" tabindex="-1"></a>  </span>
+<span id="cb19-12"><a href="#cb19-12" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="fu">seq_along</span>(folds)) {</span>
+<span id="cb19-13"><a href="#cb19-13" tabindex="-1"></a>    test_idx <span class="ot">&lt;-</span> folds[[i]]</span>
+<span id="cb19-14"><a href="#cb19-14" tabindex="-1"></a>    train_data <span class="ot">&lt;-</span> data[<span class="sc">-</span>test_idx, ]</span>
+<span id="cb19-15"><a href="#cb19-15" tabindex="-1"></a>    test_data <span class="ot">&lt;-</span> data[test_idx, ]</span>
+<span id="cb19-16"><a href="#cb19-16" tabindex="-1"></a>    </span>
+<span id="cb19-17"><a href="#cb19-17" tabindex="-1"></a>    model <span class="ot">&lt;-</span> <span class="fu">ctree</span>(formula, <span class="at">data =</span> train_data)</span>
+<span id="cb19-18"><a href="#cb19-18" tabindex="-1"></a>    pred_probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, test_data, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)</span>
+<span id="cb19-19"><a href="#cb19-19" tabindex="-1"></a>    pred_probs_matrix <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, pred_probs)</span>
+<span id="cb19-20"><a href="#cb19-20" tabindex="-1"></a>    all_predictions[test_idx] <span class="ot">&lt;-</span> <span class="fu">predict</span>(model, test_data)</span>
+<span id="cb19-21"><a href="#cb19-21" tabindex="-1"></a>    all_probabilities[test_idx, ] <span class="ot">&lt;-</span> pred_probs_matrix</span>
+<span id="cb19-22"><a href="#cb19-22" tabindex="-1"></a>  }</span>
+<span id="cb19-23"><a href="#cb19-23" tabindex="-1"></a>  </span>
+<span id="cb19-24"><a href="#cb19-24" tabindex="-1"></a>  conf_matrix <span class="ot">&lt;-</span> <span class="fu">table</span>(<span class="at">Predicted =</span> all_predictions, <span class="at">Actual =</span> data<span class="sc">$</span>population)</span>
+<span id="cb19-25"><a href="#cb19-25" tabindex="-1"></a>  phi_matrix <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(conf_matrix, <span class="at">margin =</span> <span class="dv">2</span>)</span>
+<span id="cb19-26"><a href="#cb19-26" tabindex="-1"></a>  </span>
+<span id="cb19-27"><a href="#cb19-27" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">confusion_matrix =</span> conf_matrix,</span>
+<span id="cb19-28"><a href="#cb19-28" tabindex="-1"></a>       <span class="at">phi_matrix =</span> phi_matrix,</span>
+<span id="cb19-29"><a href="#cb19-29" tabindex="-1"></a>       <span class="at">predictions =</span> all_predictions,</span>
+<span id="cb19-30"><a href="#cb19-30" tabindex="-1"></a>       <span class="at">probabilities =</span> all_probabilities)</span>
+<span id="cb19-31"><a href="#cb19-31" tabindex="-1"></a>}</span>
+<span id="cb19-32"><a href="#cb19-32" tabindex="-1"></a></span>
+<span id="cb19-33"><a href="#cb19-33" tabindex="-1"></a><span class="co"># Run CV and get phi matrix</span></span>
+<span id="cb19-34"><a href="#cb19-34" tabindex="-1"></a>ctree_cv <span class="ot">&lt;-</span> <span class="fu">get_cv_results_ctree</span>(baseline, formula)</span>
+<span id="cb19-35"><a href="#cb19-35" tabindex="-1"></a></span>
+<span id="cb19-36"><a href="#cb19-36" tabindex="-1"></a><span class="co"># Train full CTREE model on baseline</span></span>
+<span id="cb19-37"><a href="#cb19-37" tabindex="-1"></a>ctree_model <span class="ot">&lt;-</span> <span class="fu">ctree</span>(formula, <span class="at">data =</span> baseline,</span>
+<span id="cb19-38"><a href="#cb19-38" tabindex="-1"></a>                     <span class="at">controls =</span> <span class="fu">ctree_control</span>(<span class="at">mincriterion =</span> <span class="fl">0.95</span>,</span>
+<span id="cb19-39"><a href="#cb19-39" tabindex="-1"></a>                                              <span class="at">minsplit =</span> <span class="dv">20</span>,</span>
+<span id="cb19-40"><a href="#cb19-40" tabindex="-1"></a>                                              <span class="at">minbucket =</span> <span class="dv">7</span>))</span>
+<span id="cb19-41"><a href="#cb19-41" tabindex="-1"></a></span>
+<span id="cb19-42"><a href="#cb19-42" tabindex="-1"></a><span class="co"># Predict classes and posterior probabilities for mixture</span></span>
+<span id="cb19-43"><a href="#cb19-43" tabindex="-1"></a>ctree_probs <span class="ot">&lt;-</span> <span class="fu">predict</span>(ctree_model, mix_data_prepared, <span class="at">type =</span> <span class="st">&quot;prob&quot;</span>)</span>
+<span id="cb19-44"><a href="#cb19-44" tabindex="-1"></a>ctree_probs_matrix <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, ctree_probs)</span>
+<span id="cb19-45"><a href="#cb19-45" tabindex="-1"></a>ctree_classes <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(<span class="fu">predict</span>(ctree_model, mix_data_prepared))</span>
+<span id="cb19-46"><a href="#cb19-46" tabindex="-1"></a></span>
+<span id="cb19-47"><a href="#cb19-47" tabindex="-1"></a><span class="co"># Run HISEA estimates with CTREE results</span></span>
+<span id="cb19-48"><a href="#cb19-48" tabindex="-1"></a>ctree_results <span class="ot">&lt;-</span> <span class="fu">run_hisea_estimates</span>(</span>
+<span id="cb19-49"><a href="#cb19-49" tabindex="-1"></a>  <span class="at">pseudo_classes =</span> ctree_classes,</span>
+<span id="cb19-50"><a href="#cb19-50" tabindex="-1"></a>  <span class="at">likelihoods =</span> ctree_probs_matrix,</span>
+<span id="cb19-51"><a href="#cb19-51" tabindex="-1"></a>  <span class="at">phi_matrix =</span> ctree_cv<span class="sc">$</span>phi_matrix,</span>
+<span id="cb19-52"><a href="#cb19-52" tabindex="-1"></a>  <span class="at">np =</span> np,</span>
+<span id="cb19-53"><a href="#cb19-53" tabindex="-1"></a>  <span class="at">type =</span> <span class="st">&quot;BOOTSTRAP&quot;</span>,</span>
+<span id="cb19-54"><a href="#cb19-54" tabindex="-1"></a>  <span class="at">stocks_names =</span> stocks_names,</span>
+<span id="cb19-55"><a href="#cb19-55" tabindex="-1"></a>  <span class="at">export_csv =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb19-56"><a href="#cb19-56" tabindex="-1"></a>  <span class="at">output_dir =</span> <span class="st">&quot;results_ctree&quot;</span>,</span>
+<span id="cb19-57"><a href="#cb19-57" tabindex="-1"></a>  <span class="at">verbose =</span> <span class="cn">FALSE</span></span>
+<span id="cb19-58"><a href="#cb19-58" tabindex="-1"></a>)</span>
+<span id="cb19-59"><a href="#cb19-59" tabindex="-1"></a></span>
+<span id="cb19-60"><a href="#cb19-60" tabindex="-1"></a><span class="co"># Display results</span></span>
+<span id="cb19-61"><a href="#cb19-61" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">CTREE Results - Mean Estimates:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+## CTREE Results - Mean Estimates:</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">print</span>(ctree_results<span class="sc">$</span>mean_estimates)</span></code></pre></div>
+<pre><code>##            RAW      COOK     COOKC        EM       ML
+## East 0.4023718 0.3843952 0.3843952 0.3843952 0.328979
+## West 0.5976282 0.6156048 0.6156048 0.6156048 0.671021</code></pre>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">CTREE Results - Standard Deviations:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span></code></pre></div>
+<pre><code>## 
+## CTREE Results - Standard Deviations:</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">print</span>(ctree_results<span class="sc">$</span>sd_estimates)</span></code></pre></div>
+<pre><code>##              RAW       COOK      COOKC          EM          ML
+## East 0.007095196 0.00812427 0.00812427 0.008124264 0.008600688
+## West 0.007095196 0.00812427 0.00812427 0.008124264 0.008600688</code></pre>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="co"># Visualize tree and results</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a><span class="fu">plot</span>(ctree_model)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>results_long <span class="ot">&lt;-</span> <span class="fu">melt</span>(ctree_results<span class="sc">$</span>mean_estimates)</span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a><span class="fu">colnames</span>(results_long) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Stock&quot;</span>, <span class="st">&quot;Method&quot;</span>, <span class="st">&quot;Proportion&quot;</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a><span class="fu">ggplot</span>(results_long, <span class="fu">aes</span>(<span class="at">x =</span> Method, <span class="at">y =</span> Proportion, <span class="at">fill =</span> Stock)) <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">&quot;identity&quot;</span>, <span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;CTREE Stock Proportion Estimates&quot;</span>,</span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">&quot;Estimated Proportion&quot;</span>,</span>
+<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">&quot;Estimation Method&quot;</span>) <span class="sc">+</span></span>
+<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<hr />
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>This vignette demonstrated how to:</p>
+<ul>
+<li>Prepare baseline and mixture data,</li>
+<li>Perform stratified cross-validation to estimate classification
+accuracy (phi matrix),</li>
+<li>Train various classifiers (LDA, RF, CTREE),</li>
+<li>Predict mixture sample classes and posterior probabilities,</li>
+<li>Run <code>run_hisea_estimates()</code> to get robust mixed-stock
+proportion estimates with confidence intervals,</li>
+<li>Visualize and interpret the results.</li>
+</ul>
+<p>You can extend this approach to any classification method that
+provides pseudo-classes and posterior probabilities, leveraging the
+classical HISEA framework within the <strong>Rhisea</strong>
+package.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

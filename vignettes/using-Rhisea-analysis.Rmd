@@ -4,9 +4,9 @@ author: "Sosthene AKIA"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using Rhisea for Mixed-Stock Analysis — Data frame vs HISEA format}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\\VignetteIndexEntry{Using Rhisea for Mixed-Stock Analysis: Data frame vs HISEA format}
+  %\\VignetteEngine{knitr::rmarkdown}
+  %\\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}

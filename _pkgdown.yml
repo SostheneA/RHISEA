@@ -1,0 +1,30 @@
+url: https://github.com/SostheneA/Rhisea
+
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+home:
+  title: "Rhisea"
+  description: "Rhisea: R Package for Mixed-Stock Analysis Extending HISEA"
+
+navbar:
+  structure:
+    left:
+      - home
+      - articles
+    right:
+      - github
+  components:
+    github:
+      icon: fa-github
+      aria-label: "GitHub repository"
+      href: https://github.com/SostheneA/Rhisea
+
+articles:
+  - title: "Tutorials"
+    contents:
+      - Comparing-Multiple_Classifiers-with-Rhisea-for-Mixed-Stock_Analysis
+      - Using-run_hisea_estimates-with-Custom_Classification_Models
+      - Comparing-R_Implementation-vs-Fortran
+      - using-Rhisea-analysis

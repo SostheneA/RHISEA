@@ -2,9 +2,9 @@
 title: "Using `run_hisea_estimates()` with Custom Classification Models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using run_hisea_estimates with Custom Classification Models}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+  %\\VignetteIndexEntry{Using `run_hisea_estimates()` with Custom Classification Models}
+  %\\VignetteEngine{knitr::rmarkdown}
+  %\\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
