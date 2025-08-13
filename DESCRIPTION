@@ -3,7 +3,8 @@ Type: Package
 Title: R Implementation of HISEA for Mixed Stock Analysis
 Version: 0.1.0
 Authors@R: 
-    person("Sosthene", "Akia", email = "sosthene.akia@dfo-mpo.ca", role = c("aut", "cre"))
+    c(person("Sosthene", "Akia", email = "sosthene.akia@dfo-mpo.ca", role = c("aut", "cre")),
+    person("Alex", "Hanke", email = "alex.hanke@dfo-mpo.ca", role = "aut"))
 Description: R implementation of the HISEA method for mixed stock analysis, 
     supporting multiple classifiers (LDA, RF, MCLUST, etc.) and estimators 
     (COOK, EM, ML). Includes simulation, bootstrap, and full analysis routines.

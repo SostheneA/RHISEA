@@ -1,6 +1,12 @@
 ---
 title: "Comparing built-in classification methods in Rhisea for mixed-stock analysis"
-author: "Sosthene AKIA & Alex Hanke"
+author:
+  - name: "Sosthene Akia"
+    email: "sosthene.akia@dfo-mpo.ca"
+    affiliation: "Fisheries and Oceans Canada"
+  - name: "Alex Hanke"
+    email: "alex.hanke@dfo-mpo.ca"
+    affiliation: "Fisheries and Oceans Canada"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

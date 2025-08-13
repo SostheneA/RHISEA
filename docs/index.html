@@ -55,7 +55,7 @@
 <div class="page-header"><h1 id="rhisea">Rhisea<a class="anchor" aria-label="anchor" href="#rhisea"></a>
 </h1></div>
 <blockquote>
-<p>R Package for Mixed-Stock Analysis Extending HISEA with Flexible and Robust Classification Frameworks</p>
+<p><em>R Package for Mixed-Stock Analysis Extending HISEA with Flexible and Robust Classification Frameworks</em></p>
 </blockquote>
 <p>Rhisea modernizes and extends HISEA with flexible, robust classification frameworks to estimate source contributions and assign individuals to their stock of origin, with rigorous uncertainty quantification.</p>
 <div class="section level2">
@@ -74,6 +74,28 @@
 <ul>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#citation">Citation</a></li>
+<li>
+<a href="#from-hisea-fortran-to-rhisea-modern-mixed-stock-analysis-in-r">From HISEA FORTRAN to Rhisea: Modern Mixed-Stock Analysis in R</a>
+<ul>
+<li><a href="#however-the-classical-hisea-had-important-limitations">However, the classical HISEA had important limitations:</a></li>
+<li>
+<a href="#the-modern-workflow-rhisea-in-r">The Modern Workflow: Rhisea in R</a>
+<ul>
+<li>
+<a href="#key-innovations">Key Innovations</a>
+<ul>
+<li><a href="#id_1--flexible-classifier-choice">1- Flexible Classifier Choice</a></li>
+<li><a href="#id_2--modern-data-handling">2- Modern Data Handling</a></li>
+<li><a href="#id_3--expanded-outputs--reproducibility">3- Expanded Outputs &amp; Reproducibility</a></li>
+<li><a href="#id_4--intuitive-modular-workflow">4- Intuitive, Modular Workflow</a></li>
+</ul>
+</li>
+<li><a href="#step-by-step-overview-see-diagram">Step-by-Step Overview (see diagram)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#conclusion-the-rhisea-advantage">Conclusion: The Rhisea Advantage</a></li>
 </ul>
 </div>
 <div class="section level2">
@@ -92,6 +114,91 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"Rhisea"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
+<div class="section level1">
+<h1 id="from-hisea-fortran-to-rhisea-modern-mixed-stock-analysis-in-r">From HISEA FORTRAN to Rhisea: Modern Mixed-Stock Analysis in R<a class="anchor" aria-label="anchor" href="#from-hisea-fortran-to-rhisea-modern-mixed-stock-analysis-in-r"></a>
+</h1>
+<p>Mixed-stock analysis is a fundamental tool for fisheries science, allowing estimation of the contributions of source populations to mixture samples (e.g., fisheries catches). The original HISEA program, implemented in FORTRAN, pioneered this approach with a robust statistical framework and introduced several estimators (Θ₁ to Θ₅) for stock proportion inference.</p>
+<div class="section level3">
+<h3 id="however-the-classical-hisea-had-important-limitations">However, the classical HISEA had important limitations:<a class="anchor" aria-label="anchor" href="#however-the-classical-hisea-had-important-limitations"></a>
+</h3>
+<ul>
+<li>Only a single built-in classifier (LDA/discriminant analysis), requiring the variables to be approximately multivariate normal with constant covariance matrices.</li>
+<li>Limited flexibility for integrating modern statistical learning approaches.</li>
+<li>Rigid input/output based on text files (<em>.std,</em> .mix, *.ctl), and no option to save intermediate or diagnostic results for downstream analysis.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="the-modern-workflow-rhisea-in-r">The Modern Workflow: Rhisea in R<a class="anchor" aria-label="anchor" href="#the-modern-workflow-rhisea-in-r"></a>
+</h2>
+<p>Rhisea builds on the foundation of HISEA and brings mixed-stock analysis into the present:</p>
+<div class="section level3">
+<h3 id="key-innovations">Key Innovations<a class="anchor" aria-label="anchor" href="#key-innovations"></a>
+</h3>
+<div class="section level4">
+<h4 id="id_1--flexible-classifier-choice">1- Flexible Classifier Choice<a class="anchor" aria-label="anchor" href="#id_1--flexible-classifier-choice"></a>
+</h4>
+<p>With Rhisea, you are not limited to LDA. Built-in support now exists for a wide range of modern supervised learning classifiers:</p>
+<ul>
+<li><p>Linear/Quadratic Discriminant Analysis (LDA, QDA, MASS)</p></li>
+<li><p>Mixture models (MCLUST)</p></li>
+<li><p>Decision Trees (CTREE, CART)</p></li>
+<li><p>Linear/Multinomial Regression (MLR)</p></li>
+<li><p>k-Nearest Neighbors (KNN, kknn)</p></li>
+<li><p>Support Vector Machines (SVM)</p></li>
+<li><p>Random Forests (RF, randomForest)</p></li>
+<li><p>Extreme Gradient Boosting (XGB)</p></li>
+<li><p>Artificial Neural Networks (ANN, nnet)</p></li>
+<li>
+<p>Naive Bayes (NB, e1071)</p>
+<p>…and you can even supply your own trained model and prediction function.</p>
+</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="id_2--modern-data-handling">2- Modern Data Handling<a class="anchor" aria-label="anchor" href="#id_2--modern-data-handling"></a>
+</h4>
+<p>You can work directly with R data frames—no need for fixed-format text files. However, full compatibility is retained: you may still use HISEA-formatted files for reproducibility or validation against legacy outputs.</p>
+</div>
+<div class="section level4">
+<h4 id="id_3--expanded-outputs--reproducibility">3- Expanded Outputs &amp; Reproducibility<a class="anchor" aria-label="anchor" href="#id_3--expanded-outputs--reproducibility"></a>
+</h4>
+<ul>
+<li>Rhisea logs not only the final report but can save all intermediate objects (classification probabilities, confusion matrices, etc.) as .rda files for downstream diagnostics and reproducibility.</li>
+<li>Results are summarized with confidence intervals via bootstrap, and automated visualizations are provided.</li>
+<li>All run parameters, models, and derived files can be archived for full transparency and reproducibility.</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="id_4--intuitive-modular-workflow">4- Intuitive, Modular Workflow<a class="anchor" aria-label="anchor" href="#id_4--intuitive-modular-workflow"></a>
+</h4>
+<p>Each step of the process is transparent: from baseline/mixture data ingestion → classifier choice and fitting → estimation with all classical HISEA estimators (Θ₁: Raw, Θ₂: Cook &amp; Lord, Θ₃: Cook Constrained, Θ₄: EM MillarC, Θ₅: EM ML) → summary and report. You control every aspect or automate it all.</p>
+</div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="step-by-step-overview-see-diagram">Step-by-Step Overview (see diagram)<a class="anchor" aria-label="anchor" href="#step-by-step-overview-see-diagram"></a>
+</h2>
+<ol style="list-style-type: decimal">
+<li>Start: Specify your inputs—choose between R data frames or HISEA .std/.mix control files.</li>
+<li>Classifier Selection: Easily select or define your choice of classification model for stock assignment.</li>
+<li>Model Training &amp; Validation: Fit the classifier to the baseline data, estimate the classification matrix (Φ), and validate model accuracy/confusion.</li>
+<li>Application to Mixture: Predict class probabilities for the mixture, obtain individual assignments and posterior probabilities.</li>
+<li>Estimation: Apply the suite of HISEA estimators to convert classification outputs to stock proportion estimates (Θ₁–Θ₅).</li>
+<li>Summary &amp; Reporting: Save a comprehensive summary report, with options to log all intermediate files (.rda).</li>
+<li>End: Ensure results are reproducible, documented, and ready for interpretation or downstream analysis.</li>
+</ol>
+<p><img src="images/HISEA%20_%20Mermaid.png"></p>
+</div>
+<div class="section level2">
+<h2 id="conclusion-the-rhisea-advantage">Conclusion: The Rhisea Advantage<a class="anchor" aria-label="anchor" href="#conclusion-the-rhisea-advantage"></a>
+</h2>
+<p>With Rhisea, you retain all the statistical rigor of original HISEA - including compatibility and reproducibility with legacy workflows - while gaining the flexibility, transparency, and analytic power of modern R. Advanced users can plug in custom classifiers, automate cross-validation, and leverage the full R ecosystem for further statistical or graphical analysis. All intermediate steps are traceable and archivable for robust, audit-friendly science.</p>
+<blockquote>
+<p><strong><em>“Reference: Millar, R.B. (1990),”A Versatile Computer Program for Mixed Stock Fishery Composition Estimation”, Can. Tech. Rep. Fish. Aquat. Sci. 1753: iii + 29 p.”</em></strong></p>
+</blockquote>
+</div>
+</div>
+
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
@@ -119,6 +226,7 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Sosthene Akia <br><small class="roles"> Author, maintainer </small>   </li>
+<li>Alex Hanke <br><small class="roles"> Author </small>   </li>
 </ul>
 </div>
 
@@ -129,7 +237,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Sosthene Akia.</p>
+  <p>Developed by Sosthene Akia, Alex Hanke.</p>
 </div>
 
 <div class="pkgdown-footer-right">

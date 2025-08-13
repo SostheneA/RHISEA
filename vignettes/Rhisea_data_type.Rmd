@@ -1,6 +1,12 @@
 ---
 title: "Two input paths in Rhisea: run_hisea_all with HISEA-style files or Dataframes"
-author: "Sosthene AKIA & Alex Hanke"
+author:
+  - name: "Sosthene Akia"
+    email: "sosthene.akia@dfo-mpo.ca"
+    affiliation: "Fisheries and Oceans Canada"
+  - name: "Alex Hanke"
+    email: "alex.hanke@dfo-mpo.ca"
+    affiliation: "Fisheries and Oceans Canada"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >

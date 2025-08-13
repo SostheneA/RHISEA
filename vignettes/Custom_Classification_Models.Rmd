@@ -1,5 +1,13 @@
 ---
 title: "Applying HISEA estimators to custom classification models with run_hisea_estimates"
+author:
+  - name: "Sosthene Akia"
+    email: "sosthene.akia@dfo-mpo.ca"
+    affiliation: "Fisheries and Oceans Canada"
+  - name: "Alex Hanke"
+    email: "alex.hanke@dfo-mpo.ca"
+    affiliation: "Fisheries and Oceans Canada"
+date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
   %\\VignetteIndexEntry{Applying HISEA estimators to custom classification models with run_hisea_estimates}

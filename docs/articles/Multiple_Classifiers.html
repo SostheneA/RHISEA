@@ -56,9 +56,19 @@
   <main id="main" class="col-md-9"><div class="page-header">
 
       <h1>Comparing built-in classification methods in Rhisea for mixed-stock analysis</h1>
-                        <h4 data-toc-skip class="author">Sosthene AKIA
-&amp; Alex Hanke</h4>
-            
+                        <h4 data-toc-skip class="author">Sosthene
+Akia</h4>
+            <address class="author_afil">
+      Fisheries and Oceans
+Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:sosthene.akia@dfo-mpo.ca" class="email">sosthene.akia@dfo-mpo.ca</a>
+      </address>
+                              <h4 data-toc-skip class="author">Alex
+Hanke</h4>
+            <address class="author_afil">
+      Fisheries and Oceans
+Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:alex.hanke@dfo-mpo.ca" class="email">alex.hanke@dfo-mpo.ca</a>
+      </address>
+                  
             <h4 data-toc-skip class="date">2025-08-13</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/SostheneA/Rhisea/blob/HEAD/vignettes/Multiple_Classifiers.Rmd"><code>vignettes/Multiple_Classifiers.Rmd</code></a></small>
@@ -312,15 +322,15 @@ and logs errors if any occur.</p>
 <span><span class="va">performance_summary</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_dfr</a></span><span class="op">(</span><span class="va">rda_files</span>, <span class="va">extract_metrics_from_rda</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">performance_summary</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                               Model Accuracy Kappa</span></span>
-<span><span class="co">## 1      ANN_ANALYSIS_20250813_112625    0.890 0.780</span></span>
-<span><span class="co">## 2      KNN_ANALYSIS_20250813_112148    0.940 0.880</span></span>
-<span><span class="co">## 3      LDA_ANALYSIS_20250813_105423    0.937 0.873</span></span>
-<span><span class="co">## 4 LDA_MASS_ANALYSIS_20250813_105500    0.937 0.873</span></span>
-<span><span class="co">## 5      MLR_ANALYSIS_20250813_114034    0.937 0.873</span></span>
-<span><span class="co">## 6       NB_ANALYSIS_20250813_113737    0.947 0.893</span></span>
-<span><span class="co">## 7      QDA_ANALYSIS_20250813_105536    0.943 0.887</span></span>
-<span><span class="co">## 8       RF_ANALYSIS_20250813_110929    0.963 0.927</span></span>
-<span><span class="co">## 9      SVM_ANALYSIS_20250813_111503    0.953 0.907</span></span></code></pre>
+<span><span class="co">## 1      ANN_ANALYSIS_20250813_150029    0.890 0.780</span></span>
+<span><span class="co">## 2      KNN_ANALYSIS_20250813_145650    0.940 0.880</span></span>
+<span><span class="co">## 3      LDA_ANALYSIS_20250813_143805    0.937 0.873</span></span>
+<span><span class="co">## 4 LDA_MASS_ANALYSIS_20250813_143848    0.937 0.873</span></span>
+<span><span class="co">## 5      MLR_ANALYSIS_20250813_150616    0.937 0.873</span></span>
+<span><span class="co">## 6       NB_ANALYSIS_20250813_150511    0.947 0.893</span></span>
+<span><span class="co">## 7      QDA_ANALYSIS_20250813_143935    0.943 0.887</span></span>
+<span><span class="co">## 8       RF_ANALYSIS_20250813_144855    0.963 0.927</span></span>
+<span><span class="co">## 9      SVM_ANALYSIS_20250813_145047    0.953 0.907</span></span></code></pre>
 <hr>
 </div>
 <div class="section level2">
@@ -377,7 +387,7 @@ analyses and reproducibility.</p></li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Sosthene Akia.</p>
+  <p>Developed by Sosthene Akia, Alex Hanke.</p>
 </div>
 
 <div class="pkgdown-footer-right">

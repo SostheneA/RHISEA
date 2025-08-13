@@ -1,6 +1,12 @@
 ---
 title: "Verifying compatibility: Rhisea (R) vs FORTRAN HISEA"
-author: "Sosthene AKIA & Alex Hanke"
+author:
+  - name: "Sosthene Akia"
+    email: "sosthene.akia@dfo-mpo.ca"
+    affiliation: "Fisheries and Oceans Canada"
+  - name: "Alex Hanke"
+    email: "alex.hanke@dfo-mpo.ca"
+    affiliation: "Fisheries and Oceans Canada"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
