@@ -1,6 +1,6 @@
 ---
 title: "Comparing-Multiple_Classifiers-with-Rhisea-for-Mixed-Stock_Analysis"
-author: "Your Name"
+author: "Sosthene AKIA & Alex Hanke"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -134,18 +134,19 @@ The script supports the following classifiers, all integrated in Rhisea’s `run
 
 # Run Automated Classifier Comparison
 
-```{r}
+```{r, warning=FALSE}
 # --- 3. Supported classifiers in run_hisea_all() ---
 models_to_run <- c(
   "LDA",        # custom LDF
   "LDA_MASS",   # MASS::lda
   "QDA",        # MASS::qda
   "RF",         # randomForest
+ # "XGB",         # xgboost::xgb.DMatrix
   "SVM",        # e1071::svm
   "KNN",        # class::knn
   "ANN",        # nnet::nnet
   "NB",         # e1071::naiveBayes
-  "MCLUST",     # mclust::MclustDA
+ # "MCLUST",     # mclust::MclustDA
   "MLR"         # nnet::multinom
 )
 
@@ -252,7 +253,7 @@ print(performance_summary)
 
 # Plot Accuracy and Kappa for Each Model
 
-```{r}
+```{r,fig.alt="Accuracy and Kappa for Each Model"}
 library(ggplot2)
 
 ggplot(performance_summary, aes(x = reorder(Model, Accuracy), y = Accuracy)) +

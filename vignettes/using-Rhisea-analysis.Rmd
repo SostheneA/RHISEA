@@ -1,10 +1,10 @@
 ---
-title: "Using Rhisea for Mixed-Stock Analysis: Data frame vs HISEA format"
-author: "Sosthene AKIA"
+title: "using-Rhisea-analysis"
+author: "Sosthene AKIA & Alex Hanke"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\\VignetteIndexEntry{Using Rhisea for Mixed-Stock Analysis: Data frame vs HISEA format}
+  %\\VignetteIndexEntry{using-Rhisea-analysis}
   %\\VignetteEngine{knitr::rmarkdown}
   %\\VignetteEncoding{UTF-8}
 ---

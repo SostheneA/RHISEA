@@ -1,10 +1,10 @@
 ---
-title: "Comparing HISEA Estimators: R Implementation vs Fortran"
-author: "Sosthene AKIA"
+title: "Comparing-R_Implementation-vs-Fortran"
+author: "Sosthene AKIA & Alex Hanke"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\\VignetteIndexEntry{Comparing HISEA Estimators: R Implementation vs Fortran}
+  %\\VignetteIndexEntry{Comparing-R_Implementation-vs-Fortran}
   %\\VignetteEngine{knitr::rmarkdown}
   %\\VignetteEncoding{UTF-8}
 ---

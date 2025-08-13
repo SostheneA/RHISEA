@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Using `run_hisea_estimates()` with Custom Classification Models • Rhisea</title>
+<title>Using-run_hisea_estimates-with-Custom_Classification_Models • Rhisea</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Using `run_hisea_estimates()` with Custom Classification Models">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Using-run_hisea_estimates-with-Custom_Classification_Models">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -29,6 +29,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item"><a class="nav-link" href="../articles/index.html">Articles</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -46,7 +47,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Using `run_hisea_estimates()` with Custom Classification Models</h1>
+      <h1>Using-run_hisea_estimates-with-Custom_Classification_Models</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/SostheneA/Rhisea/blob/HEAD/vignettes/Using-run_hisea_estimates-with-Custom_Classification_Models.Rmd"><code>vignettes/Using-run_hisea_estimates-with-Custom_Classification_Models.Rmd</code></a></small>
@@ -258,7 +259,7 @@ the workflow.</p>
 <span>       y <span class="op">=</span> <span class="st">"Estimated Proportion"</span>,</span>
 <span>       x <span class="op">=</span> <span class="st">"Estimation Method"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">45</span>, hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Using-run_hisea_estimates-with-Custom_Classification_Models_files/figure-html/lda-1.png" width="700"></p>
+<p><img src="Using-run_hisea_estimates-with-Custom_Classification_Models_files/figure-html/lda-1.png" alt="LDA classification results for mixed stock analysis" width="700"></p>
 <hr>
 </div>
 <div class="section level2">
@@ -350,7 +351,7 @@ method.</p>
 <span>       y <span class="op">=</span> <span class="st">"Estimated Proportion"</span>,</span>
 <span>       x <span class="op">=</span> <span class="st">"Estimation Method"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">45</span>, hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Using-run_hisea_estimates-with-Custom_Classification_Models_files/figure-html/rf-1.png" width="700"></p>
+<p><img src="Using-run_hisea_estimates-with-Custom_Classification_Models_files/figure-html/rf-1.png" alt="Random Forest classification results for mixed stock analysis" width="700"></p>
 <hr>
 </div>
 <div class="section level2">
@@ -439,7 +440,7 @@ permutation tests.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualize tree and results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ctree_model</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Using-run_hisea_estimates-with-Custom_Classification_Models_files/figure-html/ctree-1.png" width="700"></p>
+<p><img src="Using-run_hisea_estimates-with-Custom_Classification_Models_files/figure-html/ctree-1.png" alt="CTREE classification results for mixed stock analysis" width="700"></p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">ctree_results</span><span class="op">$</span><span class="va">mean_estimates</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">results_long</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stock"</span>, <span class="st">"Method"</span>, <span class="st">"Proportion"</span><span class="op">)</span></span>
@@ -451,7 +452,7 @@ permutation tests.</p>
 <span>       y <span class="op">=</span> <span class="st">"Estimated Proportion"</span>,</span>
 <span>       x <span class="op">=</span> <span class="st">"Estimation Method"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">45</span>, hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Using-run_hisea_estimates-with-Custom_Classification_Models_files/figure-html/ctree-2.png" width="700"></p>
+<p><img src="Using-run_hisea_estimates-with-Custom_Classification_Models_files/figure-html/ctree-2.png" alt="CTREE classification results for mixed stock analysis" width="700"></p>
 <hr>
 </div>
 <div class="section level2">

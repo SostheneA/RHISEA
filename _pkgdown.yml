@@ -12,6 +12,7 @@ navbar:
   structure:
     left:
       - home
+      - reference
       - articles
     right:
       - github
@@ -21,10 +22,68 @@ navbar:
       aria-label: "GitHub repository"
       href: https://github.com/SostheneA/Rhisea
 
+# Articles directly listed on the "Articles" page
 articles:
-  - title: "Tutorials"
+  - title: "Comparing Multiple Classifiers with Rhisea for Mixed-Stock Analysis"
     contents:
       - Comparing-Multiple_Classifiers-with-Rhisea-for-Mixed-Stock_Analysis
+
+  - title: "Using run_hisea_estimates with Custom Classification Models"
+    contents:
       - Using-run_hisea_estimates-with-Custom_Classification_Models
+
+  - title: "Comparing R Implementation vs Fortran"
+    contents:
       - Comparing-R_Implementation-vs-Fortran
+
+  - title: "Using Rhisea Analysis"
+    contents:
       - using-Rhisea-analysis
+
+
+# Function reference, organized in sections
+reference:
+  - title: "Main Analysis Functions"
+    desc: "Core functions to run HISEA analyses"
+    contents:
+      - run_hisea_all
+      - run_hisea_estimates
+      - simulate_mixture
+      - create_hisea_summary_report
+
+  - title: "Data Input and Output"
+    desc: "Functions to read, write, and prepare data for analysis"
+    contents:
+      - read_baseline
+      - read_mixture
+      - write_mix_from_dataframe
+      - write_std_from_dataframe
+      - process_hisea_input
+
+  - title: "Estimators and Algorithms"
+    desc: "Implementations of statistical estimators and algorithms"
+    contents:
+      - accel_em_algorithm
+      - em_algorithm
+      - compute_cook_estimators
+      - estimate_millar_theta4
+      - estimate_ml_theta5
+      - get_phi
+
+  - title: "Classification Tools"
+    desc: "Functions for classification models and related utilities"
+    contents:
+      - classify_samples
+      - compute_ldf_coefficients
+      - ordvec
+
+  - title: "Visualization and Output"
+    desc: "Plotting and summary printing functions"
+    contents:
+      - plot_hisea_theta
+      - print_hisea_summary
+
+  - title: "Internal Helpers"
+    desc: "Helper functions not usually called directly by users"
+    contents:
+      - .resample_baseline_data_helper

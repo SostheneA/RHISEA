@@ -1,8 +1,8 @@
 ---
-title: "Using `run_hisea_estimates()` with Custom Classification Models"
+title: "Using-run_hisea_estimates-with-Custom_Classification_Models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\\VignetteIndexEntry{Using `run_hisea_estimates()` with Custom Classification Models}
+  %\\VignetteIndexEntry{Using-run_hisea_estimates-with-Custom_Classification_Models}
   %\\VignetteEngine{knitr::rmarkdown}
   %\\VignetteEncoding{UTF-8}
 ---
@@ -53,7 +53,7 @@ The function uses the provided pseudo-classes and likelihoods as inputs to the f
 
 We start with a classical parametric classifier, LDA, to illustrate the workflow.
 
-```{r lda}
+```{r lda, fig.alt="LDA classification results for mixed stock analysis"}
 # Load required packages
 library(MASS)
 library(caret)
@@ -165,7 +165,7 @@ ggplot(results_long, aes(x = Method, y = Proportion, fill = Stock)) +
 
 Next, we apply Random Forest, a powerful ensemble learning method.
 
-```{r rf}
+```{r rf, fig.alt="Random Forest classification results for mixed stock analysis"}
 library(randomForest)
 
 # Function to perform stratified k-fold CV and compute phi matrix for RF
@@ -245,7 +245,7 @@ ggplot(results_long, aes(x = Method, y = Proportion, fill = Stock)) +
 
 Finally, we demonstrate a non-parametric tree method based on permutation tests.
 
-```{r ctree}
+```{r ctree, fig.alt="CTREE classification results for mixed stock analysis"}
 library(party)
 
 # Function to perform stratified k-fold CV and compute phi matrix for CTREE
