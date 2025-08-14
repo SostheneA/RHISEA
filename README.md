@@ -121,6 +121,7 @@ Each step of the process is transparent: from baseline/mixture data ingestion â†
 ![HISEA workflow diagram](man/figures/diagram.png)
 
 
+
 ## Conclusion: The Rhisea Advantage 
 
 With Rhisea, you retain all the statistical rigor of original HISEA - including compatibility and reproducibility with legacy workflows - while gaining the flexibility, transparency, and analytic power of modern R. Advanced users can plug in custom classifiers, automate cross-validation, and leverage the full R ecosystem for further statistical or graphical analysis. All intermediate steps are traceable and archivable for robust, audit-friendly science.
