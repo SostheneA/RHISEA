@@ -118,7 +118,7 @@ Each step of the process is transparent: from baseline/mixture data ingestion â†
 6.  Summary & Reporting: Save a comprehensive summary report, with options to log all intermediate files (.rda).
 7.  End: Ensure results are reproducible, documented, and ready for interpretation or downstream analysis.
 
-![HISEA workflow diagram](man/figures/HISEA%20_%20Mermaid.png)
+![HISEA workflow diagram](man/figures/diagram.png)
 
 
 ## Conclusion: The Rhisea Advantage 
