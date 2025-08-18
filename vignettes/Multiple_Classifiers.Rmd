@@ -1,5 +1,5 @@
 ---
-title: "Comparing built-in classification methods in Rhisea for mixed-stock analysis"
+title: "Comparing built-in classification methods in RHISEA for mixed-stock analysis"
 author:
   - name: "Sosthene Akia"
     email: "sosthene.akia@dfo-mpo.ca"
@@ -10,7 +10,7 @@ author:
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\\VignetteIndexEntry{Comparing built-in classification methods in Rhisea for mixed-stock analysis}
+  %\\VignetteIndexEntry{Comparing built-in classification methods in RHISEA for mixed-stock analysis}
   %\\VignetteEngine{knitr::rmarkdown}
   %\\VignetteEncoding{UTF-8}
 ---
@@ -23,9 +23,9 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 # Introduction
 
-This vignette demonstrates how to **perform a comprehensive comparison of multiple classification models** for mixed-stock analysis using the **Rhisea** package.
+This vignette demonstrates how to **perform a comprehensive comparison of multiple classification models** for mixed-stock analysis using the **RHISEA** package.
 
-Rhisea extends the classical HISEA mixed-stock analysis framework by allowing users to incorporate a variety of modern classifiers and evaluate their performance on the same dataset.
+RHISEA extends the classical HISEA mixed-stock analysis framework by allowing users to incorporate a variety of modern classifiers and evaluate their performance on the same dataset.
 
 By running the provided **automated classifier comparison script**, you will be able to:
 
@@ -41,15 +41,15 @@ By running the provided **automated classifier comparison script**, you will be 
 # Setup and Required Libraries
 
 ```{r}
-library(Rhisea)
-library(Rhisea)
+library(RHISEA)
+library(RHISEA)
 library(writexl)
 library(mclust)
 library(ggplot2)
 
 # --- 0. Install and load required libraries ---
 required_pkgs <- c(
-  "dplyr", "ggplot2", "purrr", "mclust", "Rhisea",
+  "dplyr", "ggplot2", "purrr", "mclust", "RHISEA",
   "MASS",       # for LDA/QDA
   "randomForest", # for Random Forest
   "xgboost",    # for XGBoost
@@ -69,7 +69,7 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(purrr)
   library(mclust)
-  library(Rhisea)
+  library(RHISEA)
   library(MASS)
   library(randomForest)
   library(xgboost)
@@ -89,8 +89,8 @@ suppressPackageStartupMessages({
 
 ```{r data}
 # Load baseline and mixture data
-baseline_file <- system.file("extdata", "baseline.rda", package = "Rhisea")
-mixture_file  <- system.file("extdata", "mixture.rda",  package = "Rhisea")
+baseline_file <- system.file("extdata", "baseline.rda", package = "RHISEA")
+mixture_file  <- system.file("extdata", "mixture.rda",  package = "RHISEA")
 
 load(baseline_file)  # loads `baseline` data.frame
 load(mixture_file)   # loads `mixture` data.frame
@@ -128,7 +128,7 @@ cat(sprintf("[%s] Starting classifier comparison\n", Sys.time()),
 
 # Supported Classifiers to Evaluate
 
-The script supports the following classifiers, all integrated in Rhisea’s `run_hisea_all()` wrapper:
+The script supports the following classifiers, all integrated in RHISEA’s `run_hisea_all()` wrapper:
 
 * Linear Discriminant Analysis (LDA)
 * Linear Discriminant Analysis via MASS package (LDA\_MASS)
@@ -235,7 +235,7 @@ for (i in seq_along(models_to_run)) {
 
 ```
 
-This loop runs each classifier, performs the mixed-stock analysis using Rhisea’s HISEA estimators, saves results in separate subfolders, and logs errors if any occur.
+This loop runs each classifier, performs the mixed-stock analysis using RHISEA’s HISEA estimators, saves results in separate subfolders, and logs errors if any occur.
 
 ---
 
@@ -289,7 +289,7 @@ ggplot(performance_summary, aes(x = reorder(Model, Kappa), y = Kappa)) +
 
 This approach provides a powerful way to evaluate and compare multiple classification methods for mixed-stock analysis, enabling you to select the most accurate and reliable model for your specific dataset.
 
-The Rhisea package’s integration of modern classifiers with classical HISEA estimation provides both flexibility and statistical rigor, empowering fisheries and ecological researchers to improve stock composition estimates.
+The RHISEA package’s integration of modern classifiers with classical HISEA estimation provides both flexibility and statistical rigor, empowering fisheries and ecological researchers to improve stock composition estimates.
 
 ---
 

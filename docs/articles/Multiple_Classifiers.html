@@ -5,12 +5,12 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Comparing built-in classification methods in Rhisea for mixed-stock analysis • Rhisea</title>
+<title>Comparing built-in classification methods in RHISEA for mixed-stock analysis • RHISEA</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Comparing built-in classification methods in Rhisea for mixed-stock analysis">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Comparing built-in classification methods in RHISEA for mixed-stock analysis">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -18,7 +18,7 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">Rhisea</a>
+    <a class="navbar-brand me-2" href="../index.html">RHISEA</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
@@ -34,14 +34,14 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/Custom_Classification_Models.html">Applying HISEA estimators to custom classification models with run_hisea_estimates</a></li>
-    <li><a class="dropdown-item" href="../articles/Multiple_Classifiers.html">Comparing built-in classification methods in Rhisea for mixed-stock analysis</a></li>
-    <li><a class="dropdown-item" href="../articles/Rhisea_data_type.html">Two input paths in Rhisea: run_hisea_all with HISEA-style files or Dataframes</a></li>
-    <li><a class="dropdown-item" href="../articles/Rhisea_vs_Fortran.html">Verifying compatibility: Rhisea (R) vs FORTRAN HISEA</a></li>
+    <li><a class="dropdown-item" href="../articles/Multiple_Classifiers.html">Comparing built-in classification methods in RHISEA for mixed-stock analysis</a></li>
+    <li><a class="dropdown-item" href="../articles/RHISEA_data_type.html">Two input paths in RHISEA: run_hisea_all with HISEA-style files or Dataframes</a></li>
+    <li><a class="dropdown-item" href="../articles/RHISEA_vs_Fortran.html">Verifying compatibility: RHISEA (R) vs FORTRAN HISEA</a></li>
   </ul>
 </li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="nav-link" href="https://github.com/SostheneA/Rhisea" aria-label="GitHub repository"><span class="fa fa-github"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="https://github.com/SostheneA/RHISEA" aria-label="GitHub repository"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
 
@@ -55,7 +55,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>Comparing built-in classification methods in Rhisea for mixed-stock analysis</h1>
+      <h1>Comparing built-in classification methods in RHISEA for mixed-stock analysis</h1>
                         <h4 data-toc-skip class="author">Sosthene
 Akia</h4>
             <address class="author_afil">
@@ -69,9 +69,9 @@ Hanke</h4>
 Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:alex.hanke@dfo-mpo.ca" class="email">alex.hanke@dfo-mpo.ca</a>
       </address>
                   
-            <h4 data-toc-skip class="date">2025-08-13</h4>
+            <h4 data-toc-skip class="date">2025-08-18</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/SostheneA/Rhisea/blob/HEAD/vignettes/Multiple_Classifiers.Rmd"><code>vignettes/Multiple_Classifiers.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/SostheneA/RHISEA/blob/HEAD/vignettes/Multiple_Classifiers.Rmd"><code>vignettes/Multiple_Classifiers.Rmd</code></a></small>
       <div class="d-none name"><code>Multiple_Classifiers.Rmd</code></div>
     </div>
 
@@ -82,8 +82,8 @@ Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:alex.hanke
 </h2>
 <p>This vignette demonstrates how to <strong>perform a comprehensive
 comparison of multiple classification models</strong> for mixed-stock
-analysis using the <strong>Rhisea</strong> package.</p>
-<p>Rhisea extends the classical HISEA mixed-stock analysis framework by
+analysis using the <strong>RHISEA</strong> package.</p>
+<p>RHISEA extends the classical HISEA mixed-stock analysis framework by
 allowing users to incorporate a variety of modern classifiers and
 evaluate their performance on the same dataset.</p>
 <p>By running the provided <strong>automated classifier comparison
@@ -106,15 +106,15 @@ visually.</li>
 <h2 id="setup-and-required-libraries">Setup and Required Libraries<a class="anchor" aria-label="anchor" href="#setup-and-required-libraries"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/SostheneA/Rhisea">Rhisea</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/SostheneA/Rhisea">Rhisea</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/SostheneA/RHISEA">RHISEA</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/SostheneA/RHISEA">RHISEA</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ropensci.r-universe.dev/writexl" class="external-link">writexl</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mclust-org.github.io/mclust/" class="external-link">mclust</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># --- 0. Install and load required libraries ---</span></span>
 <span><span class="va">required_pkgs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>  <span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"purrr"</span>, <span class="st">"mclust"</span>, <span class="st">"Rhisea"</span>,</span>
+<span>  <span class="st">"dplyr"</span>, <span class="st">"ggplot2"</span>, <span class="st">"purrr"</span>, <span class="st">"mclust"</span>, <span class="st">"RHISEA"</span>,</span>
 <span>  <span class="st">"MASS"</span>,       <span class="co"># for LDA/QDA</span></span>
 <span>  <span class="st">"randomForest"</span>, <span class="co"># for Random Forest</span></span>
 <span>  <span class="st">"xgboost"</span>,    <span class="co"># for XGBoost</span></span>
@@ -134,7 +134,7 @@ visually.</li>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mclust-org.github.io/mclust/" class="external-link">mclust</a></span><span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/SostheneA/Rhisea">Rhisea</a></span><span class="op">)</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/SostheneA/RHISEA">RHISEA</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">MASS</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.stat.berkeley.edu/~breiman/RandomForests/" class="external-link">randomForest</a></span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/dmlc/xgboost" class="external-link">xgboost</a></span><span class="op">)</span></span>
@@ -152,8 +152,8 @@ visually.</li>
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load baseline and mixture data</span></span>
-<span><span class="va">baseline_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"baseline.rda"</span>, package <span class="op">=</span> <span class="st">"Rhisea"</span><span class="op">)</span></span>
-<span><span class="va">mixture_file</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mixture.rda"</span>,  package <span class="op">=</span> <span class="st">"Rhisea"</span><span class="op">)</span></span>
+<span><span class="va">baseline_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"baseline.rda"</span>, package <span class="op">=</span> <span class="st">"RHISEA"</span><span class="op">)</span></span>
+<span><span class="va">mixture_file</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mixture.rda"</span>,  package <span class="op">=</span> <span class="st">"RHISEA"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">baseline_file</span><span class="op">)</span>  <span class="co"># loads `baseline` data.frame</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">mixture_file</span><span class="op">)</span>   <span class="co"># loads `mixture` data.frame</span></span></code></pre></div>
@@ -190,7 +190,7 @@ unknown-origin samples to be assigned to stocks.</p>
 <h2 id="supported-classifiers-to-evaluate">Supported Classifiers to Evaluate<a class="anchor" aria-label="anchor" href="#supported-classifiers-to-evaluate"></a>
 </h2>
 <p>The script supports the following classifiers, all integrated in
-Rhisea’s <code><a href="../reference/run_hisea_all.html">run_hisea_all()</a></code> wrapper:</p>
+RHISEA’s <code><a href="../reference/run_hisea_all.html">run_hisea_all()</a></code> wrapper:</p>
 <ul>
 <li>Linear Discriminant Analysis (LDA)</li>
 <li>Linear Discriminant Analysis via MASS package (LDA_MASS)</li>
@@ -296,7 +296,7 @@ Rhisea’s <code><a href="../reference/run_hisea_all.html">run_hisea_all()</a></
 <span>  <span class="va">all_results</span><span class="op">[[</span><span class="va">model</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">result</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>This loop runs each classifier, performs the mixed-stock analysis
-using Rhisea’s HISEA estimators, saves results in separate subfolders,
+using RHISEA’s HISEA estimators, saves results in separate subfolders,
 and logs errors if any occur.</p>
 <hr>
 </div>
@@ -321,25 +321,15 @@ and logs errors if any occur.</p>
 <span></span>
 <span><span class="va">performance_summary</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_dfr</a></span><span class="op">(</span><span class="va">rda_files</span>, <span class="va">extract_metrics_from_rda</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">performance_summary</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">##                                Model Accuracy Kappa</span></span>
-<span><span class="co">## 1       ANN_ANALYSIS_20250813_163337    0.890 0.780</span></span>
-<span><span class="co">## 2       ANN_ANALYSIS_20250813_182215    0.890 0.780</span></span>
-<span><span class="co">## 3       KNN_ANALYSIS_20250813_162353    0.940 0.880</span></span>
-<span><span class="co">## 4       KNN_ANALYSIS_20250813_181534    0.940 0.880</span></span>
-<span><span class="co">## 5       LDA_ANALYSIS_20250813_155831    0.937 0.873</span></span>
-<span><span class="co">## 6       LDA_ANALYSIS_20250813_173857    0.937 0.873</span></span>
-<span><span class="co">## 7  LDA_MASS_ANALYSIS_20250813_155928    0.937 0.873</span></span>
-<span><span class="co">## 8  LDA_MASS_ANALYSIS_20250813_173952    0.937 0.873</span></span>
-<span><span class="co">## 9       MLR_ANALYSIS_20250813_164201    0.937 0.873</span></span>
-<span><span class="co">## 10      MLR_ANALYSIS_20250813_183321    0.937 0.873</span></span>
-<span><span class="co">## 11       NB_ANALYSIS_20250813_164036    0.947 0.893</span></span>
-<span><span class="co">## 12       NB_ANALYSIS_20250813_183124    0.947 0.893</span></span>
-<span><span class="co">## 13      QDA_ANALYSIS_20250813_160016    0.943 0.887</span></span>
-<span><span class="co">## 14      QDA_ANALYSIS_20250813_174043    0.943 0.887</span></span>
-<span><span class="co">## 15       RF_ANALYSIS_20250813_161228    0.963 0.927</span></span>
-<span><span class="co">## 16       RF_ANALYSIS_20250813_175840    0.963 0.927</span></span>
-<span><span class="co">## 17      SVM_ANALYSIS_20250813_161503    0.953 0.907</span></span>
-<span><span class="co">## 18      SVM_ANALYSIS_20250813_180439    0.953 0.907</span></span></code></pre>
+<pre><code><span><span class="co">##                               Model Accuracy Kappa</span></span>
+<span><span class="co">## 1      KNN_ANALYSIS_20250818_175654    0.940 0.880</span></span>
+<span><span class="co">## 2      LDA_ANALYSIS_20250818_174057    0.937 0.873</span></span>
+<span><span class="co">## 3 LDA_MASS_ANALYSIS_20250818_174128    0.937 0.873</span></span>
+<span><span class="co">## 4      MLR_ANALYSIS_20250818_180214    0.937 0.873</span></span>
+<span><span class="co">## 5       NB_ANALYSIS_20250818_180114    0.947 0.893</span></span>
+<span><span class="co">## 6      QDA_ANALYSIS_20250818_174158    0.943 0.887</span></span>
+<span><span class="co">## 7       RF_ANALYSIS_20250818_174953    0.963 0.927</span></span>
+<span><span class="co">## 8      SVM_ANALYSIS_20250818_175149    0.953 0.907</span></span></code></pre>
 <hr>
 </div>
 <div class="section level2">
@@ -372,7 +362,7 @@ and logs errors if any occur.</p>
 multiple classification methods for mixed-stock analysis, enabling you
 to select the most accurate and reliable model for your specific
 dataset.</p>
-<p>The Rhisea package’s integration of modern classifiers with classical
+<p>The RHISEA package’s integration of modern classifiers with classical
 HISEA estimation provides both flexibility and statistical rigor,
 empowering fisheries and ecological researchers to improve stock
 composition estimates.</p>

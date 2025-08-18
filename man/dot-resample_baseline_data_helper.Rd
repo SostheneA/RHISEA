@@ -44,16 +44,6 @@
 
 \item{resampled_baseline_sizes}{Integer vector. Sizes of resamples per stock.}
 
-\item{knn_k}{Integer. Number of neighbors for KNN.}
-
-\item{rf_ntree}{Integer. Number of trees for Random Forest.}
-
-\item{svm_kernel}{Character. Kernel type for SVM.}
-
-\item{xgb_nrounds}{Integer. Number of boosting rounds for XGBoost.}
-
-\item{ann_size}{Integer. Number of hidden units for ANN.}
-
 \item{phi_method}{Character. "standard" or "cv" (cross-validation-based confusion matrix).}
 
 \item{mclust_model_names}{Character vector. Models to test with Mclust.}

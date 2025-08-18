@@ -1,11 +1,11 @@
-url: https://github.com/SostheneA/Rhisea
+url: https://github.com/SostheneA/RHISEA
 
 template:
   bootstrap: 5
 
 home:
-  title: "Rhisea"
-  description: "Rhisea: R Package for Mixed-Stock Analysis Extending HISEA"
+  title: "RHISEA"
+  description: "RHISEA: R Package for Mixed-Stock Analysis Extending HISEA"
 
 navbar:
   structure:
@@ -19,7 +19,7 @@ navbar:
     github:
       icon: fa-github
       aria-label: "GitHub repository"
-      href: https://github.com/SostheneA/Rhisea
+      href: https://github.com/SostheneA/RHISEA
 
 # Articles directly listed on the "Articles" page
 articles:
@@ -28,8 +28,8 @@ articles:
   contents:
   - Custom_Classification_Models
   - Multiple_Classifiers
-  - Rhisea_data_type
-  - Rhisea_vs_Fortran
+  - RHISEA_data_type
+  - RHISEA_vs_Fortran
 
 
 # Function reference, organized in sections

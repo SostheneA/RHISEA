@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 ## Introduction
 
-The `run_hisea_estimates()` function is a core component of the **Rhisea** package that allows users to **build their own classification models** and seamlessly integrate these results into the classical mixed-stock analysis framework originally implemented by the HISEA program.
+The `run_hisea_estimates()` function is a core component of the **RHISEA** package that allows users to **build their own classification models** and seamlessly integrate these results into the classical mixed-stock analysis framework originally implemented by the HISEA program.
 
 HISEA is widely used to estimate the proportions of different source populations (stocks) within a mixed sample based on known baseline data. It does so by combining classification outputs with sophisticated estimators and bootstrap procedures to provide robust stock composition estimates along with measures of uncertainty.
 
@@ -69,11 +69,11 @@ library(MASS)
 library(caret)
 library(reshape2)
 library(ggplot2)
-library(Rhisea)
+library(RHISEA)
 
 # Load baseline and mixture data
-baseline_file <- system.file("extdata", "baseline.rda", package = "Rhisea")
-mixture_file  <- system.file("extdata", "mixture.rda",  package = "Rhisea")
+baseline_file <- system.file("extdata", "baseline.rda", package = "RHISEA")
+mixture_file  <- system.file("extdata", "mixture.rda",  package = "RHISEA")
 
 load(baseline_file)  # loads `baseline` data.frame
 load(mixture_file)   # loads `mixture` data.frame
@@ -350,4 +350,4 @@ This vignette demonstrated how to:
 -   Run `run_hisea_estimates()` to get robust mixed-stock proportion estimates with confidence intervals,
 -   Visualize and interpret the results.
 
-You can extend this approach to any classification method that provides pseudo-classes and posterior probabilities, leveraging the classical HISEA framework within the **Rhisea** package.
+You can extend this approach to any classification method that provides pseudo-classes and posterior probabilities, leveraging the classical HISEA framework within the **RHISEA** package.

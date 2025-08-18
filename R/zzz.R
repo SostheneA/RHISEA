@@ -34,7 +34,7 @@
 .onAttach <- function(libname, pkgname) {
   tryCatch({
     .required_pkgs()
-    packageStartupMessage("Rhisea loaded successfully")
+    packageStartupMessage("RHISEA loaded successfully")
   }, error = function(e) {
     warning("Error loading required packages: ", e$message)
   })

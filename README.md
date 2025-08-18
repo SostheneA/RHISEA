@@ -1,8 +1,8 @@
-# Rhisea
+# RHISEA
 
 > ***"R Package for Mixed-Stock Analysis Extending HISEA with Flexible and Robust Classification Frameworks"***
 
-Rhisea modernizes and extends HISEA with flexible, robust classification frameworks to estimate source contributions and assign individuals to their stock of origin, with rigorous uncertainty quantification.
+RHISEA modernizes and extends HISEA with flexible, robust classification frameworks to estimate source contributions and assign individuals to their stock of origin, with rigorous uncertainty quantification.
 
 ## Key features:
 
@@ -15,36 +15,36 @@ Rhisea modernizes and extends HISEA with flexible, robust classification framewo
 
 -   [Installation](#installation)
 -   [Citation](#citation)
--   [From HISEA FORTRAN to Rhisea: Modern Mixed-Stock Analysis in R](#from-hisea-fortran-to-rhisea-modern-mixed-stock-analysis-in-r)
+-   [From HISEA FORTRAN to RHISEA: Modern Mixed-Stock Analysis in R](#from-hisea-fortran-to-RHISEA-modern-mixed-stock-analysis-in-r)
     -   [However, the classical HISEA had important limitations:](#however-the-classical-hisea-had-important-limitations)
-    -   [The Modern Workflow: Rhisea in R](#the-modern-workflow-rhisea-in-r)
+    -   [The Modern Workflow: RHISEA in R](#the-modern-workflow-RHISEA-in-r)
         -   [Key Innovations](#key-innovations)
             -   [1- Flexible Classifier Choice](#1--flexible-classifier-choice)
             -   [2- Modern Data Handling](#2--modern-data-handling)
             -   [3- Expanded Outputs & Reproducibility](#3--expanded-outputs--reproducibility)
             -   [4- Intuitive, Modular Workflow](#4--intuitive-modular-workflow)
         -   [Step-by-Step Overview (see diagram)](#step-by-step-overview-see-diagram)
--   [Conclusion: The Rhisea Advantage](#conclusion-the-rhisea-advantage)
+-   [Conclusion: The RHISEA Advantage](#conclusion-the-RHISEA-advantage)
 
 ## Installation
 
-Rhisea can be installed from GitHub:
+RHISEA can be installed from GitHub:
 
 ``` r
 library(devtools)
-install_github("SostheneA/Rhisea", dependencies = TRUE)
+install_github("SostheneA/RHISEA", dependencies = TRUE)
 ```
 
 ## Citation
 
-To cite Rhisea in publications use:
+To cite RHISEA in publications use:
 
 ``` r
-citation("Rhisea")
+citation("RHISEA")
 ```
 
 
-# From HISEA FORTRAN to Rhisea: Modern Mixed-Stock Analysis in R
+# From HISEA FORTRAN to RHISEA: Modern Mixed-Stock Analysis in R
 
 Mixed-stock analysis is a fundamental tool for fisheries science, allowing estimation of the contributions of source populations to mixture samples (e.g., fisheries catches). The original HISEA program, implemented in FORTRAN, pioneered this approach with a robust statistical framework and introduced several estimators (Θ₁ to Θ₅) for stock proportion inference.
 
@@ -56,19 +56,19 @@ Mixed-stock analysis is a fundamental tool for fisheries science, allowing estim
 -   Rigid input/output based on text files (*.std,* .mix, \*.ctl), and no option to save intermediate or diagnostic results for downstream analysis.
 
 
-## The Modern Workflow: Rhisea in R {#the-modern-workflow-rhisea-in-r}
+## The Modern Workflow: RHISEA in R {#the-modern-workflow-RHISEA-in-r}
 
-Rhisea builds on the foundation of HISEA and brings mixed-stock analysis into the present:
+RHISEA builds on the foundation of HISEA and brings mixed-stock analysis into the present:
 
-## The Modern Workflow: Rhisea in R
+## The Modern Workflow: RHISEA in R
 
-Rhisea builds on the foundation of HISEA and brings mixed-stock analysis into the present:
+RHISEA builds on the foundation of HISEA and brings mixed-stock analysis into the present:
 
 ### Key Innovations
 
 #### 1- Flexible Classifier Choice
 
-With Rhisea, you are not limited to LDA. Built-in support now exists for a wide range of modern supervised learning classifiers:
+With RHISEA, you are not limited to LDA. Built-in support now exists for a wide range of modern supervised learning classifiers:
 
 -   Linear/Quadratic Discriminant Analysis (LDA, QDA, MASS)
 
@@ -98,7 +98,7 @@ You can work directly with R data frames---no need for fixed-format text files. 
 
 #### 3- Expanded Outputs & Reproducibility
 
--   Rhisea logs not only the final report but can save all intermediate objects (classification probabilities, confusion matrices, etc.) as .rda files for downstream diagnostics and reproducibility.
+-   RHISEA logs not only the final report but can save all intermediate objects (classification probabilities, confusion matrices, etc.) as .rda files for downstream diagnostics and reproducibility.
 -   Results are summarized with confidence intervals via bootstrap, and automated visualizations are provided.
 -   All run parameters, models, and derived files can be archived for full transparency and reproducibility.
 
@@ -122,8 +122,8 @@ Each step of the process is transparent: from baseline/mixture data ingestion �
 
 
 
-## Conclusion: The Rhisea Advantage 
+## Conclusion: The RHISEA Advantage 
 
-With Rhisea, you retain all the statistical rigor of original HISEA - including compatibility and reproducibility with legacy workflows - while gaining the flexibility, transparency, and analytic power of modern R. Advanced users can plug in custom classifiers, automate cross-validation, and leverage the full R ecosystem for further statistical or graphical analysis. All intermediate steps are traceable and archivable for robust, audit-friendly science.
+With RHISEA, you retain all the statistical rigor of original HISEA - including compatibility and reproducibility with legacy workflows - while gaining the flexibility, transparency, and analytic power of modern R. Advanced users can plug in custom classifiers, automate cross-validation, and leverage the full R ecosystem for further statistical or graphical analysis. All intermediate steps are traceable and archivable for robust, audit-friendly science.
 
 > ***"Reference: Millar, R.B. (1990),"A Versatile Computer Program for Mixed Stock Fishery Composition Estimation", Can. Tech. Rep. Fish. Aquat. Sci. 1753: iii + 29 p."***

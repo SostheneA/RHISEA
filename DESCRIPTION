@@ -1,4 +1,4 @@
-Package: Rhisea
+Package: RHISEA
 Type: Package
 Title: R Implementation of HISEA for Mixed Stock Analysis
 Version: 0.1.0
@@ -35,5 +35,5 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
-URL: https://github.com/SostheneA/Rhisea
-BugReports: https://github.com/SostheneA/Rhisea/issues
+URL: https://github.com/SostheneA/RHISEA
+BugReports: https://github.com/SostheneA/RHISEA/issues

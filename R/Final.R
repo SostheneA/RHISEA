@@ -30,11 +30,6 @@
 #' @param stocks_names Character vector. Optional vector of stock names.
 #' @param resample_baseline Logical. Resample the baseline for each replicate.
 #' @param resampled_baseline_sizes Integer vector. Sizes of resamples per stock.
-#' @param knn_k Integer. Number of neighbors for KNN.
-#' @param rf_ntree Integer. Number of trees for Random Forest.
-#' @param svm_kernel Character. Kernel type for SVM.
-#' @param xgb_nrounds Integer. Number of boosting rounds for XGBoost.
-#' @param ann_size Integer. Number of hidden units for ANN.
 #' @param phi_method Character. "standard" or "cv" (cross-validation-based confusion matrix).
 #' @param mclust_model_names Character vector. Models to test with Mclust.
 #' @param mclust_perform_cv Logical. Whether to cross-validate Mclust.
@@ -135,13 +130,14 @@ split_by_class_list <- function(data, labels) {
 # -------------------------------------------------------------------
 # Helper: train one classifier
 # -------------------------------------------------------------------
+`%||%` <- function(x, y) if (is.null(x)) y else x
 train_model <- function(train_data, train_labels,
                         method_class,
                         np, nv,
-                        knn_k, rf_ntree, svm_kernel, xgb_nrounds, ann_size,
-                        generic_colnames) {
+                        generic_colnames,...) {
   m <- toupper(method_class)
   out <- list()
+  args <- list(...)
   if (m=="LDA") {
     out$model <- compute_ldf_coefficients(split_by_class_list(train_data, train_labels))
   } else if (m=="LDA_MASS") {
@@ -176,50 +172,44 @@ train_model <- function(train_data, train_labels,
     out$feature_names <- feature_names
     out$levels <- levels(factor(train_labels))
   } else if (m=="KNN") {
-    out$model <- list(train_data=train_data, train_labels=train_labels, k=knn_k)
+    k <- args$k %||% 5
+    out$model <- list(train_data=train_data, train_labels=train_labels, k=k)
   } else if (m=="SVM") {
-    out$model <- e1071::svm(x=train_data, y=train_labels, kernel=svm_kernel, probability=TRUE)
+    kernel <- args$kernel %||% "radial"
+    out$model <- e1071::svm(x=train_data, y=train_labels, kernel=kernel, probability=TRUE)
   } else if (m=="RF") {
+    ntree <- args$ntree %||% 500
     # Ensure data is in the correct format
     train_matrix <- as.data.frame(train_data)
     colnames(train_matrix) <- paste0("Feature_", seq_len(ncol(train_data)))
     out$model <- randomForest::randomForest(x=train_matrix,
                                             y=factor(train_labels),
-                                            ntree=rf_ntree)
+                                            ntree=ntree)
     out$feature_names <- colnames(train_matrix)
   } else if (m=="XGB") {
-    # Add consistent feature names
+    nrounds <- args$nrounds %||% 100
     feature_names <- paste0("Feature_", seq_len(ncol(train_data)))
     train_matrix <- as.matrix(train_data)
     colnames(train_matrix) <- feature_names
-
-    # Convert labels to numeric (0-based)
     labels_num <- as.integer(as.factor(train_labels)) - 1
-
-    dmat <- xgboost::xgb.DMatrix(data=train_matrix,
-                                 label=labels_num)
-
-    # Set parameters
-    params <- list(
+    dmat <- xgboost::xgb.DMatrix(data=train_matrix, label=labels_num)
+    params <- modifyList(list(
       objective = "multi:softprob",
       num_class = np,
       eval_metric = "mlogloss",
       eta = 0.3,
       max_depth = 6
-    )
-
-    # Train the model
+    ), args)  # surcharge avec ce qui est dans ...
     out$model <- xgboost::xgb.train(
       params = params,
       data = dmat,
-      nrounds = xgb_nrounds,
+      nrounds = nrounds,
       verbose = 0
     )
-
-    # Store information needed for prediction
     out$feature_names <- feature_names
     out$np <- np
   } else if (m=="ANN") {
+    size <- args$size %||% 5
     df <- data.frame(Class=train_labels, train_data)
     if (nv>0) colnames(df)[-1] <- generic_colnames
     f <- if (nv>0)
@@ -227,8 +217,8 @@ train_model <- function(train_data, train_labels,
     else
       as.formula("Class ~ 1")
     out$model <- nnet::nnet(f, data=df,
-                            size=ann_size, trace=FALSE,
-                            MaxNWts=max(5000,((nv+1)*ann_size+(ann_size+1)*np)*3+2000),
+                            size=size, trace=FALSE,
+                            MaxNWts=max(5000,((nv+1)*size+(size+1)*np)*3+2000),
                             maxit=200)
   } else if (m=="NB") {
     out$model <- e1071::naiveBayes(x=train_data, y=train_labels)
@@ -237,6 +227,7 @@ train_model <- function(train_data, train_labels,
   }
   out
 }
+
 
 # -------------------------------------------------------------------
 # Helper: predict from a trained model

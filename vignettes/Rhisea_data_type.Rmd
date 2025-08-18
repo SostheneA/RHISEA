@@ -1,5 +1,5 @@
 ---
-title: "Two input paths in Rhisea: run_hisea_all with HISEA-style files or Dataframes"
+title: "Two input paths in RHISEA: run_hisea_all with HISEA-style files or Dataframes"
 author:
   - name: "Sosthene Akia"
     email: "sosthene.akia@dfo-mpo.ca"
@@ -10,7 +10,7 @@ author:
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\\VignetteIndexEntry{Two input paths in Rhisea: run_hisea_all with HISEA-style files or Dataframes}
+  %\\VignetteIndexEntry{Two input paths in RHISEA: run_hisea_all with HISEA-style files or Dataframes}
   %\\VignetteEngine{knitr::rmarkdown}
   %\\VignetteEncoding{UTF-8}
 ---
@@ -29,7 +29,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 # Introduction
 
-This vignette demonstrates two equivalent ways to run `run_hisea_all()` from the **Rhisea** package:
+This vignette demonstrates two equivalent ways to run `run_hisea_all()` from the **RHISEA** package:
 
 1. **Data frame inputs** (R objects `baseline` and `mixture` already loaded), and
 2. **HISEA file inputs** (`hisea.std` and `hisea.mix` files).
@@ -39,10 +39,10 @@ We run the same analysis with LDA classifier and compare the results (means, boo
 # Required packages
 
 ```{r libs, message=TRUE}
-library(Rhisea)
+library(RHISEA)
 library(tidyverse)
 library(data.table)
-library(mclust)     # used by some Rhisea internals or for post-analysis
+library(mclust)     # used by some RHISEA internals or for post-analysis
 ```
 
 
@@ -50,8 +50,8 @@ library(mclust)     # used by some Rhisea internals or for post-analysis
 
 ```{r load-data}
 # Option A: load .rda saved objects (development)
-baseline_file <- system.file("extdata", "baseline.rda", package = "Rhisea")
-mixture_file  <- system.file("extdata", "mixture.rda",  package = "Rhisea")
+baseline_file <- system.file("extdata", "baseline.rda", package = "RHISEA")
+mixture_file  <- system.file("extdata", "mixture.rda",  package = "RHISEA")
 
 load(baseline_file)  # loads `baseline` data.frame
 load(mixture_file)   # loads `mixture` data.frame
