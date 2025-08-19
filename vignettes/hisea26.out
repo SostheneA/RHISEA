@@ -1,0 +1,43 @@
+ PROGRAM  HISEA.......EXECUTION DATE: Mon Aug 18 23:50:41 2025
+
+ Test Control File for HISEA                                                     
+
+
+ FUNCTION OF THIS RUN IS.........ANALYSIS  
+ #STOCKS IN THE MODEL............ 2
+ THE STOCKS ARE..................East     West    
+ #VARIABLES USED................. 2
+
+
+ ===============================================================================
+
+
+                         MEAN AND STD DEV SUMMARY OF VARIABLES
+
+ VAR       East           West    
+
+  1         23.760         31.140    
+            (4.69)         (5.48)   
+
+  2         24.770         29.580    
+            (4.69)         (4.88)   
+
+ ===============================================================================
+
+
+
+
+ THE SIZES OF THE STANDARDS ARE    100   100
+
+ THE MIXED SAMPLE HAS   100 FISH
+
+
+ TABLE OF COMPOSITION ESTIMATES
+
+
+             RAW      COOK & LORD      COOK        MILLAR      MAXIMUM
+                                  CONSTRAINED  CONSTRAINED  LIKELIHOOD
+
+
+ East      0.7600       0.9194       0.9194       0.9194       0.9147
+ West      0.2400       0.0806       0.0806       0.0806       0.0853
