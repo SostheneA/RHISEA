@@ -1,2 +1,0 @@
-[2025-08-18 18:29:40] Starting classifier comparison
-[2025-08-18 18:46:40] ERROR in ANN: invalid model formula in ExtractVars
