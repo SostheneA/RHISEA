@@ -5,7 +5,7 @@ template:
 
 home:
   title: "RHISEA"
-  description: "RHISEA: An R package for modern mixed-stock analysis with flexible classification frameworks"
+  description: "RHISEA: An R package for flexible and reproducible mixed-stock analysis in fisheries and ecology"
 
 navbar:
   structure:
