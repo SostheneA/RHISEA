@@ -1,6 +1,6 @@
 # RHISEA
 
-> ***"An R package for modern mixed-stock analysis with flexible classification frameworks"***
+> ***"An R package for flexible and reproducible mixed-stock analysis in fisheries and ecology"***
 
 RHISEA modernizes and extends HISEA with flexible, robust classification frameworks to estimate source contributions and assign individuals to their stock of origin, with rigorous uncertainty quantification.
 
