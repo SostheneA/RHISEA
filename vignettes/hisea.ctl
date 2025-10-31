@@ -1,6 +1,6 @@
 'Test Control File for HISEA'    ## Title
 'ANALYSIS'                     ## ANALYSIS, SIMULATION, BOOTSTRAP
-2 'East' 'West'         ## N stocks, names
+2 'Europe' 'Nth America'         ## N stocks, names
 2                                ## Number of variables
 'STD' 'Y'                        ## 'STD' and 'Y' or 'N' to resample baseline
 50 50                            ## Sample sizes for resampled baseline

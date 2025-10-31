@@ -24,14 +24,10 @@ run_hisea_all(
   stocks_names = NULL,
   resample_baseline = FALSE,
   resampled_baseline_sizes = NULL,
-  knn_k = 5,
-  rf_ntree = 500,
-  svm_kernel = "radial",
-  xgb_nrounds = 50,
-  ann_size = 5,
   phi_method = c("standard", "cv"),
   mclust_model_names = NULL,
-  mclust_perform_cv = TRUE
+  mclust_perform_cv = TRUE,
+  ...
 )
 }
 \arguments{
@@ -73,21 +69,43 @@ run_hisea_all(
 
 \item{resampled_baseline_sizes}{Integer vector. Sizes for resampled baseline. Default: NULL}
 
-\item{knn_k}{Integer. Number of neighbors for KNN method. Default: 5}
-
-\item{rf_ntree}{Integer. Number of trees for Random Forest. Default: 500}
-
-\item{svm_kernel}{Character. Kernel type for SVM ("radial", "linear", etc.). Default: "radial"}
-
-\item{xgb_nrounds}{Integer. Number of rounds for XGBoost. Default: 100}
-
-\item{ann_size}{Integer. Size of neural network hidden layer. Default: 5}
-
 \item{phi_method}{Character. Method for phi calculation. Default: "default"}
 
 \item{mclust_model_names}{Character vector. Model names for mclust. Default: NULL}
 
 \item{mclust_perform_cv}{Logical. Whether to perform cross-validation for mclust. Default: FALSE}
+
+\item{...}{Additional arguments passed to the underlying classifier.
+Certain classifiers support hyperparameter tuning via these arguments:
+\itemize{
+\item \strong{Random Forest (RF)}: \code{ntree}, \code{mtry}, \code{nodesize}, \code{maxnodes}
+\itemize{
+\item Example: \code{run_hisea_all(..., method_class="RF", ntree=5000, mtry=3)}
+}
+\item \strong{Support Vector Machine (SVM)}: \code{cost}, \code{gamma}, \code{kernel}
+\itemize{
+\item Example: \code{run_hisea_all(..., method_class="SVM", cost=10, kernel="radial")}
+}
+\item \strong{XGBoost (XGB)}: \code{nrounds}, \code{max_depth}, \code{eta}, \code{subsample}, \code{colsample_bytree}
+\itemize{
+\item Example: \code{run_hisea_all(..., method_class="XGB", nrounds=100, max_depth=4)}
+}
+\item \strong{k-Nearest Neighbors (KNN)}: \code{k}
+\itemize{
+\item Example: \code{run_hisea_all(..., method_class="KNN", k=5)}
+}
+\item \strong{Artificial Neural Network (ANN)}: \code{size}, \code{decay}, \code{maxit}
+\itemize{
+\item Example: \code{run_hisea_all(..., method_class="ANN", size=10, decay=0.01)}
+}
+\item \strong{Naive Bayes (NB)}: \code{laplace}
+\itemize{
+\item Example: \code{run_hisea_all(..., method_class="NB", laplace=1)}
+}
+}
+
+⚠ Ensure that the names of arguments match those expected by the classifier.
+Unrecognized arguments may be ignored or raise an error.}
 }
 \value{
 List containing:
@@ -114,12 +132,6 @@ result <- run_hisea_all(
   method_class = "LDA",
   baseline_path = "my_baseline.txt",
   mix_path = "my_mixture.txt"
-)
-
-# Analysis with Random Forest
-result_rf <- run_hisea_all(
-  method_class = "RF",
-  rf_ntree = 1000
 )
 }
 }

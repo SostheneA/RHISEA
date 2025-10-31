@@ -1,0 +1,137 @@
+---
+title: "Analyzing complex mixed-stock fisheries with 20 stocks"
+author:
+- name: Sosthene Akia
+  email: "sosthene.akia@dfo-mpo.ca"
+  affiliation: Fisheries and Oceans Canada
+- name: Alex Hanke
+  email: "alex.hanke@dfo-mpo.ca"
+  affiliation: Fisheries and Oceans Canada
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+vignette: "%\\\\VignetteIndexEntry{Analyzing complex mixed-stock fisheries with 20 stocks} %\\\\VignetteEngine{knitr::rmarkdown} %\\\\VignetteEncoding{UTF-8}\n"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+
+library(RHISEA)
+library(tidyverse)
+library(ggplot2)
+```
+
+
+# Introduction
+
+This tutorial demonstrates the capability of the RHISEA package to estimate stock proportions in complex mixed-stock fisheries involving 20 distinct source populations. It guides through generating simulated classification outputs (pseudo-classes, likelihoods, phi matrix), applying the five classical HISEA estimators, and visualizing the estimates.
+
+***
+
+# Data Simulation of Classification Outputs
+
+We simulate a mixture of 1000 fish from 20 stocks, generating pseudo-class assignments, likelihood matrices, and a phi matrix reflecting typical classification errors.
+
+```{r}
+set.seed(1234)
+
+np <- 20  # number of populations
+n_mixture <- 1000
+
+# Create stock names
+stocks_names <- paste0("Stock_", seq_len(np))
+
+# Simulate pseudo-classes randomly among stocks
+pseudo_classes <- sample(seq_len(np), size = n_mixture, replace = TRUE)
+
+# Simulate likelihood matrix: concentrated probabilities near true class + noise
+likelihoods <- matrix(runif(n_mixture * np, min = 0.01, max = 0.05), nrow = n_mixture, ncol = np)
+for (i in seq_len(n_mixture)) {
+  likelihoods[i, pseudo_classes[i]] <- likelihoods[i, pseudo_classes[i]] + 0.8
+}
+# Normalize rows to sum to 1
+likelihoods <- likelihoods / rowSums(likelihoods)
+
+colnames(likelihoods) <- stocks_names
+
+# Create a phi matrix with varying diagonal and asymmetric misclassification
+base_correct <- runif(np, min = 0.5, max = 0.9)
+phi_matrix <- matrix(0, nrow = np, ncol = np)
+for (j in 1:np) {
+  phi_matrix[j, j] <- base_correct[j]
+  off_diag_total <- 1 - base_correct[j]
+  off_diag_indices <- setdiff(1:np, j)
+  off_diag_vals <- runif(length(off_diag_indices))
+  off_diag_vals <- off_diag_vals / sum(off_diag_vals) * off_diag_total
+  phi_matrix[off_diag_indices, j] <- off_diag_vals
+}
+
+colnames(phi_matrix) <- stocks_names
+rownames(phi_matrix) <- stocks_names
+
+# Check columns sum to 1 (optional)
+round(colSums(phi_matrix), 6)
+
+# View phi_matrix with margins (optional)
+addmargins(phi_matrix)
+
+```
+
+***
+
+# Running Classic HISEA Estimators with `run_hisea_estimates()`
+
+Using the simulated classification outputs and phi matrix, we run all five classical estimators and summarize results.
+
+```{r}
+results <- run_hisea_estimates(
+  pseudo_classes = pseudo_classes,
+  likelihoods = likelihoods,
+  phi_matrix = phi_matrix,
+  np = np,
+  type = "BOOTSTRAP",
+  stocks_names = stocks_names,
+  export_csv = FALSE,
+  verbose = TRUE
+)
+```
+
+***
+
+# Displaying and Plotting Results
+
+We print mean estimates by estimator and stock, and visualize estimated stock proportions.
+
+```{r plot-complex-mixed-stocks, fig.cap="Analyzing complex mixed-stock fisheries with 20 stocks"}
+print(results$mean_estimates)
+print(results$sd_estimates)
+
+# Convert to tidy format for plotting
+estimates_long <- as.data.frame(results$mean_estimates) %>%
+  mutate(Stock = rownames(.)) %>%
+  pivot_longer(-Stock, names_to = "Estimator", values_to = "Proportion")
+
+ggplot(estimates_long, aes(x = Estimator, y = Proportion, fill = Stock)) +
+  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
+  theme_minimal() +
+  labs(title = "Estimated Stock Proportions by HISEA Estimator",
+       y = "Estimated Proportion",
+       x = "Estimator") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+***
+
+# Conclusion
+
+This tutorial illustrates that RHISEA is well suited for mixed-stock fisheries with numerous source populations. The simulation and estimation workflow scales to 20 stocks, producing robust and unbiased estimates using all classical HISEA estimators. This confirms the method’s applicability for complex, high-dimensional stock composition problems.
+
+***

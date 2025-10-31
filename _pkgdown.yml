@@ -5,7 +5,7 @@ template:
 
 home:
   title: "RHISEA"
-  description: "RHISEA: R Package for Mixed-Stock Analysis Extending HISEA"
+  description: "RHISEA: An R package for modern mixed-stock analysis with flexible classification frameworks"
 
 navbar:
   structure:
@@ -26,10 +26,12 @@ articles:
 - title: Tutorials
   navbar: ~
   contents:
-  - Custom_Classification_Models
-  - Multiple_Classifiers
-  - RHISEA_data_type
   - RHISEA_vs_Fortran
+  - Custom_Classification_Models
+  - RHISEA_data_type
+  - Multiple_Classifiers
+  - RHISEA_comprehensive_Guide
+  - complex_mixed_stocks
 
 
 # Function reference, organized in sections

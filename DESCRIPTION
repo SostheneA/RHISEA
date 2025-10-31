@@ -1,6 +1,6 @@
 Package: RHISEA
 Type: Package
-Title: R Implementation of HISEA for Mixed Stock Analysis
+Title: RHISEA: An R package for modern mixed-stock analysis with flexible classification frameworks
 Version: 0.1.0
 Authors@R: 
     c(person("Sosthene", "Akia", email = "sosthene.akia@dfo-mpo.ca", role = c("aut", "cre")),
@@ -11,7 +11,7 @@ Description: R implementation of the HISEA method for mixed stock analysis,
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Config/roxygenNote: 7.3.2
 Depends: R (>= 3.6.0)
 Imports:
