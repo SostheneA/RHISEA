@@ -37,10 +37,6 @@ Locus_687
 Locus_709
 Locus_786
 Locus_961
-Locus_139
-Locus_160
-Locus_301
-Locus_653
 Locus_132
 Locus_183
 Locus_255
@@ -51,12 +47,17 @@ Locus_494
 Locus_624
 Locus_688
 Locus_689
+Locus_139
+Locus_160
+Locus_301
+Locus_653
 Locus_384
+Locus_129
 Locus_601
 Locus_414
 Locus_637
-Locus_129
 Locus_714
+Locus_303
 Locus_405
 Locus_520
 Locus_536
@@ -66,4 +67,3 @@ Locus_829
 Locus_832
 Locus_874
 Locus_892
-Locus_923

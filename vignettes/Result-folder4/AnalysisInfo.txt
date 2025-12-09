@@ -1,5 +1,5 @@
  Analysis Description ( R - assignPOP ver. 1.3.1 )
- Perform assign.X() @ 2025-12-09 10:01:26 
+ Perform assign.X() @ 2025-12-09 10:40:00 
 
  Data scaled and centerd: FALSE 
  PC retaining criteria: kaiser-guttman 
