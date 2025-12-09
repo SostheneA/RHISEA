@@ -1,0 +1,18 @@
+ Analysis Description ( R - assignPOP ver. 1.3.1 )
+ Perform assign.X() @ 2025-12-09 10:01:20 
+
+ Data scaled and centerd: FALSE 
+ PC retaining criteria: kaiser-guttman 
+ PCA for non-genetic data: NA 
+ Machine learning model: naiveBayes 
+
+ Input Data ( genetics )
+ Number of known individuals: 90 
+ Number of known populations 3 
+ pop_A pop_B pop_C 
+ 30 30 30 
+
+ Number of unknown individuals: 30 
+ Number of unknown individuals assigned to populations:
+ pop_A pop_B pop_C 
+ 7 13 10 

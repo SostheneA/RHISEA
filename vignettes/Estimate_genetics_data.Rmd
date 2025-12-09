@@ -1,0 +1,243 @@
+---
+title: "Genetic assignment to Mixed-Stock Analysis with RHISEA"
+author:
+- name: Sosthene Akia
+  email: "sosthene.akia@dfo-mpo.ca"
+  affiliation: Fisheries and Oceans Canada
+- name: Alex Hanke
+  email: "alex.hanke@dfo-mpo.ca"
+  affiliation: Fisheries and Oceans Canada
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+vignette: "%\\VignetteIndexEntry{Estimate_genetics_data} %\\VignetteEngine{knitr::rmarkdown} %\\VignetteEncoding{UTF-8}\n"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4,
+  echo = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+options(rmarkdown.html_vignette.check_title = FALSE)
+
+library(MASS)
+library(caret)
+library(randomForest)
+library(reshape2)
+library(ggplot2)
+library(RHISEA)
+library(tidyverse)
+
+library(adegenet)
+library(readit)
+library(data.table)
+library(assignPOP)
+library(lubridate)
+library(stringr)
+library(knitr)
+```
+
+## Overview
+
+This tutorial illustrates how to integrate individual-level genetic assignment results into RHISEA to estimate mixed-stock proportions. It uses genotype data in GENEPOP format, processed with adegenet and assignPOP, and then feeds assignment probabilities and confusion matrices to `run_hisea_estimates()` for population-scale mixing estimates.
+
+The workflow includes:  
+- Converting GENEPOP data to an adegenet/assignPOP-compatible format  
+- Performing Monte Carlo and K-fold cross-validation for assignment accuracy  
+- Generating individual assignment probabilities and confusion matrices  
+- Passing these outputs to RHISEA for mixed-stock estimation.
+
+## Data preparation and import
+
+In this section, genotype data in GENEPOP format are read and filtered, then combined with morphometric data to create an integrated baseline dataset.
+
+```{r data-import}
+# Read baseline GENEPOP data and reduce low-variance loci
+YourGenepop <- read.Genepop(
+  "https://raw.githubusercontent.com/alexkychen/assignPOP/master/inst/extdata/simGenepop.txt",
+  pop.names = c("pop_A", "pop_B", "pop_C"),
+  haploid = FALSE
+)
+
+YourGenepopRd <- reduce.allele(YourGenepop, p = 0.95)
+
+# Integrate genetic and morphometric data
+YourIntegrateData <- compile.data(
+  YourGenepopRd,
+  "https://raw.githubusercontent.com/alexkychen/assignPOP/master/inst/extdata/morphData.csv"
+)
+
+# Import morphometric data
+morphdf <- read.csv(
+  "https://raw.githubusercontent.com/alexkychen/assignPOP/master/inst/extdata/morphData.csv",
+  header = TRUE
+)
+```
+
+Population labels are then constructed and appended to the morphometric dataset, illustrating both character and numeric encodings.
+
+```{r pop-labels}
+# Population labels as characters
+pop_label_char <- c(rep("pop_A", 30), rep("pop_B", 30), rep("pop_C", 30))
+morphdf_pop_char <- cbind(morphdf, pop_label = pop_label_char)
+
+# Population labels as numeric factors
+pop_label_num <- c(rep(1, 30), rep(2, 30), rep(3, 30))
+morphdf_pop <- cbind(morphdf, pop_label = pop_label_num)
+morphdf_pop$pop_label <- as.factor(morphdf_pop$pop_label)
+```
+
+## Assignment cross-validation
+
+Monte Carlo and K-fold cross-validation are used to evaluate assignment performance for different training proportions and subsets of loci.
+
+```{r cross-validation}
+# Monte Carlo cross-validation using SVM
+assign.MC(
+  YourGenepopRd,
+  train.inds = c(0.5, 0.7, 0.9),
+  train.loci = c(0.1, 0.25, 0.5, 1),
+  loci.sample = "fst",
+  iterations = 30,
+  model = "svm",
+  dir = "Result-folder/"
+)
+
+# K-fold cross-validation using LDA
+assign.kfold(
+  YourGenepopRd,
+  k.fold = c(3, 4, 5),
+  train.loci = c(0.1, 0.25, 0.5, 1),
+  loci.sample = "random",
+  model = "lda",
+  dir = "Result-folder2/"
+)
+```
+
+Cross-validation outputs are summarized to quantify classification accuracy across scenarios.
+
+```{r cross-validation-summary}
+accuMC <- accuracy.MC(dir = "Result-folder/")      # Monte Carlo accuracy
+accuKF <- accuracy.kfold(dir = "Result-folder2/")  # K-fold accuracy
+
+# Quick inspection of accuracy objects
+str(accuMC)
+str(accuKF)
+```
+
+## Assignment of unknown individuals
+
+Unknown individuals are imported and assigned using both genetic-only and integrated data with different classifiers.
+
+```{r unknown-data}
+# Import GENEPOP file for unknown individuals
+YourGenepopUnknown <- read.Genepop(
+  "https://raw.githubusercontent.com/alexkychen/assignPOP/master/inst/extdata/simGenepopX.txt"
+)
+
+# Integrate genetic and morphometric data for unknowns
+YourIntegrateUnknown <- compile.data(
+  YourGenepopUnknown,
+  "https://raw.githubusercontent.com/alexkychen/assignPOP/master/inst/extdata/morphDataX.csv"
+)
+
+# Non-genetic data only
+NonGeneticUnknown <- read.csv(
+  "https://raw.githubusercontent.com/alexkychen/assignPOP/master/inst/extdata/morphDataX.csv",
+  header = TRUE
+)
+```
+
+Two assignment models are illustrated: naive Bayes using genetic data and a decision tree using integrated data.
+
+```{r assignment_tests_naives_Bayes}
+# 1. Assignment using genetic data and naive Bayes
+assign.X(
+  x1 = YourGenepopRd,
+  x2 = YourGenepopUnknown,
+  dir = "Result-folder3/",
+  model = "naiveBayes"
+)
+
+```
+
+
+```{r assignment_tests_decision_tree}
+# 2. Assignment using integrated data and decision tree
+assign.X(
+  x1 = YourIntegrateData,
+  x2 = YourIntegrateUnknown,
+  dir = "Result-folder4/",
+  model = "tree"
+)
+```
+
+## From assignment matrices to RHISEA inputs
+
+assignPOP can produce a membership matrix for individuals, and RHISEA requires a misclassification (phi) matrix describing baseline stock confusion rates. Here, an example `assign.matrix` output is converted to the `phi_matrix` format expected by `run_hisea_estimates()`.
+
+```{r assign-matrix}
+# Default: read all files in the specified Monte Carlo result folder
+AM <- assign.matrix(dir = "Result-folder/")
+
+# Example confusion matrix (phi matrix) constructed from assignment results
+AM_df <- data.frame(
+  origin = c("pop_A", "pop_B", "pop_C"),
+  pop_A  = c(0.25, 0.25, 0.05),
+  pop_B  = c(0.25, 0.25, 0.10),
+  pop_C  = c(0.05, 0.10, 0.10)
+)
+
+AM_matrix <- as.matrix(AM_df[, -1])
+rownames(AM_matrix) <- AM_df$origin
+colnames(AM_matrix) <- colnames(AM_df)[-1]
+
+stocks_names <- c("pop_A", "pop_B", "pop_C")
+```
+
+Individual-level assignment probabilities are then extracted from the decision-tree assignment output and formatted for RHISEA.
+
+```{r lda-classes-probs}
+# Read assignment results from integrated-data decision tree model
+LDA_assign <- data.table(
+  readit(.data = "Result-folder4/AssignmentResult.txt")
+)
+
+# Convert predicted populations to integer class labels
+LDA_classes <- as.integer(as.factor(LDA_assign$pred.pop))
+
+# Extract assignment probabilities (one column per stock)
+LDA_probs <- as.matrix(LDA_assign[, c(3, 4, 5)])
+```
+
+## Mixed-stock estimation with RHISEA
+
+Finally, RHISEA is used to convert the individual assignment results and misclassification matrix into unbiased estimates of stock mixing proportions using bootstrap resampling.
+
+```{r rhisea-run}
+results_LDA <- run_hisea_estimates(
+  pseudo_classes = LDA_classes,
+  likelihoods    = LDA_probs,
+  phi_matrix     = AM_matrix,
+  np             = 3,
+  type           = "BOOTSTRAP",
+  stocks_names   = stocks_names,
+  export_csv     = TRUE,
+  output_dir     = "rf_results_4Mod",
+  verbose        = TRUE
+)
+
+print(results_LDA$mean_estimates)
+print(results_LDA$sd_estimates)
+
+```
+
+This workflow demonstrates how genetic classification output from an external, widely used assignment framework (for example, individual probability classification with the assignPOP package) can be directly integrated into RHISEA, enabling mixed-stock estimation that explicitly accounts for both assignment uncertainty and baseline misclassification.
+
+This highlights the adaptive capacity of RHISEA and shows that the package can flexibly incorporate different genetic assignment pipelines without imposing restrictive assumptions on how individual probabilities are generated.

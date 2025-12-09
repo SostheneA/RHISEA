@@ -1,0 +1,19 @@
+ Analysis Description ( R - assignPOP ver. 1.3.1 )
+ Perform assign.kfold() @ 2025-12-09 10:01:14 
+
+ k.fold = 3 4 5 
+ train.loci = 0.1 0.25 0.5 1 
+ Total assignment tests = 48 
+ Fst locus sample method: random 
+ Data scaled and centerd: FALSE 
+ PC retaining criteria: kaiser-guttman 
+ PCA for non-genetic data: mixed 
+ Machine learning model: lda 
+
+ Input Data ( genetics )
+ Number of individuals: 90 
+ Number of loci: 693 
+ Number of non-genetic variables: 0 
+ Number of populations: 3 
+ pop_A pop_B pop_C 
+ 30 30 30 

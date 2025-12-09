@@ -26,12 +26,13 @@ articles:
 - title: Tutorials
   navbar: ~
   contents:
+  - RHISEA_comprehensive_Guide
   - RHISEA_vs_Fortran
   - Custom_Classification_Models
-  - RHISEA_data_type
   - Multiple_Classifiers
-  - RHISEA_comprehensive_Guide
+  - RHISEA_data_type
   - complex_mixed_stocks
+  - Estimate_genetics_data
 
 
 # Function reference, organized in sections
