@@ -2,7 +2,7 @@
 % Please edit documentation in R/Final.R
 \name{run_hisea_all}
 \alias{run_hisea_all}
-\title{Internal Main Function for HISEA Run}
+\title{Run HISEA Mixed Stock Analysis}
 \usage{
 run_hisea_all(
   type = "ANALYSIS",
@@ -31,107 +31,106 @@ run_hisea_all(
 )
 }
 \arguments{
-\item{type}{Character. Type of analysis to perform. Default: "ANALYSIS"}
+\item{type}{Character. "SIMULATION", "ANALYSIS" or "BOOTSTRAP".}
 
-\item{np}{Integer. Number of populations/stocks. Default: 2}
+\item{np}{Integer. Number of populations (stocks).}
 
-\item{nv}{Integer. Number of variables/loci. Default: 2}
+\item{nv}{Integer. Number of variables.}
 
-\item{seed_val}{Integer. Random seed for reproducibility. Default: 123456}
+\item{seed_val}{Integer. Random seed for reproducibility.}
 
-\item{var_cols_std}{Character vector of column names for baseline variables}
+\item{var_cols_std}{Character vector of column names for baseline variables.}
 
-\item{var_cols_mix}{Character vector of column names for mixture variables}
+\item{var_cols_mix}{Character vector of column names for mixture variables.}
 
-\item{stock_col}{Character name of stock column in baseline data}
+\item{stock_col}{Character name of stock column in baseline data.}
 
-\item{nsamps}{Integer. Number of bootstrap samples. Default: 1000}
+\item{nsamps}{Integer. Number of replicates.}
 
-\item{Nmix}{Integer. Size of mixture sample. Default: 100}
+\item{Nmix}{Integer. Sample size of the simulated mixture (for SIMULATION only).}
 
-\item{actual}{Numeric vector. True composition proportions. Default: c(0.5, 0.5)}
+\item{actual}{Numeric vector. True proportions used in simulation.}
 
-\item{baseline_input}{Data frame or file path for baseline data}
+\item{baseline_input}{Data frame or file path for baseline data.}
 
-\item{mix_input}{Data frame or file path for mixture data}
+\item{mix_input}{Data frame or file path for mixture data.}
 
-\item{export_csv}{Logical. Whether to export results to CSV. Default: TRUE}
+\item{export_csv}{Logical. Whether to export summary and confusion matrix to CSV.}
 
-\item{output_dir}{Character. Output directory path. Default: getwd()}
+\item{output_dir}{Character. Output directory.}
 
-\item{verbose}{Logical. Whether to print progress messages. Default: TRUE}
+\item{verbose}{Logical. Print progress messages.}
 
-\item{method_class}{Character. Classification method ("LDA", "RF", "SVM", etc.). Default: "LDA"}
+\item{method_class}{Character. Classification method (e.g., "LDA", "RF", "SVM", etc.).}
 
-\item{stocks_names}{Character vector. Names of stocks. Default: NULL}
+\item{stocks_names}{Character vector. Optional vector of stock names.}
 
-\item{resample_baseline}{Logical. Whether to resample baseline data. Default: FALSE}
+\item{resample_baseline}{Logical. Resample the baseline for each replicate.}
 
-\item{resampled_baseline_sizes}{Integer vector. Sizes for resampled baseline. Default: NULL}
+\item{resampled_baseline_sizes}{Integer vector. Sizes of resamples per stock.}
 
-\item{phi_method}{Character. Method for phi calculation. Default: "default"}
+\item{phi_method}{Character. "standard" or "cv" (cross-validation-based confusion matrix).}
 
-\item{mclust_model_names}{Character vector. Model names for mclust. Default: NULL}
+\item{mclust_model_names}{Character vector. Models to test with Mclust.}
 
-\item{mclust_perform_cv}{Logical. Whether to perform cross-validation for mclust. Default: FALSE}
+\item{mclust_perform_cv}{Logical. Whether to cross-validate Mclust.}
 
-\item{...}{Additional arguments passed to the underlying classifier.
-Certain classifiers support hyperparameter tuning via these arguments:
-\itemize{
-\item \strong{Random Forest (RF)}: \code{ntree}, \code{mtry}, \code{nodesize}, \code{maxnodes}
-\itemize{
-\item Example: \code{run_hisea_all(..., method_class="RF", ntree=5000, mtry=3)}
-}
-\item \strong{Support Vector Machine (SVM)}: \code{cost}, \code{gamma}, \code{kernel}
-\itemize{
-\item Example: \code{run_hisea_all(..., method_class="SVM", cost=10, kernel="radial")}
-}
-\item \strong{XGBoost (XGB)}: \code{nrounds}, \code{max_depth}, \code{eta}, \code{subsample}, \code{colsample_bytree}
-\itemize{
-\item Example: \code{run_hisea_all(..., method_class="XGB", nrounds=100, max_depth=4)}
-}
-\item \strong{k-Nearest Neighbors (KNN)}: \code{k}
-\itemize{
-\item Example: \code{run_hisea_all(..., method_class="KNN", k=5)}
-}
-\item \strong{Artificial Neural Network (ANN)}: \code{size}, \code{decay}, \code{maxit}
-\itemize{
-\item Example: \code{run_hisea_all(..., method_class="ANN", size=10, decay=0.01)}
-}
-\item \strong{Naive Bayes (NB)}: \code{laplace}
-\itemize{
-\item Example: \code{run_hisea_all(..., method_class="NB", laplace=1)}
-}
-}
-
-⚠ Ensure that the names of arguments match those expected by the classifier.
-Unrecognized arguments may be ignored or raise an error.}
+\item{...}{Additional arguments passed to the underlying classification models (e.g., ntree for Random Forest, cost for SVM).}
 }
 \value{
-List containing:
+A list of length 8 containing the statistical summary of the estimation
+(the same as the `estimation_summary` element in the saved file):
 \describe{
-\item{estimates}{Matrix of stock composition estimates}
-\item{mean}{Mean estimates across bootstrap samples}
-\item{sd}{Standard deviations of estimates}
-\item{performance}{Performance metrics if applicable}
+  \item{mean_estimates}{Matrix [np x nsamps] of mean estimated proportions.}
+  \item{sd_estimates}{Standard deviations of the estimates.}
+  \item{mse_estimates}{Mean Squared Error (if applicable).}
+  \item{var_emp}{Empirical variance of the estimates.}
+  \item{covar_ml}{Maximum Likelihood covariance matrix.}
+  \item{cor_ml}{Correlation matrix.}
+  \item{covar_inv_ml}{Inverse of the covariance matrix.}
+  \item{det_covar_ml}{Determinant of the covariance matrix (checks for singularity).}
 }
 }
 \description{
-Does the full analysis/simulation/bootstrap run
-Run Complete HISEA Stock Composition Analysis
+This is the main wrapper function and core set of utilities for running the HISEA mixed-stock analysis
+framework, allowing simulation, analysis, or bootstrap estimation of stock composition from mixture samples.
 
-This function performs comprehensive stock composition analysis using various
-statistical methods including LDA, Random Forest, SVM, XGBoost, and others.
+Supported operation modes:
+- **SIMULATION**: Simulate mixtures based on known proportions and evaluate performance of classification and estimators.
+- **ANALYSIS**: Apply trained classifier to real mixture data to estimate stock proportions.
+- **BOOTSTRAP**: Resample real mixture to evaluate variability of estimates.
+
+Supported classifiers: LDA, QDA, Random Forest, SVM, k-NN, ANN, XGBoost, Naive Bayes, Mclust, MLR.
+Supported estimators: RAW, Cook, Constrained Cook, EM (Millar), Maximum Likelihood.
+
+Includes integrated 10-fold cross-validation and model quality evaluation (accuracy, kappa, F1, etc.).
 }
+\section{Saved Results Structure}{
+
+The function automatically saves a `.rda` file in `output_dir` containing a
+master list named `out`. This list includes:
+\describe{
+  \item{estimation_summary}{The list of 8 statistical metrics described above.}
+  \item{classification_model}{The trained classifier object (e.g., LDA, RF).}
+  \item{baseline_classification_quality}{Accuracy, Kappa, and F1 scores.}
+  \item{phi_matrix}{The confusion matrix used for bias correction.}
+  \item{mixture_classification_details}{Predicted classes and posterior probabilities.}
+}
+}
+
 \examples{
-\dontrun{
-# Basic analysis with LDA
-result <- run_hisea_all(
-  np = 2,
-  nv = 3,
-  method_class = "LDA",
-  baseline_path = "my_baseline.txt",
-  mix_path = "my_mixture.txt"
+data(baseline)
+data(mixture)
+
+res <- run_hisea_all(
+  baseline_input = baseline,
+  mix_input      = mixture,
+  stock_col      = "population",
+  var_cols_std   = c("d13c", "d18o"),
+  var_cols_mix   = c("d13c_ukn", "d18o_ukn"),
+  output_dir     = tempdir(),
+  np = 2, nv = 2, nsamps = 5, Nmix = 50, method_class = "LDA"
 )
-}
+print(res$mean_estimates)
+
 }

@@ -13,20 +13,28 @@ Each matrix should have observations as rows and variables as columns.}
 }
 \value{
 A numeric matrix of LDF coefficients. Rows correspond to populations,
-and columns correspond to variables followed by the constant term.
-The dimensions are (np x (nv + 1)).
+        and columns correspond to variables followed by the constant term.
+        The dimensions are (np x (nv + 1)).
 }
 \description{
 Computes the coefficients for Fisher's Linear Discriminant Function for each
 group (population/stock). This implementation assumes a common (pooled)
 covariance matrix across all groups, a standard assumption for LDA.
-The LDF is of the form: LDF_j(x) = C_j0 + C_j1\emph{x1 + ... + C_jp}xp.
+The LDF is of the form: LDF_j(x) = C_j0 + C_j1*x1 + ... + C_jp*xp.
 }
 \examples{
-# Create dummy baseline data for 2 stocks with 2 variables
-stock1_data <- matrix(rnorm(20, mean = 0), ncol = 2)
-stock2_data <- matrix(rnorm(20, mean = 1), ncol = 2)
-baseline_list <- list(StockA = stock1_data, StockB = stock2_data) # Named list
+# Create dummy baseline data for 2 stocks with 2 variables (isotopes)
+# Stock A
+s1 <- matrix(c(-10, 2, -11, 2.1, -10.5, 2.2), ncol = 2)
+colnames(s1) <- c("d13c", "d18o")
+# Stock B
+s2 <- matrix(c(-15, 5, -16, 5.1, -15.5, 5.2), ncol = 2)
+colnames(s2) <- c("d13c", "d18o")
+
+baseline_list <- list(StockA = s1, StockB = s2)
+
+# Compute coefficients
 ldf_coeffs <- compute_ldf_coefficients(baseline_list)
 print(ldf_coeffs)
+
 }

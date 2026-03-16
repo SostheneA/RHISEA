@@ -10,9 +10,9 @@ author:
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\\VignetteIndexEntry{Applying HISEA estimators to custom classification models with run_hisea_estimates}
-  %\\VignetteEngine{knitr::rmarkdown}
-  %\\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Comprehensive Guide to the RHISEA Package for Mixed-Stock Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -73,10 +73,10 @@ library(RHISEA)
 
 # Load baseline and mixture data
 baseline_file <- system.file("extdata", "baseline.rda", package = "RHISEA")
-mixture_file  <- system.file("extdata", "mixture.rda",  package = "RHISEA")
+mixture_file <- system.file("extdata", "mixture.rda", package = "RHISEA")
 
-load(baseline_file)  # loads `baseline` data.frame
-load(mixture_file)   # loads `mixture` data.frame
+load(baseline_file) # loads `baseline` data.frame
+load(mixture_file) # loads `mixture` data.frame
 
 # Prepare baseline data
 baseline$population <- as.factor(baseline$population)
@@ -90,29 +90,33 @@ formula <- population ~ d13c + d18o
 get_cv_results_lda <- function(data, formula, k = 10) {
   set.seed(123)
   folds <- createFolds(data$population, k = k, list = TRUE)
-  
+
   all_predictions <- factor(rep(NA, nrow(data)), levels = levels(data$population))
-  all_probabilities <- matrix(NA, nrow = nrow(data), ncol = length(levels(data$population)),
-                              dimnames = list(NULL, levels(data$population)))
-  
-  for(i in seq_along(folds)) {
+  all_probabilities <- matrix(NA,
+    nrow = nrow(data), ncol = length(levels(data$population)),
+    dimnames = list(NULL, levels(data$population))
+  )
+
+  for (i in seq_along(folds)) {
     test_idx <- folds[[i]]
     train_data <- data[-test_idx, ]
     test_data <- data[test_idx, ]
-    
+
     model <- lda(formula, data = train_data)
     pred <- predict(model, test_data)
     all_predictions[test_idx] <- pred$class
     all_probabilities[test_idx, ] <- pred$posterior
   }
-  
+
   conf_matrix <- table(Predicted = all_predictions, Actual = data$population)
   phi_matrix <- prop.table(conf_matrix, margin = 2)
-  
-  list(confusion_matrix = conf_matrix,
-       phi_matrix = phi_matrix,
-       predictions = all_predictions,
-       probabilities = all_probabilities)
+
+  list(
+    confusion_matrix = conf_matrix,
+    phi_matrix = phi_matrix,
+    predictions = all_predictions,
+    probabilities = all_probabilities
+  )
 }
 
 # Run CV and get phi matrix
@@ -163,9 +167,11 @@ colnames(results_long) <- c("Stock", "Method", "Proportion")
 ggplot(results_long, aes(x = Method, y = Proportion, fill = Stock)) +
   geom_bar(stat = "identity", position = "dodge") +
   theme_minimal() +
-  labs(title = "LDA Stock Proportion Estimates",
-       y = "Estimated Proportion",
-       x = "Estimation Method") +
+  labs(
+    title = "LDA Stock Proportion Estimates",
+    y = "Estimated Proportion",
+    x = "Estimation Method"
+  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -182,28 +188,32 @@ library(randomForest)
 get_cv_results_rf <- function(data, formula, k = 10, ntree = 500) {
   set.seed(123)
   folds <- createFolds(data$population, k = k, list = TRUE)
-  
+
   all_predictions <- factor(rep(NA, nrow(data)), levels = levels(data$population))
-  all_probabilities <- matrix(NA, nrow = nrow(data), ncol = length(levels(data$population)),
-                              dimnames = list(NULL, levels(data$population)))
-  
-  for(i in seq_along(folds)) {
+  all_probabilities <- matrix(NA,
+    nrow = nrow(data), ncol = length(levels(data$population)),
+    dimnames = list(NULL, levels(data$population))
+  )
+
+  for (i in seq_along(folds)) {
     test_idx <- folds[[i]]
     train_data <- data[-test_idx, ]
     test_data <- data[test_idx, ]
-    
+
     model <- randomForest(formula, data = train_data, ntree = ntree)
     all_predictions[test_idx] <- predict(model, test_data)
     all_probabilities[test_idx, ] <- predict(model, test_data, type = "prob")
   }
-  
+
   conf_matrix <- table(Predicted = all_predictions, Actual = data$population)
   phi_matrix <- prop.table(conf_matrix, margin = 2)
-  
-  list(confusion_matrix = conf_matrix,
-       phi_matrix = phi_matrix,
-       predictions = all_predictions,
-       probabilities = all_probabilities)
+
+  list(
+    confusion_matrix = conf_matrix,
+    phi_matrix = phi_matrix,
+    predictions = all_predictions,
+    probabilities = all_probabilities
+  )
 }
 
 # Run CV and get phi matrix
@@ -243,9 +253,11 @@ colnames(results_long) <- c("Stock", "Method", "Proportion")
 ggplot(results_long, aes(x = Method, y = Proportion, fill = Stock)) +
   geom_bar(stat = "identity", position = "dodge") +
   theme_minimal() +
-  labs(title = "Random Forest Stock Proportion Estimates",
-       y = "Estimated Proportion",
-       x = "Estimation Method") +
+  labs(
+    title = "Random Forest Stock Proportion Estimates",
+    y = "Estimated Proportion",
+    x = "Estimation Method"
+  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
@@ -262,40 +274,48 @@ library(party)
 get_cv_results_ctree <- function(data, formula, k = 10) {
   set.seed(123)
   folds <- createFolds(data$population, k = k, list = TRUE)
-  
+
   all_predictions <- factor(rep(NA, nrow(data)), levels = levels(data$population))
-  all_probabilities <- matrix(NA, nrow = nrow(data), ncol = length(levels(data$population)),
-                              dimnames = list(NULL, levels(data$population)))
-  
-  for(i in seq_along(folds)) {
+  all_probabilities <- matrix(NA,
+    nrow = nrow(data), ncol = length(levels(data$population)),
+    dimnames = list(NULL, levels(data$population))
+  )
+
+  for (i in seq_along(folds)) {
     test_idx <- folds[[i]]
     train_data <- data[-test_idx, ]
     test_data <- data[test_idx, ]
-    
+
     model <- ctree(formula, data = train_data)
     pred_probs <- predict(model, test_data, type = "prob")
     pred_probs_matrix <- do.call(rbind, pred_probs)
     all_predictions[test_idx] <- predict(model, test_data)
     all_probabilities[test_idx, ] <- pred_probs_matrix
   }
-  
+
   conf_matrix <- table(Predicted = all_predictions, Actual = data$population)
   phi_matrix <- prop.table(conf_matrix, margin = 2)
-  
-  list(confusion_matrix = conf_matrix,
-       phi_matrix = phi_matrix,
-       predictions = all_predictions,
-       probabilities = all_probabilities)
+
+  list(
+    confusion_matrix = conf_matrix,
+    phi_matrix = phi_matrix,
+    predictions = all_predictions,
+    probabilities = all_probabilities
+  )
 }
 
 # Run CV and get phi matrix
 ctree_cv <- get_cv_results_ctree(baseline, formula)
 
 # Train full CTREE model on baseline
-ctree_model <- ctree(formula, data = baseline,
-                     controls = ctree_control(mincriterion = 0.95,
-                                              minsplit = 20,
-                                              minbucket = 7))
+ctree_model <- ctree(formula,
+  data = baseline,
+  controls = ctree_control(
+    mincriterion = 0.95,
+    minsplit = 20,
+    minbucket = 7
+  )
+)
 
 # Predict classes and posterior probabilities for mixture
 ctree_probs <- predict(ctree_model, mix_data_prepared, type = "prob")
@@ -331,11 +351,23 @@ colnames(results_long) <- c("Stock", "Method", "Proportion")
 ggplot(results_long, aes(x = Method, y = Proportion, fill = Stock)) +
   geom_bar(stat = "identity", position = "dodge") +
   theme_minimal() +
-  labs(title = "CTREE Stock Proportion Estimates",
-       y = "Estimated Proportion",
-       x = "Estimation Method") +
+  labs(
+    title = "CTREE Stock Proportion Estimates",
+    y = "Estimated Proportion",
+    x = "Estimation Method"
+  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
 ```
+
+
+```{r delete, echo=FALSE}
+unlink("results_lda", recursive = TRUE, force = TRUE)
+unlink("results_rf", recursive = TRUE, force = TRUE)
+unlink("results_ctree", recursive = TRUE, force = TRUE)
+unlink(c("*.rda", "*.std", "*.mix", "*.ctr", "*.out", "*.xlsx", "fort.*"), force = TRUE)
+```
+
 
 ------------------------------------------------------------------------
 

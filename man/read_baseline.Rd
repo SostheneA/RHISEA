@@ -7,19 +7,39 @@
 read_baseline(filepath, nv)
 }
 \arguments{
-\item{filepath}{Character string, the path to the baseline \code{.std} file.}
+\item{filepath}{Character string, the path to the baseline `.std` file.}
 
 \item{nv}{Integer, the number of variables (columns) expected for each observation
 in the baseline data.}
 }
 \value{
 A list of numeric matrices. Each matrix in the list corresponds to a
-stock/population, with rows being observations and columns being variables.
-Returns an empty list if no valid data is found or errors occur during parsing.
+        stock/population, with rows being observations and columns being variables.
+        Returns an empty list if no valid data is found or errors occur during parsing.
 }
 \description{
 Reads a HISEA-formatted baseline (standard) data file. The file is expected to
 contain data for multiple stocks/populations, with data for each stock
 separated by a delimiter string (e.g., "NEXT STOCK").
 Blank lines and lines starting with '#' (comments) are ignored.
+}
+\examples{
+# Create a dummy HISEA standard file
+tmp_std <- tempfile(fileext = ".std")
+writeLines(c(
+  "# Stock A",
+  "1.2  3.4",
+  "5.6  7.8",
+  "NEXT STOCK",
+  "# Stock B",
+  "9.0  1.1"
+), tmp_std)
+
+# Read the baseline (2 variables expected)
+baseline_data <- read_baseline(tmp_std, nv = 2)
+
+# Check the results
+print(baseline_data)
+length(baseline_data) # Should be 2
+
 }

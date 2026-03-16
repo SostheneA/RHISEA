@@ -8,7 +8,7 @@ utils::globalVariables(c("Stock", "Mean", "Estimator", "SD", "ActualValue"))}
 plot_hisea_theta(summary_report, stock_names = NULL, actual_proportions = NULL)
 }
 \arguments{
-\item{summary_report}{Output from code{create_hisea_summary_report}.}
+\item{summary_report}{Output from \code{create_hisea_summary_report}.}
 
 \item{stock_names}{Optional character vector for stock labels.}
 
@@ -20,4 +20,19 @@ A ggplot object.
 \description{
 Plot HISEA theta estimates with error bars
 utils::globalVariables(c("Stock", "Mean", "Estimator", "SD", "ActualValue"))
+}
+\examples{
+# 1. Generate a summary report first
+nsamps <- 5; np <- 2; nest <- 2
+est_array <- array(runif(nsamps * np * nest), dim = c(nsamps, np, nest))
+dimnames(est_array) <- list(NULL, c("Pop1", "Pop2"), c("RAW", "ML"))
+rep <- create_hisea_summary_report(est_array, run_type = "ANALYSIS")
+
+# 2. Plot results
+if (requireNamespace("ggplot2", quietly = TRUE)) {
+  p <- plot_hisea_theta(rep, actual_proportions = c(0.5, 0.5))
+  print(p)
+}
+
+
 }

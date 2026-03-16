@@ -1,23 +1,33 @@
 Package: RHISEA
 Type: Package
-Title: RHISEA: An R package for modern mixed-stock analysis with flexible classification frameworks
+Title: RHISEA: Modern Mixed-Stock Analysis with Flexible Classifiers
 Version: 0.1.0
 Authors@R: 
-    c(person("Sosthene", "Akia", email = "sosthene.akia@dfo-mpo.ca", role = c("aut", "cre")),
-    person("Alex", "Hanke", email = "alex.hanke@dfo-mpo.ca", role = "aut"))
-Description: R implementation of the HISEA method for mixed stock analysis, 
-    supporting multiple classifiers (LDA, RF, MCLUST, etc.) and estimators 
-    (COOK, EM, ML). Includes simulation, bootstrap, and full analysis routines.
+    c(person("Sosthene", "A. V. Akia", 
+             email = "sosthene.akia@dfo-mpo.gc.ca", 
+             role = c("aut", "cre", "cph"),
+             comment = "Fisheries and Oceans Canada, Gulf Fisheries Centre"),
+      person("Alex", "Hanke", 
+             email = "alex.hanke@dfo-mpo.gc.ca", 
+             role = c("aut", "cph"),
+             comment = "Fisheries and Oceans Canada, St. Andrews Biological Station"))
+Maintainer: Sosthene A. V. Akia <sosthene.akia@dfo-mpo.gc.ca>
+Description: RHISEA modernizes Millar's HISEA (1987,1990) methodology for reproducible mixed-stock analysis. 
+    Supports multiple classifiers (LDA, RF, MCLUST, SVM, etc.) and estimators (EM, ML, COOK). 
+    Includes simulation frameworks, bootstrap resampling, and complete analysis workflows 
+    for fisheries stock assessment and population structure inference.
 License: GPL-3
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
-Config/roxygenNote: 7.3.2
-Depends: R (>= 3.6.0)
+Depends: 
+    R (>= 3.5.0)
 Imports:
     stats,
     utils,
     MASS,
+    data.table,
+    ggplot2,
+    tidyr,
     caret,
     xgboost,
     randomForest,
@@ -25,15 +35,18 @@ Imports:
     e1071,
     mclust,
     class,
-    kknn,
-    ggplot2,
-    tidyr,
-    data.table
-Suggests:
-    testthat,
+    kknn
+SystemRequirements: Windows (for the included hisea.exe binary)
+Suggests: 
+    testthat (>= 3.0.0),
     roxygen2,
     knitr,
-    rmarkdown
+    rmarkdown,
+    covr,
+    readr,
+    dplyr
 VignetteBuilder: knitr
 URL: https://github.com/SostheneA/RHISEA
 BugReports: https://github.com/SostheneA/RHISEA/issues
+Config/testthat/edition: 3
+LazyData: true

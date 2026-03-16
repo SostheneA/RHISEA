@@ -61,20 +61,27 @@ ordvec <- function(num, upper) {
 #'                     Must sum to 1 and have the same length as `baseline_data_list`.
 #' @param N_mixture_size Integer, the total number of individuals to draw for the synthetic mixture.
 #'
+#' @examples
+#' # 1. Prepare dummy baseline data for 2 stocks
+#' stock1 <- matrix(rnorm(40, mean = 0, sd = 1), ncol = 2)
+#' stock2 <- matrix(rnorm(60, mean = 2, sd = 1), ncol = 2)
+#' baseline_list <- list(StockA = stock1, StockB = stock2)
+#'
+#' # 2. Set true proportions and mixture size
+#' true_props <- c(0.6, 0.4)
+#' n_mix <- 100
+#'
+#' # 3. Generate the synthetic mixture
+#' simulated_sample <- simulate_mixture(baseline_list, true_props, n_mix)
+#'
+#' # 4. Verify output
+#' head(simulated_sample)
+#' nrow(simulated_sample) # Should be 100
+#'
 #' @return A numeric matrix representing the simulated mixture sample. Rows are
 #'         individuals, and columns are variables. Returns an error if the mixture
 #'         cannot be formed (e.g., due to empty baseline stocks needed for sampling).
 #' @export
-#' @examples
-#' # Dummy baseline data
-#' stock1 <- matrix(rnorm(20 * 2, mean = 0, sd = 1), ncol = 2) # Assuming 2 variables
-#' stock2 <- matrix(rnorm(30 * 2, mean = 2, sd = 1), ncol = 2) # Assuming 2 variables
-#' baseline_list_ex <- list(stock1, stock2)
-#' true_props_ex <- c(0.6, 0.4) # 60% from stock1, 40% from stock2
-#' mixture_N_ex <- 100
-#' # simulated_sample_ex <- simulate_mixture(baseline_list_ex, true_props_ex, mixture_N_ex)
-#' # print(head(simulated_sample_ex))
-#' # print(nrow(simulated_sample_ex)) # Should be close to 100
 simulate_mixture <- function(baseline_data_list, actual_proportions, N_mixture_size) {
   # --- Input Validation ---
   if (!is.list(baseline_data_list) || length(baseline_data_list) == 0) {
@@ -102,7 +109,7 @@ simulate_mixture <- function(baseline_data_list, actual_proportions, N_mixture_s
     stop("'N_mixture_size' must be a single positive integer.")
   }
   num_vars_check <- sapply(baseline_data_list, ncol)
-  if(length(unique(num_vars_check[sapply(baseline_data_list, function(x) !is.null(x) && nrow(x) > 0)])) > 1){
+  if (length(unique(num_vars_check[sapply(baseline_data_list, function(x) !is.null(x) && nrow(x) > 0)])) > 1) {
     stop("All non-empty baseline stock matrices must have the same number of columns (variables).")
   }
 
@@ -127,29 +134,32 @@ simulate_mixture <- function(baseline_data_list, actual_proportions, N_mixture_s
     current_stock_data <- baseline_data_list[[j]]
     # Default number of columns for empty matrices, taken from first non-empty stock if possible
     default_ncol <- unique(num_vars_check[sapply(baseline_data_list, function(x) !is.null(x) && nrow(x) > 0)])[1]
-    if(is.na(default_ncol) && length(baseline_data_list)>0) default_ncol <- ncol(baseline_data_list[[1]]) # fallback if all empty
+    if (is.na(default_ncol) && length(baseline_data_list) > 0) default_ncol <- ncol(baseline_data_list[[1]]) # fallback if all empty
 
     # Skip if no samples are to be drawn from this stock
     if (num_to_sample_from_stock_j == 0) {
       # Store an empty matrix with correct number of columns if possible
-      n_cols_for_empty <- if(!is.null(ncol(current_stock_data))) ncol(current_stock_data) else if(!is.na(default_ncol)) default_ncol else 0
+      n_cols_for_empty <- if (!is.null(ncol(current_stock_data))) ncol(current_stock_data) else if (!is.na(default_ncol)) default_ncol else 0
       mixture_components[[j]] <- matrix(numeric(0), ncol = n_cols_for_empty, nrow = 0)
       next
     }
 
-    num_available_in_stock_j <- if(is.null(current_stock_data)) 0 else nrow(current_stock_data)
+    num_available_in_stock_j <- if (is.null(current_stock_data)) 0 else nrow(current_stock_data)
 
     if (num_available_in_stock_j == 0) {
       # This condition means we need to sample from an empty stock. This is an error.
-      stop(paste("Cannot sample", num_to_sample_from_stock_j, "individuals from stock", j,
-                 "as it has no available data in 'baseline_data_list'."))
+      stop(paste(
+        "Cannot sample", num_to_sample_from_stock_j, "individuals from stock", j,
+        "as it has no available data in 'baseline_data_list'."
+      ))
     }
 
     # Sample 'num_to_sample_from_stock_j' individuals from 'current_stock_data'
     # Sampling WITH REPLACEMENT is standard for this type of simulation.
     sampled_indices <- sample(seq_len(num_available_in_stock_j),
-                              size = num_to_sample_from_stock_j,
-                              replace = TRUE)
+      size = num_to_sample_from_stock_j,
+      replace = TRUE
+    )
     mixture_components[[j]] <- current_stock_data[sampled_indices, , drop = FALSE]
   }
 
@@ -164,7 +174,7 @@ simulate_mixture <- function(baseline_data_list, actual_proportions, N_mixture_s
     stop("Simulate_mixture resulted in an empty mixture despite N_mixture_size > 0. Check actual_proportions and baseline data availability.")
   } else { # N_mixture_size was 0
     # Determine number of columns from first available baseline or default to 0
-    n_cols_final <- if(!is.null(default_ncol) && !is.na(default_ncol)) default_ncol else 0
+    n_cols_final <- if (!is.null(default_ncol) && !is.na(default_ncol)) default_ncol else 0
     final_mixture_sample <- matrix(numeric(0), ncol = n_cols_final, nrow = 0)
   }
 

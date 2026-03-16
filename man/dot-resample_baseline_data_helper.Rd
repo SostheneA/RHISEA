@@ -2,7 +2,7 @@
 % Please edit documentation in R/Final.R
 \name{.resample_baseline_data_helper}
 \alias{.resample_baseline_data_helper}
-\title{Run HISEA Mixed Stock Analysis}
+\title{Helper: resample baseline data per stock}
 \usage{
 .resample_baseline_data_helper(
   original_baseline_list,
@@ -12,87 +12,18 @@
 )
 }
 \arguments{
-\item{type}{Character. "SIMULATION", "ANALYSIS" or "BOOTSTRAP".}
+\item{original_baseline_list}{List of baseline matrices.}
 
-\item{np}{Integer. Number of populations (stocks).}
+\item{resampled_sizes}{Integer vector of sizes for resampling.}
 
-\item{nv}{Integer. Number of variables.}
+\item{stock_names_for_error}{Character vector of stock names for error messages.}
 
-\item{seed_val}{Integer. Random seed for reproducibility.}
-
-\item{nsamps}{Integer. Number of replicates.}
-
-\item{Nmix}{Integer. Sample size of the simulated mixture (for SIMULATION only).}
-
-\item{actual}{Numeric vector. True proportions used in simulation.}
-
-\item{baseline_path}{Character. File path to the baseline \code{.std} file.}
-
-\item{mix_path}{Character. File path to the mixture \code{.mix} file.}
-
-\item{export_csv}{Logical. Whether to export summary and confusion matrix to CSV.}
-
-\item{output_dir}{Character. Output directory.}
-
-\item{verbose}{Logical. Print progress messages.}
-
-\item{method_class}{Character. Classification method (e.g., "LDA", "RF", "SVM", etc.).}
-
-\item{stocks_names}{Character vector. Optional vector of stock names.}
-
-\item{resample_baseline}{Logical. Resample the baseline for each replicate.}
-
-\item{resampled_baseline_sizes}{Integer vector. Sizes of resamples per stock.}
-
-\item{phi_method}{Character. "standard" or "cv" (cross-validation-based confusion matrix).}
-
-\item{mclust_model_names}{Character vector. Models to test with Mclust.}
-
-\item{mclust_perform_cv}{Logical. Whether to cross-validate Mclust.}
+\item{nv_fallback}{Integer. Number of variables to use if a matrix is empty.}
 }
 \value{
-A list with:
-\describe{
-\item{estimation_summary}{Summary table with mean, SD, and RMSE of estimates.}
-\item{classification_model}{Final trained classifier object.}
-\item{baseline_classification_quality}{Accuracy, Kappa, and per-class metrics.}
-\item{phi_matrix}{Estimated confusion matrix used in corrections.}
-\item{mixture_classification_details}{List with predicted pseudo-classes and likelihoods.}
-}
-
-A \code{.rda} file of results is also saved in \code{output_dir}.
+A list of resampled matrices.
 }
 \description{
-This is the main wrapper function and core set of utilities for running the HISEA mixed-stock analysis
-framework, allowing simulation, analysis, or bootstrap estimation of stock composition from mixture samples.
-
-Supported operation modes:
-\itemize{
-\item \strong{SIMULATION}: Simulate mixtures based on known proportions and evaluate performance of classification and estimators.
-\item \strong{ANALYSIS}: Apply trained classifier to real mixture data to estimate stock proportions.
-\item \strong{BOOTSTRAP}: Resample real mixture to evaluate variability of estimates.
+Helper: resample baseline data per stock
 }
-
-Supported classifiers: LDA, QDA, Random Forest, SVM, k-NN, ANN, XGBoost, Naive Bayes, Mclust, MLR.
-Supported estimators: RAW, Cook, Constrained Cook, EM (Millar), Maximum Likelihood.
-
-Includes integrated 10-fold cross-validation and model quality evaluation (accuracy, kappa, F1, etc.).
-}
-\examples{
-\dontrun{
-run_hisea_all(type="SIMULATION",
-             np=3, nv=5,
-             actual=c(0.2,0.3,0.5),
-             Nmix=200,
-             baseline_path="baseline.std",
-             method_class="RF",
-             resample_baseline=TRUE,
-             resampled_baseline_sizes=c(100,100,100),
-             output_dir="results")
-}
-
-}
-\seealso{
-\code{compute_cook_estimators}, \code{estimate_millar}, \code{estimate_ml},
-\code{get_cv_metrics_and_phi}, \code{train_model}, \code{predict_model}, \code{.resample_baseline_data_helper}
-}
+\keyword{internal}

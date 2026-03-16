@@ -42,7 +42,7 @@ We run the same analysis with LDA classifier and compare the results (means, boo
 library(RHISEA)
 library(tidyverse)
 library(data.table)
-library(mclust)     # used by some RHISEA internals or for post-analysis
+library(mclust) # used by some RHISEA internals or for post-analysis
 ```
 
 
@@ -51,10 +51,10 @@ library(mclust)     # used by some RHISEA internals or for post-analysis
 ```{r load-data}
 # Option A: load .rda saved objects (development)
 baseline_file <- system.file("extdata", "baseline.rda", package = "RHISEA")
-mixture_file  <- system.file("extdata", "mixture.rda",  package = "RHISEA")
+mixture_file <- system.file("extdata", "mixture.rda", package = "RHISEA")
 
-load(baseline_file)  # loads `baseline` data.frame
-load(mixture_file)   # loads `mixture` data.frame
+load(baseline_file) # loads `baseline` data.frame
+load(mixture_file) # loads `mixture` data.frame
 
 # Quick checks
 stopifnot(is.data.frame(baseline) || is.data.table(baseline))
@@ -85,7 +85,7 @@ list.files(pattern = "hisea\\.(std|mix)$")
 ```{r params}
 np <- 2
 nv <- 2
-Nsamps <- 1000     # number of bootstrap/resampling iterations inside run_hisea_all (depends on function)
+Nsamps <- 1000 # number of bootstrap/resampling iterations inside run_hisea_all (depends on function)
 Nmix <- 100
 baseline_file <- "hisea.std"
 mixture_file <- "hisea.mix"
@@ -104,7 +104,7 @@ seed_val <- 123456
 DataFrame_option <- run_hisea_all(
   type = "ANALYSIS",
   np = np,
-  phi_method = "cv",         # chosen in your script: cv or standard; we use "cv" here
+  phi_method = "cv", # chosen in your script: cv or standard; we use "cv" here
   nv = nv,
   resample_baseline = resample_baseline,
   resampled_baseline_sizes = resampled_baseline_sizes,
@@ -114,9 +114,9 @@ DataFrame_option <- run_hisea_all(
   baseline_input = baseline,
   mix_input = mixture,
   method_class = "LDA",
-  stocks_names = stock_labels, 
+  stocks_names = stock_labels,
   stock_col = "population",
-  var_cols_std = c("d13c", "d18o"),  
+  var_cols_std = c("d13c", "d18o"),
   var_cols_mix = c("d13c_ukn", "d18o_ukn")
 )
 
@@ -125,7 +125,7 @@ print("Data frame input — mean estimates:")
 print(round(DataFrame_option$mean, 4))
 
 # If the object contains bootstrap results, show a small summary
-if (!is.null(DataFrame_option$boot) ) {
+if (!is.null(DataFrame_option$boot)) {
   cat("\nBootstrap summary (data frame input):\n")
   print(summary(DataFrame_option$boot))
 }
@@ -151,7 +151,7 @@ HiseaFormat_option <- run_hisea_all(
   nsamps = Nsamps,
   Nmix = Nmix,
   baseline_input = baseline_file,
-  mix_input  = mixture_file,
+  mix_input = mixture_file,
   method_class = "LDA",
   stocks_names = stock_labels
 )
@@ -159,7 +159,7 @@ HiseaFormat_option <- run_hisea_all(
 print("HISEA file input — mean estimates:")
 print(round(HiseaFormat_option$mean, 4))
 
-if (!is.null(HiseaFormat_option$boot) ) {
+if (!is.null(HiseaFormat_option$boot)) {
   cat("\nBootstrap summary (HISEA file input):\n")
   print(summary(HiseaFormat_option$boot))
 }
@@ -186,7 +186,6 @@ kable(df_compare, digits = 4, caption = "Comparison of estimates: Data frame vs 
 
 # Plot side-by-side bars
 df_plot <- df_compare %>% pivot_longer(cols = c(mean_df, mean_file), names_to = "input_type", values_to = "estimate")
-
 ```
 
 # Visualize bootstrap distributions (if available)
@@ -194,11 +193,10 @@ df_plot <- df_compare %>% pivot_longer(cols = c(mean_df, mean_file), names_to = 
 If the objects returned contain bootstrap distributions (common when `nsamps` used), plot histograms/density for each stock and input type:
 
 ```{r plot-boot, warning=FALSE, message=FALSE}
-
 DataFrame_option_boot <- run_hisea_all(
   type = "BOOTSTRAP",
   np = np,
-  phi_method = "cv",         # chosen in your script: cv or standard; we use "cv" here
+  phi_method = "cv", # chosen in your script: cv or standard; we use "cv" here
   nv = nv,
   resample_baseline = resample_baseline,
   resampled_baseline_sizes = resampled_baseline_sizes,
@@ -208,9 +206,9 @@ DataFrame_option_boot <- run_hisea_all(
   baseline_input = baseline,
   mix_input = mixture,
   method_class = "LDA",
-  stocks_names = stock_labels, 
+  stocks_names = stock_labels,
   stock_col = "population",
-  var_cols_std = c("d13c", "d18o"),  
+  var_cols_std = c("d13c", "d18o"),
   var_cols_mix = c("d13c_ukn", "d18o_ukn")
 )
 
@@ -225,15 +223,17 @@ HiseaFormat_option_boot <- run_hisea_all(
   nsamps = Nsamps,
   Nmix = Nmix,
   baseline_input = baseline_file,
-  mix_input  = mixture_file,
+  mix_input = mixture_file,
   method_class = "LDA",
   stocks_names = stock_labels
 )
 
-make_boot_df <- function(boot_obj, label){
-  if (is.null(boot_obj)) return(NULL)
+make_boot_df <- function(boot_obj, label) {
+  if (is.null(boot_obj)) {
+    return(NULL)
+  }
   # adapt depending on structure
-  boot_mat <- as.matrix(boot_obj)  # try to coerce
+  boot_mat <- as.matrix(boot_obj) # try to coerce
   df <- as.data.frame(boot_mat)
   names(df) <- stock_labels[1:ncol(df)]
   df_long <- pivot_longer(df, cols = everything(), names_to = "stock", values_to = "estimate")

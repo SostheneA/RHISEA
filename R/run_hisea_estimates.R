@@ -11,6 +11,20 @@
 #' @param output_dir Output directory
 #' @param verbose Print progress messages
 #'
+#' @examples
+#' # Advanced estimation using probability matrices
+#' dummy_probs <- matrix(runif(150), ncol = 3)
+#' dummy_probs <- dummy_probs / rowSums(dummy_probs)
+#' dummy_classes <- max.col(dummy_probs)
+#'
+#' results <- run_hisea_estimates(
+#'   pseudo_classes = dummy_classes,
+#'   likelihoods = dummy_probs,
+#'   phi_matrix = diag(3),
+#'   np = 3, type = "ANALYSIS"
+#' )
+#' print(results$mean_estimates)
+#'
 #' @return List containing estimates and metrics
 #' @export
 run_hisea_estimates <- function(pseudo_classes,
@@ -23,7 +37,6 @@ run_hisea_estimates <- function(pseudo_classes,
                                 export_csv = FALSE,
                                 output_dir = ".",
                                 verbose = FALSE) {
-
   # Input validation
   type <- toupper(type)
   if (!type %in% c("ANALYSIS", "SIMULATION", "BOOTSTRAP")) {
@@ -48,12 +61,15 @@ run_hisea_estimates <- function(pseudo_classes,
   }
 
   # Calculate Phi inverse
-  phi_det <- tryCatch({
-    det(phi_matrix)
-  }, error = function(e) {
-    warning("Could not compute det(phi_matrix): ", e$message)
-    0
-  })
+  phi_det <- tryCatch(
+    {
+      det(phi_matrix)
+    },
+    error = function(e) {
+      warning("Could not compute det(phi_matrix): ", e$message)
+      0
+    }
+  )
 
   if (abs(phi_det) < 1e-12) {
     inv_Phi <- MASS::ginv(phi_matrix)
@@ -64,14 +80,15 @@ run_hisea_estimates <- function(pseudo_classes,
   # Prepare results array
   est_names <- c("RAW", "COOK", "COOKC", "EM", "ML")
   all_res <- array(NA_real_,
-                   dim = c(nsamps, np, length(est_names)),
-                   dimnames = list(NULL, stocks_names, est_names))
+    dim = c(nsamps, np, length(est_names)),
+    dimnames = list(NULL, stocks_names, est_names)
+  )
 
   # Main loop
   if (verbose) message("Running ", nsamps, " x ", type)
 
   for (i in seq_len(nsamps)) {
-    if (verbose && (i==1 || i==nsamps || i%%max(1,floor(nsamps/10))==0)) {
+    if (verbose && (i == 1 || i == nsamps || i %% max(1, floor(nsamps / 10)) == 0)) {
       message(" Iter ", i, "/", nsamps)
     }
 
@@ -86,23 +103,23 @@ run_hisea_estimates <- function(pseudo_classes,
     }
 
     # Calculate HISEA estimators
-    raw   <- prop.table(tabulate(pc_iter, nbins = np))
-    ck    <- compute_cook_estimators(pc_iter, inv_Phi, np)
-    emv   <- estimate_millar(pc_iter, phi_matrix, np, verbose = FALSE)
-    mlp   <- estimate_ml(like_iter, np, verbose = FALSE)
+    raw <- prop.table(tabulate(pc_iter, nbins = np))
+    ck <- compute_cook_estimators(pc_iter, inv_Phi, np)
+    emv <- estimate_millar(pc_iter, phi_matrix, np, verbose = FALSE)
+    mlp <- estimate_ml(like_iter, np, verbose = FALSE)
 
     # Store results
-    all_res[i, , "RAW"]   <- raw
-    all_res[i, , "COOK"]  <- ck$cook
+    all_res[i, , "RAW"] <- raw
+    all_res[i, , "COOK"] <- ck$cook
     all_res[i, , "COOKC"] <- ck$cook_constrained
-    all_res[i, , "EM"]    <- emv
-    all_res[i, , "ML"]    <- mlp
+    all_res[i, , "EM"] <- emv
+    all_res[i, , "ML"] <- mlp
   }
 
   # Create summary
   summary_l <- list(
-    mean_estimates = apply(all_res, c(2,3), mean, na.rm = TRUE),
-    sd_estimates = apply(all_res, c(2,3), sd, na.rm = TRUE),
+    mean_estimates = apply(all_res, c(2, 3), mean, na.rm = TRUE),
+    sd_estimates = apply(all_res, c(2, 3), sd, na.rm = TRUE),
     estimates = all_res
   )
 
@@ -112,11 +129,13 @@ run_hisea_estimates <- function(pseudo_classes,
     timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
     write.csv(as.data.frame(summary_l$mean_estimates),
-              file.path(output_dir, paste0("mean_estimates_", timestamp, ".csv")),
-              row.names = TRUE)
+      file.path(output_dir, paste0("mean_estimates_", timestamp, ".csv")),
+      row.names = TRUE
+    )
     write.csv(as.data.frame(summary_l$sd_estimates),
-              file.path(output_dir, paste0("sd_estimates_", timestamp, ".csv")),
-              row.names = TRUE)
+      file.path(output_dir, paste0("sd_estimates_", timestamp, ".csv")),
+      row.names = TRUE
+    )
   }
 
   if (verbose) message("run_hisea_estimates() done.")

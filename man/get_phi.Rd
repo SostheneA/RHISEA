@@ -20,9 +20,19 @@ Matrix of phi values
 Calculate the phi matrix for stock composition analysis.
 }
 \examples{
-\dontrun{
-pred <- c(1, 2, 1, 2)
-true <- c(1, 2, 1, 1)
-phi_matrix <- get_phi(pred, true, np = 2)
-}
+# Simulated classification results
+# 4 individuals: 2 from Stock 1, 2 from Stock 2
+true_labels <- c(1, 1, 2, 2)
+predicted_class <- c(1, 2, 2, 2) # One error: individual 2 misclassified
+
+# Compute Phi matrix (2 stocks)
+phi_matrix <- get_phi(
+  predicted_class = predicted_class,
+  true_labels = true_labels,
+  np = 2
+)
+
+# The result shows the classification accuracy per stock
+print(phi_matrix)
+
 }

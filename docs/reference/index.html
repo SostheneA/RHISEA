@@ -43,8 +43,7 @@
 
       <div class="section-desc"><p>Core functions to run HISEA analyses</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -54,20 +53,23 @@
           <code><a href="run_hisea_all.html">run_hisea_all()</a></code>
 
         </dt>
-        <dd>Internal Main Function for HISEA Run</dd>
-      </dl><dl><dt>
+        <dd>Run HISEA Mixed Stock Analysis</dd>
+
+        <dt>
 
           <code><a href="run_hisea_estimates.html">run_hisea_estimates()</a></code>
 
         </dt>
         <dd>Run HISEA Estimations Only</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="simulate_mixture.html">simulate_mixture()</a></code>
 
         </dt>
         <dd>Simulate a Mixed Fishery Sample from Known Stock Proportions</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="create_hisea_summary_report.html">create_hisea_summary_report()</a></code>
 
@@ -78,8 +80,7 @@
 
       <div class="section-desc"><p>Functions to read, write, and prepare data for analysis</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -90,37 +91,47 @@
 
         </dt>
         <dd>Read HISEA Baseline File</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="read_mixture.html">read_mixture()</a></code>
 
         </dt>
         <dd>Read HISEA Mixture File</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="write_mix_from_dataframe.html">write_mix_from_dataframe()</a></code>
 
         </dt>
         <dd>Write Mixture Data to File</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="write_std_from_dataframe.html">write_std_from_dataframe()</a></code>
 
         </dt>
         <dd>Write Standard Data to File</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="process_hisea_input.html">process_hisea_input()</a></code>
 
         </dt>
         <dd>Process HISEA Input Data</dd>
+
+        <dt>
+
+          <code><a href="baseline.html">baseline</a></code>
+
+        </dt>
+        <dd>Baseline Data for RHISEA</dd>
       </dl></div><div class="section level2">
       <h2 id="estimators-and-algorithms">Estimators and Algorithms<a class="anchor" aria-label="anchor" href="#estimators-and-algorithms"></a></h2>
 
       <div class="section-desc"><p>Implementations of statistical estimators and algorithms</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -131,31 +142,36 @@
 
         </dt>
         <dd>Accelerated Expectation-Maximization (EM) Algorithm</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="em_algorithm.html">em_algorithm()</a></code>
 
         </dt>
         <dd>Standard Expectation-Maximization (EM) Algorithm for Stock Proportions</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="compute_cook_estimators.html">compute_cook_estimators()</a></code>
 
         </dt>
         <dd>Compute Cook Estimators for Stock Proportions</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="estimate_millar_theta4.html">estimate_millar_theta4()</a></code>
 
         </dt>
         <dd>Estimate Millar Theta4 Parameter</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="estimate_ml_theta5.html">estimate_ml_theta5()</a></code>
 
         </dt>
         <dd>Estimate Stock Composition Using Direct Maximum Likelihood (Theta5)</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="get_phi.html">get_phi()</a></code>
 
@@ -166,8 +182,7 @@
 
       <div class="section-desc"><p>Functions for classification models and related utilities</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -178,13 +193,15 @@
 
         </dt>
         <dd>Classify Samples Using LDF Coefficients</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="compute_ldf_coefficients.html">compute_ldf_coefficients()</a></code>
 
         </dt>
         <dd>Compute Linear Discriminant Function (LDF) Coefficients</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="ordvec.html">ordvec()</a></code>
 
@@ -195,8 +212,7 @@
 
       <div class="section-desc"><p>Plotting and summary printing functions</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -207,7 +223,8 @@
 
         </dt>
         <dd>Plot HISEA theta estimates with error bars utils::globalVariables(c("Stock", "Mean", "Estimator", "SD", "ActualValue"))</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="print_hisea_summary.html">print_hisea_summary()</a></code>
 
@@ -218,8 +235,7 @@
 
       <div class="section-desc"><p>Helper functions not usually called directly by users</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -229,18 +245,18 @@
           <code><a href="dot-resample_baseline_data_helper.html">.resample_baseline_data_helper()</a></code>
 
         </dt>
-        <dd>Run HISEA Mixed Stock Analysis</dd>
+        <dd>Helper: resample baseline data per stock</dd>
       </dl></div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Sosthene Akia, Alex Hanke.</p>
+  <p>Developed by Sosthene A. V. Akia, Alex Hanke.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

@@ -68,7 +68,7 @@
 
 
 <dl><dt id="arg-summary-report">summary_report<a class="anchor" aria-label="anchor" href="#arg-summary-report"></a></dt>
-<dd><p>Output from codecreate_hisea_summary_report.</p></dd>
+<dd><p>Output from <code>create_hisea_summary_report</code>.</p></dd>
 
 
 <dt id="arg-nsamps">nsamps<a class="anchor" aria-label="anchor" href="#arg-nsamps"></a></dt>
@@ -119,17 +119,37 @@
 <dd><p>Integer, size of simulated mixture.</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>`data.frame` summary statistics (invisibly)</p>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">baseline</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="co"># Minimal example (prints structure)</span></span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">summary_rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_hisea_summary_report.html">create_hisea_summary_report</a></span><span class="op">(</span><span class="va">results_array</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">print_hisea_summary</span><span class="op">(</span><span class="va">summary_rep</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">baseline</span><span class="op">)</span> <span class="co"># Shows data structure</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Classes 'data.table' and 'data.frame':	300 obs. of  3 variables:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ d13c      : num  -7.99 -8.23 -7.99 -7.32 -9.01 -8.19 -8.48 -8.42 -8.02 -7.9 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ d18o      : num  -0.46 -0.58 -0.89 -1.06 -0.89 -1.25 -0.27 -0.72 -0.74 -0.51 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  $ population: Factor w/ 2 levels "East","West": 1 1 1 1 1 1 1 1 1 1 ...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Sosthene Akia, Alex Hanke.</p>
+  <p>Developed by Sosthene A. V. Akia, Alex Hanke.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

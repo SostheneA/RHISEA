@@ -29,3 +29,24 @@ Generates a comprehensive summary from HISEA estimation results, including
 means, standard deviations, MSE (for simulations), and covariance/correlation
 for ML estimates (often for bootstrap).
 }
+\examples{
+# 1. Create a dummy estimation array (10 samples, 2 stocks, 3 estimators)
+nsamps <- 10; np <- 2; nest <- 3
+est_array <- array(runif(nsamps * np * nest), dim = c(nsamps, np, nest))
+dimnames(est_array) <- list(
+  NULL,
+  c("StockA", "StockB"),
+  c("RAW", "COOK", "ML")
+)
+# Ensure proportions sum to 1
+for(i in 1:nsamps) for(k in 1:nest) est_array[i,,k] <- est_array[i,,k]/sum(est_array[i,,k])
+
+# 2. Generate report
+summary_rep <- create_hisea_summary_report(
+  all_estimates_array = est_array,
+  actual_proportions = c(0.6, 0.4),
+  run_type = "SIMULATION"
+)
+print(summary_rep$mean_estimates)
+
+}

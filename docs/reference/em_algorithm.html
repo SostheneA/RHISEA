@@ -62,19 +62,19 @@
 
 
 <dl><dt id="arg-likelihood">likelihood<a class="anchor" aria-label="anchor" href="#arg-likelihood"></a></dt>
-<dd><p>A numeric matrix (N_rows x N_populations) where <code>likelihood[i, j]</code>
+<dd><p>A numeric matrix (N_rows x N_populations) where `likelihood[i, j]`
 is $P(Data_i | Stock_j)$ or a value proportional to it.
 N_rows can be N_samples (for Theta5) or N_populations (for Theta4).</p></dd>
 
 
 <dt id="arg-np">np<a class="anchor" aria-label="anchor" href="#arg-np"></a></dt>
-<dd><p>Integer, the number of populations (stocks). Should match <code>ncol(likelihood)</code>.</p></dd>
+<dd><p>Integer, the number of populations (stocks). Should match `ncol(likelihood)`.</p></dd>
 
 
 <dt id="arg-freq">freq<a class="anchor" aria-label="anchor" href="#arg-freq"></a></dt>
 <dd><p>Optional numeric vector of frequencies/weights for each "observation"
-(row in <code>likelihood</code>). Length must match <code>nrow(likelihood)</code>.
-Defaults to <code>rep(1, nrow(likelihood))</code>.</p></dd>
+(row in `likelihood`). Length must match `nrow(likelihood)`.
+Defaults to `rep(1, nrow(likelihood))`.</p></dd>
 
 
 <dt id="arg-max-iter">max_iter<a class="anchor" aria-label="anchor" href="#arg-max-iter"></a></dt>
@@ -83,7 +83,7 @@ Defaults to <code>rep(1, nrow(likelihood))</code>.</p></dd>
 
 <dt id="arg-tol">tol<a class="anchor" aria-label="anchor" href="#arg-tol"></a></dt>
 <dd><p>Numeric, the convergence tolerance. The algorithm stops if the maximum
-absolute change in any <code>theta</code> component is less than <code>tol</code>.</p></dd>
+absolute change in any `theta` component is less than `tol`.</p></dd>
 
 
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
@@ -97,19 +97,26 @@ estimates at each iteration is saved to a CSV file at this path.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A numeric vector of estimated stock proportions (theta), length <code>np</code>.</p>
+    <p>A numeric vector of estimated stock proportions (theta), length `np`.</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">em_out</span> <span class="op">&lt;-</span> <span class="fu">em_algorithm</span><span class="op">(</span><span class="va">baseline</span>, theta_start <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">ncol</a></span><span class="op">(</span><span class="va">baseline</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Sosthene Akia, Alex Hanke.</p>
+  <p>Developed by Sosthene A. V. Akia, Alex Hanke.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

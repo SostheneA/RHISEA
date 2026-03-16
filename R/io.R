@@ -10,6 +10,24 @@
 #' @param filepath Character string, the path to the baseline `.std` file.
 #' @param nv Integer, the number of variables (columns) expected for each observation
 #'           in the baseline data.
+#' @examples
+#' # Create a dummy HISEA standard file
+#' tmp_std <- tempfile(fileext = ".std")
+#' writeLines(c(
+#'   "# Stock A",
+#'   "1.2  3.4",
+#'   "5.6  7.8",
+#'   "NEXT STOCK",
+#'   "# Stock B",
+#'   "9.0  1.1"
+#' ), tmp_std)
+#'
+#' # Read the baseline (2 variables expected)
+#' baseline_data <- read_baseline(tmp_std, nv = 2)
+#'
+#' # Check the results
+#' print(baseline_data)
+#' length(baseline_data) # Should be 2
 #'
 #' @return A list of numeric matrices. Each matrix in the list corresponds to a
 #'         stock/population, with rows being observations and columns being variables.
@@ -28,11 +46,14 @@ read_baseline <- function(filepath, nv) {
   }
 
   # Read all lines from the file
-  raw_lines <- tryCatch({
-    readLines(filepath, warn = FALSE)
-  }, error = function(e) {
-    stop(paste("Error reading file:", filepath, "-", conditionMessage(e)))
-  })
+  raw_lines <- tryCatch(
+    {
+      readLines(filepath, warn = FALSE)
+    },
+    error = function(e) {
+      stop(paste("Error reading file:", filepath, "-", conditionMessage(e)))
+    }
+  )
 
   # --- Pre-processing Lines ---
   # 1. Remove leading/trailing whitespace
@@ -60,7 +81,7 @@ read_baseline <- function(filepath, nv) {
   # --- Process Each Stock Block ---
   for (i in 1:(length(all_split_points) - 1)) {
     start_line_idx <- all_split_points[i] + 1
-    end_line_idx <- all_split_points[i+1] - 1
+    end_line_idx <- all_split_points[i + 1] - 1
 
     # Skip if the block is effectively empty (e.g., consecutive delimiters or delimiter at EOF)
     if (start_line_idx > end_line_idx) {
@@ -79,30 +100,42 @@ read_baseline <- function(filepath, nv) {
     }
 
     # Attempt to scan numeric data from the lines of the current stock block
-    scanned_values <- tryCatch({
-      # Concatenate lines into a single string for scan, helps handle numbers split across lines if any (though not typical for HISEA)
-      # However, HISEA usually has one observation per line.
-      scan(text = stock_data_lines, what = numeric(), quiet = TRUE, comment.char="#", multi.line = TRUE)
-    }, warning = function(w){
-      warning(paste("Warning while scanning numeric data for a stock block (lines approx.", start_line_idx, "to", end_line_idx,
-                    "in processed file contents):", conditionMessage(w)), call. = FALSE)
-      numeric(0) # Return empty numeric on warning (e.g., non-numeric data found)
-    }, error = function(e) {
-      warning(paste("Error scanning numeric data for a stock block (lines approx.", start_line_idx, "to", end_line_idx,
-                    "in processed file contents):", conditionMessage(e)), call. = FALSE)
-      numeric(0) # Return empty numeric on error
-    })
+    scanned_values <- tryCatch(
+      {
+        # Concatenate lines into a single string for scan, helps handle numbers split across lines if any (though not typical for HISEA)
+        # However, HISEA usually has one observation per line.
+        scan(text = stock_data_lines, what = numeric(), quiet = TRUE, comment.char = "#", multi.line = TRUE)
+      },
+      warning = function(w) {
+        warning(paste(
+          "Warning while scanning numeric data for a stock block (lines approx.", start_line_idx, "to", end_line_idx,
+          "in processed file contents):", conditionMessage(w)
+        ), call. = FALSE)
+        numeric(0) # Return empty numeric on warning (e.g., non-numeric data found)
+      },
+      error = function(e) {
+        warning(paste(
+          "Error scanning numeric data for a stock block (lines approx.", start_line_idx, "to", end_line_idx,
+          "in processed file contents):", conditionMessage(e)
+        ), call. = FALSE)
+        numeric(0) # Return empty numeric on error
+      }
+    )
 
     # Validate scanned values for the current stock
     if (length(scanned_values) == 0) {
-      warning(paste("No numeric values were successfully scanned for a stock block (lines approx.", start_line_idx, "to", end_line_idx,
-                    "). Skipping this stock block."), call. = FALSE)
+      warning(paste(
+        "No numeric values were successfully scanned for a stock block (lines approx.", start_line_idx, "to", end_line_idx,
+        "). Skipping this stock block."
+      ), call. = FALSE)
       next
     }
     if (length(scanned_values) %% nv != 0) {
-      warning(paste("Number of values read for a stock (", length(scanned_values),
-                    ") is not a multiple of the number of variables 'nv' (", nv,
-                    "). Lines approx.", start_line_idx, "to", end_line_idx, ". Skipping this stock block."), call. = FALSE)
+      warning(paste(
+        "Number of values read for a stock (", length(scanned_values),
+        ") is not a multiple of the number of variables 'nv' (", nv,
+        "). Lines approx.", start_line_idx, "to", end_line_idx, ". Skipping this stock block."
+      ), call. = FALSE)
       next
     }
 
@@ -111,9 +144,11 @@ read_baseline <- function(filepath, nv) {
     data_list[[length(data_list) + 1]] <- stock_matrix
   } # End loop over stock blocks
 
-  if(length(data_list) == 0) {
+  if (length(data_list) == 0) {
     warning("No valid stock data successfully read from the baseline file: ", filepath,
-            ". Check file format, delimiters, and 'nv'.", call. = FALSE)
+      ". Check file format, delimiters, and 'nv'.",
+      call. = FALSE
+    )
   }
 
   return(data_list)
@@ -129,6 +164,21 @@ read_baseline <- function(filepath, nv) {
 #' @param filepath Character string, the path to the mixture `.mix` file.
 #' @param nv Integer, the number of variables (columns) expected for each observation
 #'           in the mixture data.
+#' @examples
+#' # Create a dummy HISEA mixture file
+#' tmp_mix <- tempfile(fileext = ".mix")
+#' writeLines(c(
+#'   "1.1  2.2",
+#'   "3.3  4.4",
+#'   "5.5  6.6"
+#' ), tmp_mix)
+#'
+#' # Read the mixture (2 variables expected)
+#' mixture_matrix <- read_mixture(tmp_mix, nv = 2)
+#'
+#' # Check the results
+#' print(mixture_matrix)
+#' nrow(mixture_matrix) # Should be 3
 #'
 #' @return A numeric matrix where rows are observations and columns are variables.
 #'         Returns an empty matrix (with `nv` columns) if no valid data is found or errors occur.
@@ -146,16 +196,19 @@ read_mixture <- function(filepath = "hisea.mix", nv) {
   }
 
   # Read all lines from the file
-  all_lines <- tryCatch({
-    readLines(filepath, warn = FALSE)
-  }, error = function(e) {
-    stop(paste("Error reading file:", filepath, "-", conditionMessage(e)))
-  })
+  all_lines <- tryCatch(
+    {
+      readLines(filepath, warn = FALSE)
+    },
+    error = function(e) {
+      stop(paste("Error reading file:", filepath, "-", conditionMessage(e)))
+    }
+  )
 
   # Pre-processing: Remove comments and trim whitespace
   processed_lines <- trimws(all_lines)
   processed_lines <- processed_lines[!grepl("^\\s*#", processed_lines)] # Remove comment lines
-  processed_lines <- processed_lines[processed_lines != ""]              # Remove empty lines
+  processed_lines <- processed_lines[processed_lines != ""] # Remove empty lines
 
   # Filter for lines that appear to contain only space-separated numbers.
   # This regex is more robust for numbers including decimals, scientific notation, and negative signs.
@@ -169,15 +222,19 @@ read_mixture <- function(filepath = "hisea.mix", nv) {
   }
 
   # Scan the numeric values from the filtered data lines
-  scanned_values <- tryCatch({
-    scan(text = data_lines, what = numeric(), quiet = TRUE, comment.char="#", multi.line = TRUE)
-  }, warning = function(w){
-    warning(paste("Warning while scanning numeric data in mixture file", filepath, ":", conditionMessage(w)), call. = FALSE)
-    numeric(0) # Return empty numeric on warning
-  }, error = function(e) {
-    warning(paste("Error scanning numeric data in mixture file", filepath, ":", conditionMessage(e)), call. = FALSE)
-    numeric(0) # Return empty numeric on error
-  })
+  scanned_values <- tryCatch(
+    {
+      scan(text = data_lines, what = numeric(), quiet = TRUE, comment.char = "#", multi.line = TRUE)
+    },
+    warning = function(w) {
+      warning(paste("Warning while scanning numeric data in mixture file", filepath, ":", conditionMessage(w)), call. = FALSE)
+      numeric(0) # Return empty numeric on warning
+    },
+    error = function(e) {
+      warning(paste("Error scanning numeric data in mixture file", filepath, ":", conditionMessage(e)), call. = FALSE)
+      numeric(0) # Return empty numeric on error
+    }
+  )
 
   if (length(scanned_values) == 0) {
     warning(paste("No numeric values were successfully scanned from mixture file:", filepath), call. = FALSE)
@@ -186,9 +243,11 @@ read_mixture <- function(filepath = "hisea.mix", nv) {
 
   # Check if the number of scanned values is a multiple of 'nv'
   if (length(scanned_values) %% nv != 0) {
-    warning(paste("Total number of numeric values scanned in mixture file (", length(scanned_values),
-                  ") is not a multiple of the number of variables 'nv' (", nv,
-                  "). File may be corrupt or 'nv' incorrect. Returning empty matrix."), call. = FALSE)
+    warning(paste(
+      "Total number of numeric values scanned in mixture file (", length(scanned_values),
+      ") is not a multiple of the number of variables 'nv' (", nv,
+      "). File may be corrupt or 'nv' incorrect. Returning empty matrix."
+    ), call. = FALSE)
     return(matrix(numeric(0), ncol = nv, nrow = 0))
   }
 

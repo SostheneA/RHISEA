@@ -44,3 +44,18 @@ List containing estimates and metrics
 \description{
 Run HISEA Estimations Only
 }
+\examples{
+# Advanced estimation using probability matrices
+dummy_probs <- matrix(runif(150), ncol = 3)
+dummy_probs <- dummy_probs / rowSums(dummy_probs)
+dummy_classes <- max.col(dummy_probs)
+
+results <- run_hisea_estimates(
+  pseudo_classes = dummy_classes,
+  likelihoods = dummy_probs,
+  phi_matrix = diag(3),
+  np = 3, type = "ANALYSIS"
+)
+print(results$mean_estimates)
+
+}

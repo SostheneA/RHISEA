@@ -20,6 +20,16 @@
 #'               Dimensions should be np x np.
 #' @param np Integer, the number of populations (stocks).
 #'
+#' @examples
+#' # 2 stocks, 10 samples classified
+#' preds <- c(1, 1, 1, 2, 2, 2, 1, 1, 1, 1) # Mostly stock 1
+#' # Dummy Phi matrix (80% accuracy)
+#' phi <- matrix(c(0.8, 0.2, 0.2, 0.8), 2, 2)
+#' phi_inv <- solve(phi)
+#'
+#' cooks <- compute_cook_estimators(preds, phi_inv, np = 2)
+#' print(cooks$cook_constrained)
+#'
 #' @return A list containing three numeric vectors:
 #'         \item{raw}{Raw proportions of classification.}
 #'         \item{cook}{Cook's corrected estimates.}
@@ -36,9 +46,11 @@ compute_cook_estimators <- function(class_predictions, PHIinv, np) {
       stop("'class_predictions' must be a vector of integers.")
     }
   }
-  if (length(class_predictions) > 0 && (any(class_predictions < 1, na.rm=TRUE) || any(class_predictions > np, na.rm=TRUE))) {
-    stop(paste0("'class_predictions' contain values outside the range [1, np]. Min: ",
-                min(class_predictions, na.rm=T), ", Max: ", max(class_predictions, na.rm=T)))
+  if (length(class_predictions) > 0 && (any(class_predictions < 1, na.rm = TRUE) || any(class_predictions > np, na.rm = TRUE))) {
+    stop(paste0(
+      "'class_predictions' contain values outside the range [1, np]. Min: ",
+      min(class_predictions, na.rm = T), ", Max: ", max(class_predictions, na.rm = T)
+    ))
   }
   if (!is.matrix(PHIinv) || !is.numeric(PHIinv) || nrow(PHIinv) != np || ncol(PHIinv) != np) {
     stop("'PHIinv' must be a numeric matrix of dimensions np x np.")
@@ -81,8 +93,8 @@ compute_cook_estimators <- function(class_predictions, PHIinv, np) {
     }
 
     active_set_A <- numeric(np) # Vector A in HISEA, marks stocks with >0 proportion
-    sum_A_indicator <- 0        # ATOT in HISEA: count of stocks in active set
-    sum_theta_in_A <- 0         # ATHTOT in HISEA: sum of proportions for stocks in active set (after zeroing negatives)
+    sum_A_indicator <- 0 # ATOT in HISEA: count of stocks in active set
+    sum_theta_in_A <- 0 # ATHTOT in HISEA: sum of proportions for stocks in active set (after zeroing negatives)
 
     for (j in 1:np) {
       if (current_constrained_estimates[j] > 1e-9) { # Consider positive if > small epsilon
@@ -110,7 +122,7 @@ compute_cook_estimators <- function(class_predictions, PHIinv, np) {
       # If Np > 0, this is problematic. HISEA doesn't explicitly detail this, implies it shouldn't happen or method fails.
       # Fallback to equal proportions.
       warning("Constrained Cook: all estimates zeroed out during an iteration. Results may be unstable. Falling back to 1/np.", call. = FALSE)
-      if (np > 0) current_constrained_estimates <- rep(1/np, np) else current_constrained_estimates <- numeric(0)
+      if (np > 0) current_constrained_estimates <- rep(1 / np, np) else current_constrained_estimates <- numeric(0)
       break # Exit loop as no further progress can be made
     }
   } # End of iteration loop for constraining
@@ -122,7 +134,7 @@ compute_cook_estimators <- function(class_predictions, PHIinv, np) {
     cook_constrained_final <- current_constrained_estimates / sum_final_estimates
   } else if (np > 0) {
     warning("Constrained Cook estimator resulted in all zero proportions; defaulting to 1/np.", call. = FALSE)
-    cook_constrained_final <- rep(1/np, np)
+    cook_constrained_final <- rep(1 / np, np)
   } else {
     cook_constrained_final <- numeric(0) # Case np = 0
   }
@@ -155,6 +167,14 @@ compute_cook_estimators <- function(class_predictions, PHIinv, np) {
 #' @param save_theta_path Optional character string. If provided, the history of theta
 #'                        estimates at each iteration is saved to a CSV file at this path.
 #'
+#' @examples
+#' # Dummy likelihood matrix (10 samples, 3 stocks)
+#' lik <- matrix(runif(30), 10, 3)
+#' lik <- lik / rowSums(lik) # Normalize rows
+#'
+#' theta_em <- em_algorithm(lik, np = 3, max_iter = 20)
+#' print(theta_em)
+#'
 #' @return A numeric vector of estimated stock proportions (theta), length `np`.
 #' @export
 em_algorithm <- function(likelihood, np, freq = NULL,
@@ -183,10 +203,10 @@ em_algorithm <- function(likelihood, np, freq = NULL,
   } else if (!is.numeric(freq) || length(freq) != N_rows_likelihood) {
     stop("Length of 'freq' must match the number of rows in 'likelihood', and it must be numeric.")
   }
-  if(any(is.na(likelihood)) || any(!is.finite(likelihood))){
+  if (any(is.na(likelihood)) || any(!is.finite(likelihood))) {
     stop("EM algorithm: 'likelihood' matrix contains NA or non-finite values.")
   }
-  if(any(is.na(freq)) || any(!is.finite(freq)) || any(freq < 0)){
+  if (any(is.na(freq)) || any(!is.finite(freq)) || any(freq < 0)) {
     stop("EM algorithm: 'freq' vector contains NA, non-finite, or negative values.")
   }
 
@@ -194,14 +214,20 @@ em_algorithm <- function(likelihood, np, freq = NULL,
   n_effective_sum_freq <- sum(freq)
   if (n_effective_sum_freq <= 0 && N_rows_likelihood > 0) { # Only warn if there were rows but freqs summed to 0
     warning("EM algorithm: Sum of frequencies is zero or negative. Returning initial equal proportions.", call. = FALSE)
-    if (np > 0) return(rep(1 / np, np)) else return(numeric(0))
+    if (np > 0) {
+      return(rep(1 / np, np))
+    } else {
+      return(numeric(0))
+    }
   }
   # If N_rows_likelihood is 0, n_effective_sum_freq will be 0 too, handled above.
 
 
   # Initial guess for theta: equal proportions
   theta <- if (np > 0) rep(1 / np, np) else numeric(0)
-  if (np == 0) return(theta) # No proportions to estimate if np=0
+  if (np == 0) {
+    return(theta)
+  } # No proportions to estimate if np=0
 
   theta_history <- list() # To store theta at each iteration if save_theta_path is provided
 
@@ -269,22 +295,27 @@ em_algorithm <- function(likelihood, np, freq = NULL,
 
     if (iter == max_iter && verbose) {
       warning("EM algorithm reached maximum iterations (", max_iter,
-              ") without full convergence to tolerance (", tol,
-              "). Max change was: ", signif(max_abs_change, 6), call. = FALSE)
+        ") without full convergence to tolerance (", tol,
+        "). Max change was: ", signif(max_abs_change, 6),
+        call. = FALSE
+      )
     }
   } # End of EM iterations
 
   # Save theta history if path provided
   if (save_theta_path != FALSE && !is.null(save_theta_path) && length(theta_history) > 0) {
-    tryCatch({
-      theta_df <- do.call(rbind, theta_history)
-      colnames(theta_df) <- paste0("Stock", 1:np)
-      theta_df <- data.frame(Iteration = seq_along(theta_history), theta_df)
-      write.csv(theta_df, file = save_theta_path, row.names = FALSE)
-      if(verbose) cat("Theta history saved to:", save_theta_path, "\n")
-    }, error = function(e){
-      warning(paste("Could not save theta history to CSV:", conditionMessage(e)), call. = FALSE)
-    })
+    tryCatch(
+      {
+        theta_df <- do.call(rbind, theta_history)
+        colnames(theta_df) <- paste0("Stock", 1:np)
+        theta_df <- data.frame(Iteration = seq_along(theta_history), theta_df)
+        write.csv(theta_df, file = save_theta_path, row.names = FALSE)
+        if (verbose) cat("Theta history saved to:", save_theta_path, "\n")
+      },
+      error = function(e) {
+        warning(paste("Could not save theta history to CSV:", conditionMessage(e)), call. = FALSE)
+      }
+    )
   }
 
   return(theta)
@@ -298,6 +329,14 @@ em_algorithm <- function(likelihood, np, freq = NULL,
 #' This is a simplified interpretation of HISEA's ACCEL subroutine.
 #'
 #' @inheritParams em_algorithm
+#'
+#' @examples
+#' lik <- matrix(runif(30), 10, 3)
+#' lik <- lik / rowSums(lik)
+#'
+#' theta_accel <- accel_em_algorithm(lik, np = 3)
+#' print(theta_accel)
+#'
 #'
 #' @return A numeric vector of estimated stock proportions (theta), length `np`.
 #' @export
@@ -316,27 +355,35 @@ accel_em_algorithm <- function(likelihood, np, freq = NULL,
     if (np > 0) {
       warning("Accelerated EM: 'likelihood' matrix has 0 rows. Returning initial equal proportions.", call. = FALSE)
       return(rep(1 / np, np))
-    } else { return(numeric(0)) }
+    } else {
+      return(numeric(0))
+    }
   }
   if (is.null(freq)) {
     freq <- rep(1, N_rows_likelihood)
   } else if (!is.numeric(freq) || length(freq) != N_rows_likelihood) {
     stop("Length of 'freq' must match 'nrow(likelihood)', and it must be numeric.")
   }
-  if(any(is.na(likelihood)) || any(!is.finite(likelihood))){
+  if (any(is.na(likelihood)) || any(!is.finite(likelihood))) {
     stop("Accelerated EM: 'likelihood' matrix contains NA or non-finite values.")
   }
-  if(any(is.na(freq)) || any(!is.finite(freq)) || any(freq < 0)){
+  if (any(is.na(freq)) || any(!is.finite(freq)) || any(freq < 0)) {
     stop("Accelerated EM: 'freq' vector contains NA, non-finite, or negative values.")
   }
   n_effective_sum_freq <- sum(freq)
   if (n_effective_sum_freq <= 0 && N_rows_likelihood > 0) {
     warning("Accelerated EM: Sum of frequencies is zero or negative. Returning initial equal proportions.", call. = FALSE)
-    if (np > 0) return(rep(1 / np, np)) else return(numeric(0))
+    if (np > 0) {
+      return(rep(1 / np, np))
+    } else {
+      return(numeric(0))
+    }
   }
 
   theta <- if (np > 0) rep(1 / np, np) else numeric(0)
-  if (np == 0) return(theta)
+  if (np == 0) {
+    return(theta)
+  }
 
   # Variables for acceleration
   diff1_current_step <- numeric(np)
@@ -369,12 +416,12 @@ accel_em_algorithm <- function(likelihood, np, freq = NULL,
       theta_after_em_step <- theta_after_em_step / sum(theta_after_em_step)
     } else {
       warning(paste("AccelEM iteration", iter, ": All EM step thetas near zero. Resetting."), call. = FALSE)
-      theta_after_em_step <- rep(1/np, np)
+      theta_after_em_step <- rep(1 / np, np)
     }
     theta_after_em_step[theta_after_em_step < 0] <- 0
 
     # Update differences for acceleration logic
-    diff2_prev_step <- diff1_current_step       # Store previous step's difference
+    diff2_prev_step <- diff1_current_step # Store previous step's difference
     diff1_current_step <- theta_after_em_step - theta # Current EM step's difference
 
     max_abs_change_em_step <- max(abs(diff1_current_step))
@@ -382,7 +429,7 @@ accel_em_algorithm <- function(likelihood, np, freq = NULL,
     if (verbose) {
       cat("\nAccelEM Iteration:", iter, "(EM Step Output)\n")
       cat("LogLik (from theta at iter start):", signif(log_likelihood_at_iter_start, 7), "\n")
-      cat("Theta (after EM step): ", paste(sapply(theta_after_em_step, function(x) sprintf("%.6f",x)), collapse = ", "), "\n")
+      cat("Theta (after EM step): ", paste(sapply(theta_after_em_step, function(x) sprintf("%.6f", x)), collapse = ", "), "\n")
       cat("Max abs diff (EM step from theta at iter start):", signif(max_abs_change_em_step, 6), "\n")
     }
 
@@ -411,14 +458,14 @@ accel_em_algorithm <- function(likelihood, np, freq = NULL,
       r_estimates_k[!is.finite(r_estimates_k)] <- 1 # Default if diff2_k was zero, to avoid large alpha
 
       # Use a robust measure, e.g., median, and ensure it's within reasonable bounds for stability
-      r_median <- stats::median(r_estimates_k[abs(diff2_prev_step) > (tol/100)], na.rm = TRUE)
+      r_median <- stats::median(r_estimates_k[abs(diff2_prev_step) > (tol / 100)], na.rm = TRUE)
       if (is.na(r_median)) r_median <- 1 # Fallback if all diff2 small
 
       alpha_aitken <- 1.0 # Default: no acceleration (alpha_aitken-1 = 0)
       if (r_median < (1.0 - sqrt(.Machine$double.eps)) && r_median > -1.0) { # Check for stable r_median
-        alpha_aitken = 1.0 / (1.0 - r_median)
+        alpha_aitken <- 1.0 / (1.0 - r_median)
       } else { # r_median indicates instability or very fast convergence/divergence
-        if (verbose) cat("Acceleration skipped: r_median (", signif(r_median,4) ,") out of stable range.\n")
+        if (verbose) cat("Acceleration skipped: r_median (", signif(r_median, 4), ") out of stable range.\n")
       }
 
       # Aitken extrapolation: theta_k - ( (delta_theta_k)^2 / (delta_theta_k - delta_theta_{k-1}) )
@@ -441,7 +488,7 @@ accel_em_algorithm <- function(likelihood, np, freq = NULL,
         if (sum(theta_accelerated_try) > .Machine$double.eps) {
           theta_accelerated_try <- theta_accelerated_try / sum(theta_accelerated_try)
         } else {
-          theta_accelerated_try <- rep(1/np, np) # Fallback
+          theta_accelerated_try <- rep(1 / np, np) # Fallback
         }
 
         # Check if the accelerated step increases log-likelihood compared to *theta at start of iter*
@@ -455,20 +502,20 @@ accel_em_algorithm <- function(likelihood, np, freq = NULL,
           if (verbose) {
             cat("--- Accepted Accelerated Step ---\n")
             cat("LogLik (Accel candidate):", signif(log_likelihood_accel_candidate, 7), "\n")
-            cat("Theta (Accel candidate): ", paste(sapply(theta_next_candidate,function(x)sprintf("%.6f",x)), collapse = ", "), "\n")
+            cat("Theta (Accel candidate): ", paste(sapply(theta_next_candidate, function(x) sprintf("%.6f", x)), collapse = ", "), "\n")
           }
           if (save_theta_path != FALSE && !is.null(save_theta_path)) {
             theta_history[[paste0(iter, "_accel")]] <- theta_next_candidate
           }
           # Update diff1 based on accepted accelerated step for next iteration's diff2 calculation
           # This diff1 is (theta_accelerated - theta_at_start_of_iter)
-          diff1_current_step = theta_next_candidate - theta
+          diff1_current_step <- theta_next_candidate - theta
         } else {
           if (verbose) cat("--- Rejected Accelerated Step (LogLik did not improve sufficiently vs start of iter) ---\n")
           # If rejected, diff1_current_step remains (theta_after_em_step - theta)
         }
       } else {
-        if (verbose) cat("--- Acceleration factor (alpha_aitken=", signif(alpha_aitken,4) ,") out of bounds, using EM step. ---\n")
+        if (verbose) cat("--- Acceleration factor (alpha_aitken=", signif(alpha_aitken, 4), ") out of bounds, using EM step. ---\n")
       }
     } # End of acceleration attempt block
 
@@ -483,29 +530,34 @@ accel_em_algorithm <- function(likelihood, np, freq = NULL,
 
     if (iter == max_iter && verbose) {
       warning("Accelerated EM reached maximum iterations (", max_iter,
-              ") without full convergence to tolerance (", tol, "). Max change was: ",
-              signif(max(abs(theta - prev_theta_for_diff_check)), 6), call. = FALSE)
+        ") without full convergence to tolerance (", tol, "). Max change was: ",
+        signif(max(abs(theta - prev_theta_for_diff_check)), 6),
+        call. = FALSE
+      )
     }
   } # End of iterations
 
   # Save theta history if path provided
   if (save_theta_path != FALSE && !is.null(save_theta_path) && length(theta_history) > 0) {
-    tryCatch({
-      # Need to handle the _em and _accel tags if just collating
-      # For simplicity, just rbind what was stored.
-      final_theta_history_df <- data.frame()
-      iter_count = 0
-      for(name in names(theta_history)){
-        iter_count = iter_count + 1
-        temp_df = data.frame(Iteration_Step = name, t(theta_history[[name]]))
-        colnames(temp_df)[-1] <- paste0("Stock",1:np)
-        final_theta_history_df <- rbind(final_theta_history_df, temp_df)
+    tryCatch(
+      {
+        # Need to handle the _em and _accel tags if just collating
+        # For simplicity, just rbind what was stored.
+        final_theta_history_df <- data.frame()
+        iter_count <- 0
+        for (name in names(theta_history)) {
+          iter_count <- iter_count + 1
+          temp_df <- data.frame(Iteration_Step = name, t(theta_history[[name]]))
+          colnames(temp_df)[-1] <- paste0("Stock", 1:np)
+          final_theta_history_df <- rbind(final_theta_history_df, temp_df)
+        }
+        write.csv(final_theta_history_df, file = save_theta_path, row.names = FALSE)
+        if (verbose) cat("Theta history (incl. EM/Accel steps) saved to:", save_theta_path, "\n")
+      },
+      error = function(e) {
+        warning(paste("Could not save theta history to CSV:", conditionMessage(e)), call. = FALSE)
       }
-      write.csv(final_theta_history_df, file = save_theta_path, row.names = FALSE)
-      if(verbose) cat("Theta history (incl. EM/Accel steps) saved to:", save_theta_path, "\n")
-    }, error = function(e){
-      warning(paste("Could not save theta history to CSV:", conditionMessage(e)), call. = FALSE)
-    })
+    )
   }
 
   return(theta)
@@ -521,26 +573,28 @@ accel_em_algorithm <- function(likelihood, np, freq = NULL,
 #' @param np Integer number of populations
 #' @param use_accelerated_em Logical; whether to use the accelerated EM version
 #' @param ... Additional arguments passed to internal functions
+#'
+#' @examples
+#' preds <- c(1, 1, 2, 1, 2)
+#' phi_mat <- matrix(c(0.9, 0.1, 0.1, 0.9), 2, 2)
+#'
+#' theta4 <- estimate_millar_theta4(preds, phi_mat, np = 2)
+#' print(theta4)
+#'
 #' @return Numeric value of the estimated theta4 parameter
 #' @export
-#' @examples
-#' \dontrun{
-#' pred_classes <- c(1, 2, 1, 2)
-#' phi_mat <- matrix(c(0.8, 0.2, 0.2, 0.8), 2, 2)
-#' theta4 <- estimate_millar_theta4(pred_classes, phi_mat, np = 2)
-#' }
 estimate_millar_theta4 <- function(class_predictions_mixed_sample, PHI_matrix, np,
                                    use_accelerated_em = TRUE, ...) {
   # --- Input Validation ---
-  if (!is.numeric(np) || length(np) != 1 || np < 1 || floor(np) != np ) {
+  if (!is.numeric(np) || length(np) != 1 || np < 1 || floor(np) != np) {
     stop("'np' must be a single positive integer.")
   }
   if (length(class_predictions_mixed_sample) == 0) {
     warning("Estimate Millar (Theta4): 'class_predictions_mixed_sample' is empty. Returning equal proportions if np > 0.", call. = FALSE)
-    return(if (np > 0) rep(1/np, np) else numeric(0))
+    return(if (np > 0) rep(1 / np, np) else numeric(0))
   }
   if (!is.numeric(class_predictions_mixed_sample) || !all(floor(class_predictions_mixed_sample) == class_predictions_mixed_sample) ||
-      any(class_predictions_mixed_sample < 1) || any(class_predictions_mixed_sample > np)) {
+    any(class_predictions_mixed_sample < 1) || any(class_predictions_mixed_sample > np)) {
     stop("'class_predictions_mixed_sample' must be a vector of integers between 1 and np.")
   }
   if (!is.matrix(PHI_matrix) || !is.numeric(PHI_matrix) || nrow(PHI_matrix) != np || ncol(PHI_matrix) != np) {
@@ -586,12 +640,19 @@ estimate_millar_theta4 <- function(class_predictions_mixed_sample, PHI_matrix, n
 #' @param use_accelerated_em Logical, if TRUE, uses `accel_em_algorithm`, otherwise `em_algorithm`. Default TRUE.
 #' @param ... Additional arguments passed to the chosen EM algorithm
 #'            (e.g., `max_iter`, `tol`, `verbose`, `save_theta_path`).
+#' @examples
+#' # Direct ML estimation from individual likelihoods
+#' lik <- matrix(runif(50), 25, 2)
+#' lik <- lik / rowSums(lik)
+#'
+#' theta5 <- estimate_ml_theta5(lik, np = 2)
+#' print(theta5)
 #'
 #' @return A numeric vector of estimated stock proportions (Theta5).
 #' @export
 estimate_ml_theta5 <- function(individual_likelihoods, np, freq = NULL, use_accelerated_em = TRUE, ...) {
   # --- Input Validation ---
-  if (!is.numeric(np) || length(np) != 1 || np < 1 || floor(np) != np ) {
+  if (!is.numeric(np) || length(np) != 1 || np < 1 || floor(np) != np) {
     stop("'np' must be a single positive integer.")
   }
   if (!is.matrix(individual_likelihoods) || !is.numeric(individual_likelihoods)) {
@@ -602,7 +663,7 @@ estimate_ml_theta5 <- function(individual_likelihoods, np, freq = NULL, use_acce
   }
   if (nrow(individual_likelihoods) == 0) {
     warning("Estimate ML (Theta5): 'individual_likelihoods' matrix has 0 rows. Returning equal proportions if np > 0.", call. = FALSE)
-    return(if (np > 0) rep(1/np, np) else numeric(0))
+    return(if (np > 0) rep(1 / np, np) else numeric(0))
   }
 
   if (is.null(freq)) {

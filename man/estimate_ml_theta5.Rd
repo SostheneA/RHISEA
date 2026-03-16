@@ -14,18 +14,18 @@ estimate_ml_theta5(
 }
 \arguments{
 \item{individual_likelihoods}{A numeric matrix (N_mixed_samples x NP) where
-\code{individual_likelihoods[i,j]} is $P(Data_i | Stock_j)$, the likelihood
-of observing the data for mixed sample fish \code{i} given it came from stock \code{j}.}
+`individual_likelihoods[i,j]` is $P(Data_i | Stock_j)$, the likelihood
+of observing the data for mixed sample fish `i` given it came from stock `j`.}
 
 \item{np}{Integer, the number of populations (stocks).}
 
 \item{freq}{Optional numeric vector of frequencies/weights for each sample (row) in
-\code{individual_likelihoods}. Defaults to \code{rep(1, nrow(individual_likelihoods))}.}
+`individual_likelihoods`. Defaults to `rep(1, nrow(individual_likelihoods))`.}
 
-\item{use_accelerated_em}{Logical, if TRUE, uses \code{accel_em_algorithm}, otherwise \code{em_algorithm}. Default TRUE.}
+\item{use_accelerated_em}{Logical, if TRUE, uses `accel_em_algorithm`, otherwise `em_algorithm`. Default TRUE.}
 
 \item{...}{Additional arguments passed to the chosen EM algorithm
-(e.g., \code{max_iter}, \code{tol}, \code{verbose}, \code{save_theta_path}).}
+(e.g., `max_iter`, `tol`, `verbose`, `save_theta_path`).}
 }
 \value{
 A numeric vector of estimated stock proportions (Theta5).
@@ -35,4 +35,13 @@ Applies an EM algorithm to obtain the direct Maximum Likelihood Estimate (MLE)
 of stock proportions (Theta_5 in HISEA). This uses the likelihood of each
 individual mixed fishery sample fish belonging to each stock.
 The likelihood maximized is:
+}
+\examples{
+# Direct ML estimation from individual likelihoods
+lik <- matrix(runif(50), 25, 2)
+lik <- lik / rowSums(lik)
+
+theta5 <- estimate_ml_theta5(lik, np = 2)
+print(theta5)
+
 }

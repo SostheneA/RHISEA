@@ -50,15 +50,15 @@ library(ggplot2)
 # --- 0. Install and load required libraries ---
 required_pkgs <- c(
   "dplyr", "ggplot2", "purrr", "mclust", "RHISEA",
-  "MASS",       # for LDA/QDA
+  "MASS", # for LDA/QDA
   "randomForest", # for Random Forest
-  "xgboost",    # for XGBoost
-  "e1071",      # for SVM and Naive Bayes
-  "class",      # for k-NN
-  "klaR",       # for additional NB methods
-  "partykit",   # for CTree
-  "nnet",       # for multinom and ANN
-  "caret"       # for cross-validation utilities
+  "xgboost", # for XGBoost
+  "e1071", # for SVM and Naive Bayes
+  "class", # for k-NN
+  "klaR", # for additional NB methods
+  "partykit", # for CTree
+  "nnet", # for multinom and ANN
+  "caret" # for cross-validation utilities
 )
 
 to_install <- setdiff(required_pkgs, rownames(installed.packages()))
@@ -90,11 +90,10 @@ suppressPackageStartupMessages({
 ```{r data}
 # Load baseline and mixture data
 baseline_file <- system.file("extdata", "baseline.rda", package = "RHISEA")
-mixture_file  <- system.file("extdata", "mixture.rda",  package = "RHISEA")
+mixture_file <- system.file("extdata", "mixture.rda", package = "RHISEA")
 
-load(baseline_file)  # loads `baseline` data.frame
-load(mixture_file)   # loads `mixture` data.frame
-
+load(baseline_file) # loads `baseline` data.frame
+load(mixture_file) # loads `mixture` data.frame
 ```
 
 The `baseline` dataset contains known stock samples labeled by population. The `mixture` dataset contains unknown-origin samples to be assigned to stocks.
@@ -104,10 +103,10 @@ The `baseline` dataset contains known stock samples labeled by population. The `
 # Define Analysis Parameters and Output Setup
 
 ```{r}
-np <- 2               # Number of populations/stocks
-nv <- 2               # Number of variables used (e.g., isotopes)
-Nsamps <- 1000        # Number of bootstrap samples for estimation
-Nmix <- 100           # Number of mixture samples
+np <- 2 # Number of populations/stocks
+nv <- 2 # Number of variables used (e.g., isotopes)
+Nsamps <- 1000 # Number of bootstrap samples for estimation
+Nmix <- 100 # Number of mixture samples
 stock_labels <- c("East", "West")
 resampled_baseline_sizes <- c(50, 50)
 resample_baseline <- TRUE
@@ -121,7 +120,8 @@ log_file <- file.path(output_directory, "comparison_log.txt")
 
 if (!dir.exists(output_directory)) dir.create(output_directory)
 cat(sprintf("[%s] Starting classifier comparison\n", Sys.time()),
-    file = log_file, append = TRUE)
+  file = log_file, append = TRUE
+)
 ```
 
 ---
@@ -149,32 +149,36 @@ The script supports the following classifiers, all integrated in RHISEA’s `run
 ```{r, warning=FALSE}
 # --- 3. Supported classifiers in run_hisea_all() ---
 models_to_run <- c(
-  "LDA",        # custom LDF
-  "LDA_MASS",   # MASS::lda
-  "QDA",        # MASS::qda
-  "RF",         # randomForest
- # "XGB",         # xgboost::xgb.DMatrix
-  "SVM",        # e1071::svm
-  "KNN",        # class::knn
-  "ANN",        # nnet::nnet
-  "NB",         # e1071::naiveBayes
- # "MCLUST",     # mclust::MclustDA
-  "MLR"         # nnet::multinom
+  "LDA", # custom LDF
+  "LDA_MASS", # MASS::lda
+  "QDA", # MASS::qda
+  "RF", # randomForest
+  # "XGB",         # xgboost::xgb.DMatrix
+  "SVM", # e1071::svm
+  "KNN", # class::knn
+  "ANN", # nnet::nnet
+  "NB", # e1071::naiveBayes
+  # "MCLUST",     # mclust::MclustDA
+  "MLR" # nnet::multinom
 )
 
 all_results <- list()
 
 # --- 4. Helper: extract performance metrics safely ---
 extract_metrics <- function(res) {
-  if (is.null(res) || inherits(res, "error")) return(NULL)
+  if (is.null(res) || inherits(res, "error")) {
+    return(NULL)
+  }
   cv_res <- res$baseline_classification_quality$cv_results
   if (!is.null(cv_res)) {
     return(data.frame(
       Accuracy = mean(cv_res$Accuracy, na.rm = TRUE),
-      Kappa    = mean(cv_res$Kappa,    na.rm = TRUE),
+      Kappa = mean(cv_res$Kappa, na.rm = TRUE),
       F1_Score = if ("Mean_F1" %in% names(cv_res)) {
         mean(cv_res$Mean_F1, na.rm = TRUE)
-      } else NA_real_
+      } else {
+        NA_real_
+      }
     ))
   }
   qual <- res$baseline_classification_quality
@@ -194,32 +198,32 @@ message("Launching comparative analysis for ", length(models_to_run), " classifi
 for (i in seq_along(models_to_run)) {
   model <- models_to_run[i]
   message("-> Running model: ", model)
-  
+
   # Create subdirectory for this model
   model_dir <- file.path(output_directory, model)
   if (!dir.exists(model_dir)) dir.create(model_dir)
-  
+
   # Run the HISEA analysis
   result <- tryCatch(
     run_hisea_all(
-      type                    = "ANALYSIS",
-      np                      = np,
-      nv                      = nv,
-      resample_baseline       = resample_baseline,
-      resampled_baseline_sizes= resampled_baseline_sizes,
-      seed_val                = 123456,
-      nsamps                  = Nsamps,
-      Nmix                    = Nmix,
+      type = "ANALYSIS",
+      np = np,
+      nv = nv,
+      resample_baseline = resample_baseline,
+      resampled_baseline_sizes = resampled_baseline_sizes,
+      seed_val = 123456,
+      nsamps = Nsamps,
+      Nmix = Nmix,
       baseline_input = baseline,
-      mix_input  = mixture,
-      method_class            = model,
-      stocks_names = stock_labels, 
+      mix_input = mixture,
+      method_class = model,
+      stocks_names = stock_labels,
       stock_col = "population",
-      var_cols_std = c("d13c", "d18o"),  
-      var_cols_mix = c("d13c_ukn" ,"d18o_ukn"),
-      export_csv              = TRUE,
-      output_dir              = model_dir,
-      verbose                 = FALSE,
+      var_cols_std = c("d13c", "d18o"),
+      var_cols_mix = c("d13c_ukn", "d18o_ukn"),
+      export_csv = TRUE,
+      output_dir = model_dir,
+      verbose = FALSE,
       phi_method = c("standard", "cv")[2]
     ),
     error = function(e) {
@@ -229,10 +233,9 @@ for (i in seq_along(models_to_run)) {
       structure(list(error = e), class = "error")
     }
   )
-  
+
   all_results[[model]] <- result
 }
-
 ```
 
 This loop runs each classifier, performs the mixed-stock analysis using RHISEA’s HISEA estimators, saves results in separate subfolders, and logs errors if any occur.
@@ -246,9 +249,9 @@ This loop runs each classifier, performs the mixed-stock analysis using RHISEA�
 rda_files <- list.files(output_directory, pattern = "result_.*\\.rda$", recursive = TRUE, full.names = TRUE)
 
 extract_metrics_from_rda <- function(rda_path) {
-  load(rda_path)  # loads 'out'
+  load(rda_path) # loads 'out'
   model_name <- gsub(".*result_(.*)\\.rda$", "\\1", rda_path)
-  
+
   if (!is.null(out$baseline_classification_quality)) {
     acc <- out$baseline_classification_quality$accuracy
     kappa <- out$baseline_classification_quality$kappa
@@ -271,15 +274,19 @@ library(ggplot2)
 ggplot(performance_summary, aes(x = reorder(Model, Accuracy), y = Accuracy)) +
   geom_col(fill = "steelblue") +
   coord_flip() +
-  labs(title = "Classifier Accuracy Comparison",
-       x = "Classifier Model", y = "Accuracy") +
+  labs(
+    title = "Classifier Accuracy Comparison",
+    x = "Classifier Model", y = "Accuracy"
+  ) +
   theme_minimal()
 
 ggplot(performance_summary, aes(x = reorder(Model, Kappa), y = Kappa)) +
   geom_col(fill = "darkorange") +
   coord_flip() +
-  labs(title = "Classifier Kappa Comparison",
-       x = "Classifier Model", y = "Kappa") +
+  labs(
+    title = "Classifier Kappa Comparison",
+    x = "Classifier Model", y = "Kappa"
+  ) +
   theme_minimal()
 ```
 

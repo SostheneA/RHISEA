@@ -8,10 +8,11 @@ author:
   email: "alex.hanke@dfo-mpo.ca"
   affiliation: Fisheries and Oceans Canada
 date: "`r Sys.Date()`"
-output:
-  html_document:
-    df_print: paged
-vignette: "%\\\\VignetteIndexEntry{Analyzing complex mixed-stock fisheries with 20 stocks} %\\\\VignetteEngine{knitr::rmarkdown} %\\\\VignetteEncoding{UTF-8}\n"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Comprehensive Guide to the RHISEA Package for Mixed-Stock Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -43,7 +44,7 @@ We simulate a mixture of 1000 fish from 20 stocks, generating pseudo-class assig
 ```{r}
 set.seed(1234)
 
-np <- 20  # number of populations
+np <- 20 # number of populations
 n_mixture <- 1000
 
 # Create stock names
@@ -82,7 +83,6 @@ round(colSums(phi_matrix), 6)
 
 # View phi_matrix with margins (optional)
 addmargins(phi_matrix)
-
 ```
 
 ***
@@ -122,11 +122,18 @@ estimates_long <- as.data.frame(results$mean_estimates) %>%
 ggplot(estimates_long, aes(x = Estimator, y = Proportion, fill = Stock)) +
   geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
   theme_minimal() +
-  labs(title = "Estimated Stock Proportions by HISEA Estimator",
-       y = "Estimated Proportion",
-       x = "Estimator") +
+  labs(
+    title = "Estimated Stock Proportions by HISEA Estimator",
+    y = "Estimated Proportion",
+    x = "Estimator"
+  ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+```{r delete, echo=FALSE}
+unlink(c("*.rda", "*.std", "*.mix", "*.ctr", "*.out", "*.xlsx", "fort.*"), force = TRUE)
+```
+
 
 ***
 

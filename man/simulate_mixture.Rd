@@ -12,14 +12,14 @@ baseline (standard) data for one stock/population, with
 observations as rows and variables as columns.}
 
 \item{actual_proportions}{A numeric vector of true proportions for each stock in the mixture.
-Must sum to 1 and have the same length as \code{baseline_data_list}.}
+Must sum to 1 and have the same length as `baseline_data_list`.}
 
 \item{N_mixture_size}{Integer, the total number of individuals to draw for the synthetic mixture.}
 }
 \value{
 A numeric matrix representing the simulated mixture sample. Rows are
-individuals, and columns are variables. Returns an error if the mixture
-cannot be formed (e.g., due to empty baseline stocks needed for sampling).
+        individuals, and columns are variables. Returns an error if the mixture
+        cannot be formed (e.g., due to empty baseline stocks needed for sampling).
 }
 \description{
 Creates a synthetic fishery mixture by sampling individuals from different baseline
@@ -27,13 +27,20 @@ stocks according to specified true proportions. Sampling from each stock is done
 with replacement.
 }
 \examples{
-# Dummy baseline data
-stock1 <- matrix(rnorm(20 * 2, mean = 0, sd = 1), ncol = 2) # Assuming 2 variables
-stock2 <- matrix(rnorm(30 * 2, mean = 2, sd = 1), ncol = 2) # Assuming 2 variables
-baseline_list_ex <- list(stock1, stock2)
-true_props_ex <- c(0.6, 0.4) # 60\% from stock1, 40\% from stock2
-mixture_N_ex <- 100
-# simulated_sample_ex <- simulate_mixture(baseline_list_ex, true_props_ex, mixture_N_ex)
-# print(head(simulated_sample_ex))
-# print(nrow(simulated_sample_ex)) # Should be close to 100
+# 1. Prepare dummy baseline data for 2 stocks
+stock1 <- matrix(rnorm(40, mean = 0, sd = 1), ncol = 2)
+stock2 <- matrix(rnorm(60, mean = 2, sd = 1), ncol = 2)
+baseline_list <- list(StockA = stock1, StockB = stock2)
+
+# 2. Set true proportions and mixture size
+true_props <- c(0.6, 0.4)
+n_mix <- 100
+
+# 3. Generate the synthetic mixture
+simulated_sample <- simulate_mixture(baseline_list, true_props, n_mix)
+
+# 4. Verify output
+head(simulated_sample)
+nrow(simulated_sample) # Should be 100
+
 }

@@ -15,20 +15,20 @@ em_algorithm(
 )
 }
 \arguments{
-\item{likelihood}{A numeric matrix (N_rows x N_populations) where \code{likelihood[i, j]}
+\item{likelihood}{A numeric matrix (N_rows x N_populations) where `likelihood[i, j]`
 is $P(Data_i | Stock_j)$ or a value proportional to it.
 N_rows can be N_samples (for Theta5) or N_populations (for Theta4).}
 
-\item{np}{Integer, the number of populations (stocks). Should match \code{ncol(likelihood)}.}
+\item{np}{Integer, the number of populations (stocks). Should match `ncol(likelihood)`.}
 
 \item{freq}{Optional numeric vector of frequencies/weights for each "observation"
-(row in \code{likelihood}). Length must match \code{nrow(likelihood)}.
-Defaults to \code{rep(1, nrow(likelihood))}.}
+(row in `likelihood`). Length must match `nrow(likelihood)`.
+Defaults to `rep(1, nrow(likelihood))`.}
 
 \item{max_iter}{Integer, the maximum number of iterations for the EM algorithm.}
 
 \item{tol}{Numeric, the convergence tolerance. The algorithm stops if the maximum
-absolute change in any \code{theta} component is less than \code{tol}.}
+absolute change in any `theta` component is less than `tol`.}
 
 \item{verbose}{Logical, if TRUE, prints iteration number and current theta estimates.}
 
@@ -36,8 +36,17 @@ absolute change in any \code{theta} component is less than \code{tol}.}
 estimates at each iteration is saved to a CSV file at this path.}
 }
 \value{
-A numeric vector of estimated stock proportions (theta), length \code{np}.
+A numeric vector of estimated stock proportions (theta), length `np`.
 }
 \description{
 Estimates mixing proportions (theta) from a likelihood matrix using the EM algorithm.
+}
+\examples{
+# Dummy likelihood matrix (10 samples, 3 stocks)
+lik <- matrix(runif(30), 10, 3)
+lik <- lik / rowSums(lik) # Normalize rows
+
+theta_em <- em_algorithm(lik, np = 3, max_iter = 20)
+print(theta_em)
+
 }

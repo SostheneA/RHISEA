@@ -21,8 +21,6 @@
 #' @param nsamps Integer. Number of replicates.
 #' @param Nmix Integer. Sample size of the simulated mixture (for SIMULATION only).
 #' @param actual Numeric vector. True proportions used in simulation.
-#' @param baseline_path Character. File path to the baseline `.std` file.
-#' @param mix_path Character. File path to the mixture `.mix` file.
 #' @param export_csv Logical. Whether to export summary and confusion matrix to CSV.
 #' @param output_dir Character. Output directory.
 #' @param verbose Logical. Print progress messages.
@@ -33,51 +31,361 @@
 #' @param phi_method Character. "standard" or "cv" (cross-validation-based confusion matrix).
 #' @param mclust_model_names Character vector. Models to test with Mclust.
 #' @param mclust_perform_cv Logical. Whether to cross-validate Mclust.
+#' @param baseline_input Data frame or file path for baseline data.
+#' @param mix_input Data frame or file path for mixture data.
+#' @param stock_col Character name of stock column in baseline data.
+#' @param var_cols_std Character vector of column names for baseline variables.
+#' @param var_cols_mix Character vector of column names for mixture variables.
+#' @param ... Additional arguments passed to the underlying classification models (e.g., ntree for Random Forest, cost for SVM).
 #'
-#' @return A list with:
+#' @return A list of length 8 containing the statistical summary of the estimation
+#' (the same as the `estimation_summary` element in the saved file):
 #' \describe{
-#'   \item{estimation_summary}{Summary table with mean, SD, and RMSE of estimates.}
-#'   \item{classification_model}{Final trained classifier object.}
-#'   \item{baseline_classification_quality}{Accuracy, Kappa, and per-class metrics.}
-#'   \item{phi_matrix}{Estimated confusion matrix used in corrections.}
-#'   \item{mixture_classification_details}{List with predicted pseudo-classes and likelihoods.}
+#'   \item{mean_estimates}{Matrix [np x nsamps] of mean estimated proportions.}
+#'   \item{sd_estimates}{Standard deviations of the estimates.}
+#'   \item{mse_estimates}{Mean Squared Error (if applicable).}
+#'   \item{var_emp}{Empirical variance of the estimates.}
+#'   \item{covar_ml}{Maximum Likelihood covariance matrix.}
+#'   \item{cor_ml}{Correlation matrix.}
+#'   \item{covar_inv_ml}{Inverse of the covariance matrix.}
+#'   \item{det_covar_ml}{Determinant of the covariance matrix (checks for singularity).}
 #' }
 #'
-#' A `.rda` file of results is also saved in `output_dir`.
-#'
-#' @seealso \code{compute_cook_estimators}, \code{estimate_millar}, \code{estimate_ml},
-#' \code{get_cv_metrics_and_phi}, \code{train_model}, \code{predict_model}, \code{.resample_baseline_data_helper}
+#' @section Saved Results Structure:
+#' The function automatically saves a `.rda` file in `output_dir` containing a
+#' master list named `out`. This list includes:
+#' \describe{
+#'   \item{estimation_summary}{The list of 8 statistical metrics described above.}
+#'   \item{classification_model}{The trained classifier object (e.g., LDA, RF).}
+#'   \item{baseline_classification_quality}{Accuracy, Kappa, and F1 scores.}
+#'   \item{phi_matrix}{The confusion matrix used for bias correction.}
+#'   \item{mixture_classification_details}{Predicted classes and posterior probabilities.}
+#' }
 #'
 #' @examples
-#' \dontrun{
-#' run_hisea_all(type="SIMULATION",
-#'              np=3, nv=5,
-#'              actual=c(0.2,0.3,0.5),
-#'              Nmix=200,
-#'              baseline_path="baseline.std",
-#'              method_class="RF",
-#'              resample_baseline=TRUE,
-#'              resampled_baseline_sizes=c(100,100,100),
-#'              output_dir="results")
-#' }
+#' data(baseline)
+#' data(mixture)
+#'
+#' res <- run_hisea_all(
+#'   baseline_input = baseline,
+#'   mix_input      = mixture,
+#'   stock_col      = "population",
+#'   var_cols_std   = c("d13c", "d18o"),
+#'   var_cols_mix   = c("d13c_ukn", "d18o_ukn"),
+#'   output_dir     = tempdir(),
+#'   np = 2, nv = 2, nsamps = 5, Nmix = 50, method_class = "LDA"
+#' )
+#' print(res$mean_estimates)
 #'
 #' @importFrom stats as.formula predict
-#' @importFrom utils write.csv
 #' @importFrom data.table data.table .SD
 #' @importFrom MASS ginv
-#' @importFrom utils write.csv
+#' @importFrom utils write.csv modifyList
 #' @export
+run_hisea_all <- function(type = "ANALYSIS",
+                          np, nv,
+                          seed_val = 123456,
+                          var_cols_std = NULL,
+                          var_cols_mix = NULL,
+                          stock_col = NULL,
+                          nsamps = 1000,
+                          Nmix = 100,
+                          actual = NULL,
+                          baseline_input = NULL,
+                          mix_input = NULL,
+                          export_csv = FALSE,
+                          output_dir = ".",
+                          verbose = FALSE,
+                          method_class = "LDA",
+                          stocks_names = NULL,
+                          resample_baseline = FALSE,
+                          resampled_baseline_sizes = NULL,
+                          phi_method = c("standard", "cv"),
+                          mclust_model_names = NULL,
+                          mclust_perform_cv = TRUE, ...) {
+  type <- toupper(type)
+  method_class <- toupper(method_class)
+  phi_method <- match.arg(phi_method)
+  if (is.null(var_cols_std)) var_cols_std <- paste0("V", 1:nv)
+
+  if (type == "ANALYSIS" && resample_baseline) {
+    warning("resample_baseline only for SIMULATION/BOOTSTRAP; disabling.")
+    resample_baseline <- FALSE
+  }
+  if (resample_baseline) {
+    if (!type %in% c("SIMULATION", "BOOTSTRAP")) {
+      stop("resample_baseline=TRUE requires type='SIMULATION' or 'BOOTSTRAP'.")
+    }
+    if (is.null(resampled_baseline_sizes) ||
+        length(resampled_baseline_sizes) != np) {
+      stop("resampled_baseline_sizes must be length np.")
+    }
+  }
+
+  # read baseline
+  base_list <- process_hisea_input(baseline_input,
+                                   type = "std", nv = nv,
+                                   stock_col = stock_col, var_cols_std = var_cols_std,stocks_names = stocks_names
+  )
+  if (length(base_list) != np) {
+    stop(sprintf("Baseline has %d stocks but np=%d.", length(base_list), np))
+  }
+  base_data <- do.call(rbind, base_list)
+  base_num <- rep(seq_along(base_list), times = sapply(base_list, nrow))
+
+  if (!is.null(stocks_names) && length(stocks_names) == np) {
+    stock_names_internal <- stocks_names
+  } else {
+    stock_names_internal <- paste0("Stock_", seq_len(np))
+  }
+
+  base_fac <- factor(base_num, levels = 1:np, labels = stock_names_internal)
+
+  # allocate results
+  est_names <- c("RAW", "COOK", "COOKC", "EM", "ML")
+  all_res <- array(NA_real_,
+                   dim = c(nsamps, np, length(est_names)),
+                   dimnames = list(NULL, stock_names_internal, est_names)
+  )
+
+  generic_colnames <- make.names(paste0("V", 1:nv), unique = TRUE)
+  set.seed(seed_val)
+  full_mix_boot <- NULL
+  final_model <- NULL
+  final_metrics <- NULL
+  final_Phi <- NULL
+  final_mix_pc <- NULL
+  final_mix_like <- NULL
+
+  if (verbose) {
+    message(
+      "Running ", nsamps, " x ", type, " with ", method_class,
+      " (phi=", phi_method, ")"
+    )
+  }
+
+  for (i in seq_len(nsamps)) {
+    if (verbose && (i == 1 || i == nsamps || i %% max(1, floor(nsamps / 10)) == 0)) {
+      message(" Iter ", i, "/", nsamps)
+    }
+
+    # baseline for this iter
+    if (resample_baseline) {
+      bl <- .resample_baseline_data_helper(
+        base_list,
+        resampled_baseline_sizes,
+        stock_names_internal, nv
+      )
+      bdata <- do.call(rbind, bl)
+      bnum <- rep(seq_along(bl), times = sapply(bl, nrow))
+      bfac <- factor(bnum, levels = 1:np, labels = stock_names_internal)
+      if (nrow(bdata) == 0 && sum(resampled_baseline_sizes) > 0) {
+        warning("Iter ", i, ": empty resampled baseline; skipping.")
+        all_res[i, , ] <- NA
+        next
+      }
+    } else {
+      bdata <- base_data
+      bfac <- base_fac
+    }
+
+    # compute metrics & Phi
+    if (phi_method == "cv") {
+      cmv <- get_cv_metrics_and_phi(bdata, bfac,
+                                    method_class,
+                                    np, nv,
+                                    stock_names_internal,
+                                    generic_colnames,
+                                    folds = 10, ...
+      )
+      quality <- cmv
+      iter_Phi <- as.matrix(cmv$phi_matrix)
+      # train final model on full baseline
+      mi <- train_model(
+        bdata, bfac,
+        method_class, np, nv,
+        generic_colnames, ...
+      )
+    } else {
+      mi <- train_model(
+        bdata, bfac,
+        method_class, np, nv,
+        generic_colnames, ...
+      )
+      prb <- predict_model(
+        mi, bdata, method_class,
+        stock_names_internal, generic_colnames
+      )
+      cm <- table(
+        Predicted = factor(prb$class,
+                           levels = 1:np,
+                           labels = stock_names_internal
+        ),
+        Actual = bfac
+      )
+      acc <- sum(diag(cm)) / sum(cm)
+      tot <- sum(cm)
+      pe <- sum(rowSums(cm) * colSums(cm)) / (tot^2)
+      kap <- if (abs(1 - pe) > .Machine$double.eps) (acc - pe) / (1 - pe) else NA_real_
+      quality <- list(
+        confusion_matrix = cm,
+        accuracy = acc, kappa = kap
+      )
+      iter_Phi <- as.matrix(prop.table(cm, margin = 2))
+    }
+
+    # invert or pseudo-invert Phi
+    iter_Phi <- as.matrix(iter_Phi)
+    iter_Phi <- matrix(as.numeric(iter_Phi),
+                       nrow = nrow(iter_Phi),
+                       ncol = ncol(iter_Phi)
+    )
+
+    phi_det <- tryCatch(
+      {
+        det(iter_Phi)
+      },
+      error = function(e) {
+        warning("Could not compute det(iter_Phi): ", e$message)
+        0
+      }
+    )
+
+    if (abs(phi_det) < 1e-12) {
+      inv_Phi <- MASS::ginv(iter_Phi)
+    } else {
+      inv_Phi <- solve(iter_Phi)
+    }
+
+    # store final run artifacts
+    if (i == 1 || resample_baseline) {
+      final_model <- mi$model
+      final_metrics <- quality
+      final_Phi <- iter_Phi
+    }
+
+    # generate mixture
+    if (type == "SIMULATION") {
+      if (is.null(actual)) stop("'actual' needed for SIMULATION.")
+      mix_s <- simulate_mixture(base_list, actual, Nmix)
+    } else if (type == "ANALYSIS") {
+      mix_s <- process_hisea_input(mix_input, type = "mix", nv = nv, var_cols_mix = var_cols_mix)
+    } else if (type == "BOOTSTRAP") {
+      if (i == 1) {
+        full_mix_boot <- process_hisea_input(mix_input, type = "mix", nv = nv, var_cols_mix = var_cols_mix)
+        if (nrow(full_mix_boot) == 0) {
+          stop("Bootstrap: mixture empty.")
+        }
+      }
+      idx <- sample(seq_len(nrow(full_mix_boot)), replace = TRUE)
+      mix_s <- full_mix_boot[idx, , drop = FALSE]
+    } else {
+      stop("Unknown type: ", type)
+    }
+
+    if (nrow(mix_s) == 0) {
+      warning("Iter ", i, ": empty mixture; skipping.")
+      all_res[i, , ] <- NA
+      next
+    }
+
+    # classify mixture
+    pr_m <- predict_model(
+      mi, mix_s, method_class,
+      stock_names_internal, generic_colnames
+    )
+    mix_pc <- pr_m$class
+    mix_like <- pr_m$likelihood
+    mix_like[is.na(mix_like)] <- 1 / np
+    mix_like <- t(apply(mix_like, 1, function(r) r / sum(r)))
+
+    if (i == 1 || resample_baseline) {
+      final_mix_pc <- mix_pc
+      final_mix_like <- mix_like
+    }
+
+    # HISEA estimators
+    raw <- prop.table(tabulate(mix_pc, nbins = np))
+    ck <- compute_cook_estimators(mix_pc, inv_Phi, np)
+    emv <- estimate_millar(mix_pc, iter_Phi, np, verbose = FALSE, max_iter = 200)
+    mlp <- estimate_ml(mix_like, np, verbose = FALSE, max_iter = 200)
+
+    all_res[i, , "RAW"] <- raw
+    all_res[i, , "COOK"] <- ck$cook
+    all_res[i, , "COOKC"] <- ck$cook_constrained
+    all_res[i, , "EM"] <- emv
+    all_res[i, , "ML"] <- mlp
+  }
+
+  # summary & optional CSV
+  actual_sum <- if (type == "SIMULATION") actual else NULL
+  summary_l <- create_hisea_summary_report(all_res,
+                                           actual_sum,
+                                           run_type = type
+  )
+  if (export_csv) {
+    if (!dir.exists(output_dir)) dir.create(output_dir, recursive = TRUE)
+    suf <- paste0("_", method_class, "_", type)
+    write.csv(as.data.frame(summary_l$mean_estimates),
+              file.path(output_dir, paste0("mean", suf, ".csv")),
+              row.names = FALSE
+    )
+    write.csv(as.data.frame(summary_l$sd_estimates),
+              file.path(output_dir, paste0("sd", suf, ".csv")),
+              row.names = FALSE
+    )
+    if (!is.null(summary_l$mse_estimates)) {
+      write.csv(as.data.frame(summary_l$mse_estimates),
+                file.path(output_dir, paste0("rmse", suf, ".csv")),
+                row.names = FALSE
+      )
+    }
+    cmf <- final_metrics$confusion_matrix
+    if (!is.null(cmf)) {
+      write.csv(as.data.frame.matrix(cmf),
+                file.path(output_dir, paste0("confMat", suf, ".csv")),
+                row.names = TRUE
+      )
+    }
+  }
+
+  timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+  # save full return
+  out <- list(
+    estimation_summary = summary_l,
+    classification_model = final_model,
+    baseline_classification_quality = final_metrics,
+    phi_matrix = final_Phi,
+    mixture_classification_details = list(
+      pseudo_classes = final_mix_pc,
+      likelihoods    = final_mix_like
+    )
+  )
+  save(out, file = file.path(
+    output_dir,
+    paste0("result_", method_class, "_", type, "_", timestamp, ".rda")
+  ))
+  if (verbose) message("run_hisea_all() done.")
+  summary_l
+}
 
 
 
 
-# -------------------------------------------------------------------
-# Helper: resample baseline data per stock
-# -------------------------------------------------------------------
+
+#' Helper: resample baseline data per stock
+#'
+#' @param original_baseline_list List of baseline matrices.
+#' @param resampled_sizes Integer vector of sizes for resampling.
+#' @param stock_names_for_error Character vector of stock names for error messages.
+#' @param nv_fallback Integer. Number of variables to use if a matrix is empty.
+#'
+#' @return A list of resampled matrices.
+#' @keywords internal
 .resample_baseline_data_helper <- function(original_baseline_list,
-                                          resampled_sizes,
-                                          stock_names_for_error,
-                                          nv_fallback) {
+                                           resampled_sizes,
+                                           stock_names_for_error,
+                                           nv_fallback) {
   if (length(original_baseline_list) != length(resampled_sizes)) {
     stop("Length of original_baseline_list must match resampled_sizes.")
   }
@@ -85,32 +393,34 @@
   names(new_list) <- names(original_baseline_list)
   for (j in seq_along(original_baseline_list)) {
     dat_j <- original_baseline_list[[j]]
-    n_j   <- resampled_sizes[j]
-    stock  <- if (!is.null(stock_names_for_error) &&
-                  length(stock_names_for_error)==length(original_baseline_list)) {
+    n_j <- resampled_sizes[j]
+    stock <- if (!is.null(stock_names_for_error) &&
+      length(stock_names_for_error) == length(original_baseline_list)) {
       stock_names_for_error[j]
-    } else paste0("Stock_", j)
+    } else {
+      paste0("Stock_", j)
+    }
     # zero requested empty matrix
     if (n_j == 0) {
       nc <- if (!is.null(dat_j) && !is.null(ncol(dat_j))) ncol(dat_j) else NA_integer_
-      if (is.na(nc) && j>1) {
-        for (k in (j-1):1) {
+      if (is.na(nc) && j > 1) {
+        for (k in (j - 1):1) {
           if (!is.null(original_baseline_list[[k]]) &&
-              !is.null(ncol(original_baseline_list[[k]]))) {
+            !is.null(ncol(original_baseline_list[[k]]))) {
             nc <- ncol(original_baseline_list[[k]])
             break
           }
         }
       }
       if (is.na(nc)) nc <- nv_fallback
-      new_list[[j]] <- matrix(numeric(0), nrow=0, ncol=nc)
+      new_list[[j]] <- matrix(numeric(0), nrow = 0, ncol = nc)
       next
     }
-    if (is.null(dat_j) || nrow(dat_j)==0) {
+    if (is.null(dat_j) || nrow(dat_j) == 0) {
       stop(sprintf("Cannot sample %d from '%s' (baseline empty).", n_j, stock))
     }
-    idx <- sample(seq_len(nrow(dat_j)), size=n_j, replace=TRUE)
-    new_list[[j]] <- dat_j[idx, , drop=FALSE]
+    idx <- sample(seq_len(nrow(dat_j)), size = n_j, replace = TRUE)
+    new_list[[j]] <- dat_j[idx, , drop = FALSE]
   }
   new_list
 }
@@ -134,20 +444,19 @@ split_by_class_list <- function(data, labels) {
 train_model <- function(train_data, train_labels,
                         method_class,
                         np, nv,
-                        generic_colnames,...) {
+                        generic_colnames, ...) {
   m <- toupper(method_class)
   out <- list()
   args <- list(...)
-  if (m=="LDA") {
+  if (m == "LDA") {
     out$model <- compute_ldf_coefficients(split_by_class_list(train_data, train_labels))
-  } else if (m=="LDA_MASS") {
-    out$model <- MASS::lda(train_data, grouping=train_labels, prior=rep(1/np,np))
-  } else if (m=="MCLUST") {
-    out$model <- mclust::MclustDA(data=train_data, class=train_labels, verbose=FALSE)
-  } else if (m=="QDA") {
-    out$model <- MASS::qda(train_data, grouping=train_labels, prior=rep(1/np,np))
-
-  } else if (m=="MLR") {
+  } else if (m == "LDA_MASS") {
+    out$model <- MASS::lda(train_data, grouping = train_labels, prior = rep(1 / np, np))
+  } else if (m == "MCLUST") {
+    out$model <- mclust::MclustDA(data = train_data, class = train_labels, verbose = FALSE)
+  } else if (m == "QDA") {
+    out$model <- MASS::qda(train_data, grouping = train_labels, prior = rep(1 / np, np))
+  } else if (m == "MLR") {
     # Prepare data with consistent column names
     feature_names <- paste0("Feature_", seq_len(ncol(train_data)))
     train_df <- data.frame(as.matrix(train_data))
@@ -167,39 +476,41 @@ train_model <- function(train_data, train_labels,
       f,
       data = df,
       trace = FALSE,
-      MaxNWts = max(2000, (ncol(train_data)+1)*(np-1)*2+500)
+      MaxNWts = max(2000, (ncol(train_data) + 1) * (np - 1) * 2 + 500)
     )
     out$feature_names <- feature_names
     out$levels <- levels(factor(train_labels))
-  } else if (m=="KNN") {
+  } else if (m == "KNN") {
     k <- args$k %||% 5
-    out$model <- list(train_data=train_data, train_labels=train_labels, k=k)
-  } else if (m=="SVM") {
+    out$model <- list(train_data = train_data, train_labels = train_labels, k = k)
+  } else if (m == "SVM") {
     kernel <- args$kernel %||% "radial"
-    out$model <- e1071::svm(x=train_data, y=train_labels, kernel=kernel, probability=TRUE)
-  } else if (m=="RF") {
+    out$model <- e1071::svm(x = train_data, y = train_labels, kernel = kernel, probability = TRUE)
+  } else if (m == "RF") {
     ntree <- args$ntree %||% 500
     # Ensure data is in the correct format
     train_matrix <- as.data.frame(train_data)
     colnames(train_matrix) <- paste0("Feature_", seq_len(ncol(train_data)))
-    out$model <- randomForest::randomForest(x=train_matrix,
-                                            y=factor(train_labels),
-                                            ntree=ntree)
+    out$model <- randomForest::randomForest(
+      x = train_matrix,
+      y = factor(train_labels),
+      ntree = ntree
+    )
     out$feature_names <- colnames(train_matrix)
-  } else if (m=="XGB") {
+  } else if (m == "XGB") {
     nrounds <- args$nrounds %||% 100
     feature_names <- paste0("Feature_", seq_len(ncol(train_data)))
     train_matrix <- as.matrix(train_data)
     colnames(train_matrix) <- feature_names
     labels_num <- as.integer(as.factor(train_labels)) - 1
-    dmat <- xgboost::xgb.DMatrix(data=train_matrix, label=labels_num)
+    dmat <- xgboost::xgb.DMatrix(data = train_matrix, label = labels_num)
     params <- modifyList(list(
       objective = "multi:softprob",
       num_class = np,
       eval_metric = "mlogloss",
       eta = 0.3,
       max_depth = 6
-    ), args)  # surcharge avec ce qui est dans ...
+    ), args) # surcharge avec ce qui est dans ...
     out$model <- xgboost::xgb.train(
       params = params,
       data = dmat,
@@ -208,20 +519,23 @@ train_model <- function(train_data, train_labels,
     )
     out$feature_names <- feature_names
     out$np <- np
-  } else if (m=="ANN") {
+  } else if (m == "ANN") {
     size <- args$size %||% 5
-    df <- data.frame(Class=train_labels, train_data)
-    if (nv>0) colnames(df)[-1] <- generic_colnames
-    f <- if (nv>0)
-      as.formula(paste("Class ~", paste(generic_colnames, collapse=" + ")))
-    else
+    df <- data.frame(Class = train_labels, train_data)
+    if (nv > 0) colnames(df)[-1] <- generic_colnames
+    f <- if (nv > 0) {
+      as.formula(paste("Class ~", paste(generic_colnames, collapse = " + ")))
+    } else {
       as.formula("Class ~ 1")
-    out$model <- nnet::nnet(f, data=df,
-                            size=size, trace=FALSE,
-                            MaxNWts=max(5000,((nv+1)*size+(size+1)*np)*3+2000),
-                            maxit=200)
-  } else if (m=="NB") {
-    out$model <- e1071::naiveBayes(x=train_data, y=train_labels)
+    }
+    out$model <- nnet::nnet(f,
+      data = df,
+      size = size, trace = FALSE,
+      MaxNWts = max(5000, ((nv + 1) * size + (size + 1) * np) * 3 + 2000),
+      maxit = 200
+    )
+  } else if (m == "NB") {
+    out$model <- e1071::naiveBayes(x = train_data, y = train_labels)
   } else {
     stop("Unsupported method: ", method_class)
   }
@@ -236,114 +550,119 @@ predict_model <- function(model_info, newdata, method_class,
                           stocks_names, generic_colnames) {
   m <- toupper(method_class)
   np <- length(stocks_names)
-  n  <- nrow(newdata)
-  pc <- integer(n); prob <- matrix(1/np, nrow=n, ncol=np,
-                                   dimnames=list(NULL,stocks_names))
+  n <- nrow(newdata)
+  pc <- integer(n)
+  prob <- matrix(1 / np,
+    nrow = n, ncol = np,
+    dimnames = list(NULL, stocks_names)
+  )
 
-  if (m=="LDA") {
+  if (m == "LDA") {
     r <- classify_samples(newdata, model_info$model)
-    pc   <- r$class
+    pc <- r$class
     prob <- r$likelihood
-
-  } else if (m %in% c("LDA_MASS","QDA")) {
-    pr   <- predict(model_info$model, newdata)
-    pc   <- as.integer(pr$class)
+  } else if (m %in% c("LDA_MASS", "QDA")) {
+    pr <- predict(model_info$model, newdata)
+    pc <- as.integer(pr$class)
     prob <- pr$posterior
     colnames(prob) <- stocks_names
-
-  } else if (m=="MCLUST") {
-    pr   <- predict(model_info$model, newdata=newdata)
-    prob <- pr$z; colnames(prob) <- stocks_names
-    pc   <- apply(prob,1,which.max)
-
-  } else if (m=="MLR") {
+  } else if (m == "MCLUST") {
+    pr <- predict(model_info$model, newdata = newdata)
+    prob <- pr$z
+    colnames(prob) <- stocks_names
+    pc <- apply(prob, 1, which.max)
+  } else if (m == "MLR") {
     # Prepare test data
     newdata_df <- data.frame(as.matrix(newdata))
     colnames(newdata_df) <- model_info$feature_names
 
-    tryCatch({
-      # Predict classes
-      pc_f <- predict(model_info$model, newdata = newdata_df, type = "class")
-      pc <- as.integer(factor(pc_f, levels = stocks_names))
+    tryCatch(
+      {
+        # Predict classes
+        pc_f <- predict(model_info$model, newdata = newdata_df, type = "class")
+        pc <- as.integer(factor(pc_f, levels = stocks_names))
 
-      # Predict probabilities
-      pmat <- predict(model_info$model, newdata = newdata_df, type = "probs")
+        # Predict probabilities
+        pmat <- predict(model_info$model, newdata = newdata_df, type = "probs")
 
-      # Ensure pmat is a matrix
-      if (is.null(dim(pmat))) {
-        pmat <- matrix(pmat, nrow = nrow(newdata), ncol = np)
-      }
-
-      # Check and normalize probabilities
-      if (is.matrix(pmat)) {
-        if (ncol(pmat) == np) {
-          # Normalize if needed
-          pmat <- t(apply(pmat, 1, function(x) x/sum(x)))
-          colnames(pmat) <- stocks_names
-          prob <- pmat
-        } else {
-          warning("MLR: Unexpected number of columns in probability matrix")
+        # Ensure pmat is a matrix
+        if (is.null(dim(pmat))) {
+          pmat <- matrix(pmat, nrow = nrow(newdata), ncol = np)
         }
-      } else {
-        warning("MLR: Could not get probability matrix")
-      }
-    }, error = function(e) {
-      warning("MLR prediction error: ", e$message)
-      # Return uniform probabilities in case of error
-      prob <- matrix(1/np, nrow=nrow(newdata), ncol=np,
-                     dimnames=list(NULL, stocks_names))
-      pc <- rep(1, nrow(newdata))
-    })
 
-  } else if (m=="KNN") {
-    k   <- model_info$model$k
-    td  <- model_info$model$train_data
-    tl  <- model_info$model$train_labels
-    if (nrow(td)<=k) k <- max(1,nrow(td)-1)
-    pc_f <- class::knn(train=td, test=newdata, cl=tl, k=k)
-    pc   <- as.integer(factor(pc_f, levels=stocks_names))
-    if (requireNamespace("kknn", quietly=TRUE)) {
-      dftr <- data.frame(Class=tl, td)
+        # Check and normalize probabilities
+        if (is.matrix(pmat)) {
+          if (ncol(pmat) == np) {
+            # Normalize if needed
+            pmat <- t(apply(pmat, 1, function(x) x / sum(x)))
+            colnames(pmat) <- stocks_names
+            prob <- pmat
+          } else {
+            warning("MLR: Unexpected number of columns in probability matrix")
+          }
+        } else {
+          warning("MLR: Could not get probability matrix")
+        }
+      },
+      error = function(e) {
+        warning("MLR prediction error: ", e$message)
+        # Return uniform probabilities in case of error
+        prob <- matrix(1 / np,
+          nrow = nrow(newdata), ncol = np,
+          dimnames = list(NULL, stocks_names)
+        )
+        pc <- rep(1, nrow(newdata))
+      }
+    )
+  } else if (m == "KNN") {
+    k <- model_info$model$k
+    td <- model_info$model$train_data
+    tl <- model_info$model$train_labels
+    if (nrow(td) <= k) k <- max(1, nrow(td) - 1)
+    pc_f <- class::knn(train = td, test = newdata, cl = tl, k = k)
+    pc <- as.integer(factor(pc_f, levels = stocks_names))
+    if (requireNamespace("kknn", quietly = TRUE)) {
+      dftr <- data.frame(Class = tl, td)
       colnames(dftr)[-1] <- generic_colnames
       dfte <- data.frame(newdata)
       colnames(dfte) <- generic_colnames
-      km   <- kknn::train.kknn(Class~., data=dftr,
-                               kmax=k, kernel="rectangular", scale=FALSE)
-      pp   <- predict(km, newdata=dfte, type="prob")
-      if (is.matrix(pp) && ncol(pp)==np) {
+      km <- kknn::train.kknn(Class ~ .,
+        data = dftr,
+        kmax = k, kernel = "rectangular", scale = FALSE
+      )
+      pp <- predict(km, newdata = dfte, type = "prob")
+      if (is.matrix(pp) && ncol(pp) == np) {
         colnames(pp) <- stocks_names
         prob <- pp
       }
     }
-
-  } else if (m=="SVM") {
-    pr   <- predict(model_info$model, newdata, probability=TRUE)
-    pc_f <- pr; pc <- as.integer(factor(pc_f, levels=stocks_names))
-    pa   <- attr(pr,"probabilities")
+  } else if (m == "SVM") {
+    pr <- predict(model_info$model, newdata, probability = TRUE)
+    pc_f <- pr
+    pc <- as.integer(factor(pc_f, levels = stocks_names))
+    pa <- attr(pr, "probabilities")
     if (!is.null(pa) && is.matrix(pa)) {
-      tmp <- matrix(0, nrow=n, ncol=np, dimnames=list(NULL,stocks_names))
-      cn  <- colnames(pa)
-      for (nm in intersect(cn,stocks_names)) tmp[,nm] <- pa[,nm]
-      tmp <- tmp/rowSums(tmp)
+      tmp <- matrix(0, nrow = n, ncol = np, dimnames = list(NULL, stocks_names))
+      cn <- colnames(pa)
+      for (nm in intersect(cn, stocks_names)) tmp[, nm] <- pa[, nm]
+      tmp <- tmp / rowSums(tmp)
       prob <- tmp
     }
-
-  } else if (m=="RF") {
+  } else if (m == "RF") {
     newdata_df <- as.data.frame(newdata)
     colnames(newdata_df) <- model_info$feature_names
 
     # Predict classes
-    pc_f <- predict(model_info$model, newdata_df, type="response")
-    pc <- as.integer(factor(pc_f, levels=stocks_names))
+    pc_f <- predict(model_info$model, newdata_df, type = "response")
+    pc <- as.integer(factor(pc_f, levels = stocks_names))
 
     # Predict probabilities
-    pmat <- predict(model_info$model, newdata_df, type="prob")
-    if(is.matrix(pmat) && ncol(pmat) == np) {
+    pmat <- predict(model_info$model, newdata_df, type = "prob")
+    if (is.matrix(pmat) && ncol(pmat) == np) {
       colnames(pmat) <- stocks_names
       prob <- pmat
     }
-
-  } else if (m=="XGB") {
+  } else if (m == "XGB") {
     # Prepare data with same feature names
     newdata_matrix <- as.matrix(newdata)
     colnames(newdata_matrix) <- model_info$feature_names
@@ -355,7 +674,7 @@ predict_model <- function(model_info, newdata, method_class,
     pred_prob <- predict(model_info$model, dmat)
 
     # Reshape probabilities into matrix
-    prob <- matrix(pred_prob, nrow=nrow(newdata), ncol=np, byrow=TRUE)
+    prob <- matrix(pred_prob, nrow = nrow(newdata), ncol = np, byrow = TRUE)
     colnames(prob) <- stocks_names
 
     # Determine predicted classes
@@ -365,29 +684,30 @@ predict_model <- function(model_info, newdata, method_class,
     prob <- t(apply(prob, 1, function(x) {
       x / sum(x)
     }))
-
-  } else if (m=="ANN") {
-    df    <- data.frame(newdata)
-    if (ncol(newdata)>0) colnames(df) <- generic_colnames
-    pc_f  <- predict(model_info$model, df, type="class")
-    pc    <- as.integer(factor(pc_f, levels=stocks_names))
-    pr    <- predict(model_info$model, df, type="raw")
-    if (is.matrix(pr) && ncol(pr)==np) {
-      colnames(pr) <- stocks_names; prob <- pr
-    } else if (np==2 && is.vector(pr)) {
-      prob[, stocks_names[1]] <- 1-pr; prob[, stocks_names[2]] <- pr
+  } else if (m == "ANN") {
+    df <- data.frame(newdata)
+    if (ncol(newdata) > 0) colnames(df) <- generic_colnames
+    pc_f <- predict(model_info$model, df, type = "class")
+    pc <- as.integer(factor(pc_f, levels = stocks_names))
+    pr <- predict(model_info$model, df, type = "raw")
+    if (is.matrix(pr) && ncol(pr) == np) {
+      colnames(pr) <- stocks_names
+      prob <- pr
+    } else if (np == 2 && is.vector(pr)) {
+      prob[, stocks_names[1]] <- 1 - pr
+      prob[, stocks_names[2]] <- pr
     }
-
-  } else if (m=="NB") {
-    pc_f <- predict(model_info$model, newdata=newdata, type="class")
-    pc   <- as.integer(factor(pc_f, levels=stocks_names))
-    pr   <- predict(model_info$model, newdata=newdata, type="raw")
-    if (is.matrix(pr) && ncol(pr)==np) {
-      colnames(pr) <- stocks_names; prob <- pr
+  } else if (m == "NB") {
+    pc_f <- predict(model_info$model, newdata = newdata, type = "class")
+    pc <- as.integer(factor(pc_f, levels = stocks_names))
+    pr <- predict(model_info$model, newdata = newdata, type = "raw")
+    if (is.matrix(pr) && ncol(pr) == np) {
+      colnames(pr) <- stocks_names
+      prob <- pr
     }
   }
 
-  list(class=pc, likelihood=prob)
+  list(class = pc, likelihood = prob)
 }
 
 # -------------------------------------------------------------------
@@ -396,64 +716,71 @@ predict_model <- function(model_info, newdata, method_class,
 get_cv_metrics_and_phi <- function(data, labels, method_class,
                                    np, nv, stocks_names,
                                    generic_colnames,
-                                   folds = 10,...) {
-  if (!requireNamespace("caret", quietly=TRUE))
+                                   folds = 10, ...) {
+  if (!requireNamespace("caret", quietly = TRUE)) {
     stop("Package 'caret' is required for cross-validation.")
+  }
 
   set.seed(123)
-  fold_idx <- caret::createFolds(labels, k=folds, list=TRUE)
+  fold_idx <- caret::createFolds(labels, k = folds, list = TRUE)
 
   # Collect all predictions
   preds <- integer(length(labels))
   for (f in seq_along(fold_idx)) {
-    test_i  <- fold_idx[[f]]
+    test_i <- fold_idx[[f]]
     train_i <- setdiff(seq_along(labels), test_i)
 
-    tr_data <- data[train_i,,drop=FALSE]
-    tr_lab  <- labels[train_i]
-    ts_data <- data[test_i,,drop=FALSE]
+    tr_data <- data[train_i, , drop = FALSE]
+    tr_lab <- labels[train_i]
+    ts_data <- data[test_i, , drop = FALSE]
 
-    mi  <- train_model(tr_data, tr_lab,
-                       method_class,
-                       np, nv,
-                       generic_colnames,...)
-    pr  <- predict_model(mi, ts_data, method_class,
-                         stocks_names, generic_colnames)
+    mi <- train_model(
+      tr_data, tr_lab,
+      method_class,
+      np, nv,
+      generic_colnames, ...
+    )
+    pr <- predict_model(
+      mi, ts_data, method_class,
+      stocks_names, generic_colnames
+    )
     preds[test_i] <- pr$class
   }
 
   # Build confusion
-  pred_fac <- factor(preds, levels=seq_len(np), labels=stocks_names)
-  cm       <- table(Predicted=pred_fac, Actual=labels)
+  pred_fac <- factor(preds, levels = seq_len(np), labels = stocks_names)
+  cm <- table(Predicted = pred_fac, Actual = labels)
 
   # Use caret for detailed metrics
   cmr <- suppressWarnings(
-    caret::confusionMatrix(data=pred_fac,
-                           reference=labels,
-                           mode="everything")
+    caret::confusionMatrix(
+      data = pred_fac,
+      reference = labels,
+      mode = "everything"
+    )
   )
 
-  overall_acc   <- as.numeric(cmr$overall["Accuracy"])
+  overall_acc <- as.numeric(cmr$overall["Accuracy"])
   overall_kappa <- as.numeric(cmr$overall["Kappa"])
 
   byC <- cmr$byClass
 
   # Handle multiclass (matrix) vs binary (vector)
   if (is.matrix(byC)) {
-    sens    <- as.numeric(byC[,"Sensitivity"])
-    spec    <- as.numeric(byC[,"Specificity"])
-    prec    <- as.numeric(byC[,"Precision"])
-    recall  <- as.numeric(byC[,"Recall"])
-    f1      <- as.numeric(byC[,"F1"])
-    balAcc  <- as.numeric(byC[,"Balanced Accuracy"])
+    sens <- as.numeric(byC[, "Sensitivity"])
+    spec <- as.numeric(byC[, "Specificity"])
+    prec <- as.numeric(byC[, "Precision"])
+    recall <- as.numeric(byC[, "Recall"])
+    f1 <- as.numeric(byC[, "F1"])
+    balAcc <- as.numeric(byC[, "Balanced Accuracy"])
   } else {
     # Binary: byC is a named vector of length n_metrics
-    sens    <- rep(as.numeric(byC["Sensitivity"]), np)
-    spec    <- rep(as.numeric(byC["Specificity"]), np)
-    prec    <- rep(as.numeric(byC["Precision"]), np)
-    recall  <- rep(as.numeric(byC["Recall"]), np)
-    f1      <- rep(as.numeric(byC["F1"]), np)
-    balAcc  <- rep(as.numeric(byC["Balanced Accuracy"]), np)
+    sens <- rep(as.numeric(byC["Sensitivity"]), np)
+    spec <- rep(as.numeric(byC["Specificity"]), np)
+    prec <- rep(as.numeric(byC["Precision"]), np)
+    recall <- rep(as.numeric(byC["Recall"]), np)
+    f1 <- rep(as.numeric(byC["F1"]), np)
+    balAcc <- rep(as.numeric(byC["Balanced Accuracy"]), np)
   }
 
   # Build Phi = P(assigned=i | true=j)
@@ -481,15 +808,31 @@ get_cv_metrics_and_phi <- function(data, labels, method_class,
 #' @param stock_col Stock column name
 #' @param var_cols_mix Variables for mixture data
 #' @param var_cols_std Variables for standard data
-#' @param out_path Output path
 #' @param stocks_names Stock names
+#'
 #' @return Processed data
+#'
+#' @examples
+#' # Essential: load the data first
+#' data(baseline)
+#'
+#' # Preparing baseline data for HISEA logic
+#' processed <- process_hisea_input(
+#'   input = baseline,
+#'   type = "std",
+#'   nv = 2,
+#'   stock_col = "population",
+#'   var_cols_std = c("d13c", "d18o")
+#' )
+#'
 #' @keywords internal
+#' @export
 process_hisea_input <- function(input, type = c("std", "mix"),
                                 nv = NULL,
                                 stock_col = NULL,
                                 var_cols_mix = NULL,
-                                var_cols_std = NULL) {
+                                var_cols_std = NULL,
+                                stocks_names = NULL) {
   type <- match.arg(type)
 
   # Case 1 read from existing file
@@ -509,12 +852,14 @@ process_hisea_input <- function(input, type = c("std", "mix"),
     if (type == "std") {
       # Check stock column
       if (is.null(stock_col)) stop("stock_col is required for .std")
-      if (!(stock_col %in% names(input)))
+      if (!(stock_col %in% names(input))) {
         stop("The stock column '", stock_col, "' does not exist in the provided data.frame.")
+      }
 
       # Check variable columns
-      if (!all(var_cols_std %in% names(input)))
+      if (!all(var_cols_std %in% names(input))) {
         stop("At least one of the specified variable columns does not exist in the provided data.frame.")
+      }
 
       # Get stock levels in the original order of appearance
       stock_order <- unique(input[[stock_col]])
@@ -528,20 +873,21 @@ process_hisea_input <- function(input, type = c("std", "mix"),
       names(std_list) <- NULL
 
       # Reorder to match stocks_names
-      std_list <- std_list[match(stocks_names, stock_order)]
-
+      if (!is.null(stocks_names)) {
+        std_list <- std_list[match(stocks_names, stock_order)]
+      }
       return(std_list)
-
     } else { # type == "mix"
       # Check variable columns
-      if (!all(var_cols_mix %in% names(input)))
+      if (!all(var_cols_mix %in% names(input))) {
         stop("At least one of the specified variable columns does not exist in the provided data.frame.")
+      }
 
       # Convert directly to matrix
       mix_matrix <- as.matrix(
         do.call(cbind, lapply(input[, ..var_cols_mix], as.numeric))
       )
-      colnames(mix_matrix) <- c("V1", "V2")
+      colnames(mix_matrix) <- paste0("V", 1:ncol(mix_matrix))
       return(mix_matrix)
     }
   }
@@ -556,6 +902,25 @@ process_hisea_input <- function(input, type = c("std", "mix"),
 #' @param stock_col Stock column
 #' @param file_path Output file path
 #' @return None
+#'
+#' @examples
+#' # Load baseline data
+#' data(baseline)
+#'
+#' # Define a temporary path
+#' tmp_std <- tempfile(fileext = ".std")
+#'
+#' # Export to HISEA format
+#' write_std_from_dataframe(
+#'   df = baseline,
+#'   stock_col = "population",
+#'   var_cols_std = c("d13c", "d18o"),
+#'   file_path = tmp_std
+#' )
+#'
+#' # Check if file was created
+#' file.exists(tmp_std)
+#'
 #' @keywords internal
 #' @export
 write_std_from_dataframe <- function(df, stock_col, var_cols_std, file_path = "hisea.std") {
@@ -568,7 +933,7 @@ write_std_from_dataframe <- function(df, stock_col, var_cols_std, file_path = "h
   if (!all(var_cols_std %in% names(df))) {
     stop("One or more specified variable columns are missing from the data frame.")
   }
-  df=data.table(df)
+  df <- data.table(df)
   # Split data by stock
   stock_groups <- split(df[, ..var_cols_std], df[[stock_col]])
 
@@ -590,6 +955,24 @@ write_std_from_dataframe <- function(df, stock_col, var_cols_std, file_path = "h
 #' @param var_cols_mix Variables to write
 #' @param file_path Output file path
 #' @return None
+#'
+#' @examples
+#' # Load mixture data
+#' data(mixture)
+#'
+#' # Define a temporary path
+#' tmp_mix <- tempfile(fileext = ".mix")
+#'
+#' # Export to HISEA format
+#' write_mix_from_dataframe(
+#'   mixture,
+#'   var_cols_mix = c("d13c_ukn", "d18o_ukn"),
+#'   file_path = tmp_mix
+#' )
+#'
+#' # Check if file was created
+#' file.exists(tmp_mix)
+#'
 #' @keywords internal
 #' @export
 write_mix_from_dataframe <- function(df, var_cols_mix, file_path = "hisea.mix") {
@@ -610,321 +993,4 @@ write_mix_from_dataframe <- function(df, var_cols_mix, file_path = "hisea.mix") 
   writeLines("End of mixed sample", con)
   writeLines("End of file", con)
   close(con)
-}
-
-
-#' @title Internal Main Function for HISEA Run
-#' @description Does the full analysis/simulation/bootstrap run
-
-# -------------------------------------------------------------------
-# Main wrapper: run_hisea_all()
-# -------------------------------------------------------------------
-#' Run Complete HISEA Stock Composition Analysis
-#'
-#' This function performs comprehensive stock composition analysis using various
-#' statistical methods including LDA, Random Forest, SVM, XGBoost, and others.
-#'
-#' @param type Character. Type of analysis to perform. Default: "ANALYSIS"
-#' @param np Integer. Number of populations/stocks. Default: 2
-#' @param nv Integer. Number of variables/loci. Default: 2
-#' @param seed_val Integer. Random seed for reproducibility. Default: 123456
-#' @param nsamps Integer. Number of bootstrap samples. Default: 1000
-#' @param Nmix Integer. Size of mixture sample. Default: 100
-#' @param actual Numeric vector. True composition proportions. Default: c(0.5, 0.5)
-#' @param var_cols_std Character vector of column names for baseline variables
-#' @param var_cols_mix Character vector of column names for mixture variables
-#' @param stock_col Character name of stock column in baseline data
-#' @param baseline_input Data frame or file path for baseline data
-#' @param mix_input Data frame or file path for mixture data
-#' @param export_csv Logical. Whether to export results to CSV. Default: TRUE
-#' @param output_dir Character. Output directory path. Default: getwd()
-#' @param verbose Logical. Whether to print progress messages. Default: TRUE
-#' @param method_class Character. Classification method ("LDA", "RF", "SVM", etc.). Default: "LDA"
-#' @param stocks_names Character vector. Names of stocks. Default: NULL
-#' @param resample_baseline Logical. Whether to resample baseline data. Default: FALSE
-#' @param resampled_baseline_sizes Integer vector. Sizes for resampled baseline. Default: NULL
-#' @param phi_method Character. Method for phi calculation. Default: "default"
-#' @param mclust_model_names Character vector. Model names for mclust. Default: NULL
-#' @param mclust_perform_cv Logical. Whether to perform cross-validation for mclust. Default: FALSE
-#' @param ... Additional arguments passed to the underlying classifier.
-#'   Certain classifiers support hyperparameter tuning via these arguments:
-#'
-#'   - **Random Forest (RF)**: `ntree`, `mtry`, `nodesize`, `maxnodes`
-#'     - Example: `run_hisea_all(..., method_class="RF", ntree=5000, mtry=3)`
-#'
-#'   - **Support Vector Machine (SVM)**: `cost`, `gamma`, `kernel`
-#'     - Example: `run_hisea_all(..., method_class="SVM", cost=10, kernel="radial")`
-#'
-#'   - **XGBoost (XGB)**: `nrounds`, `max_depth`, `eta`, `subsample`, `colsample_bytree`
-#'     - Example: `run_hisea_all(..., method_class="XGB", nrounds=100, max_depth=4)`
-#'
-#'   - **k-Nearest Neighbors (KNN)**: `k`
-#'     - Example: `run_hisea_all(..., method_class="KNN", k=5)`
-#'
-#'   - **Artificial Neural Network (ANN)**: `size`, `decay`, `maxit`
-#'     - Example: `run_hisea_all(..., method_class="ANN", size=10, decay=0.01)`
-#'
-#'   - **Naive Bayes (NB)**: `laplace`
-#'     - Example: `run_hisea_all(..., method_class="NB", laplace=1)`
-#'
-#'   ⚠ Ensure that the names of arguments match those expected by the classifier.
-#'     Unrecognized arguments may be ignored or raise an error.
-
-#'
-#' @return List containing:
-#' \describe{
-#'   \item{estimates}{Matrix of stock composition estimates}
-#'   \item{mean}{Mean estimates across bootstrap samples}
-#'   \item{sd}{Standard deviations of estimates}
-#'   \item{performance}{Performance metrics if applicable}
-#' }
-#'
-#' @export
-#' @examples
-#' \dontrun{
-#' # Basic analysis with LDA
-#' result <- run_hisea_all(
-#'   np = 2,
-#'   nv = 3,
-#'   method_class = "LDA",
-#'   baseline_path = "my_baseline.txt",
-#'   mix_path = "my_mixture.txt"
-#' )
-#' }
-run_hisea_all <- function(type = "ANALYSIS",
-                          np, nv,
-                          seed_val = 123456,
-                          var_cols_std=NULL,
-                          var_cols_mix=NULL,
-                          stock_col=NULL,
-                          nsamps   = 1000,
-                          Nmix     = 100,
-                          actual   = NULL,
-                          baseline_input = NULL,
-                          mix_input      = NULL,
-                          export_csv    = FALSE,
-                          output_dir    = ".",
-                          verbose       = FALSE,
-                          method_class  = "LDA",
-                          stocks_names  = NULL,
-                          resample_baseline    = FALSE,
-                          resampled_baseline_sizes = NULL,
-                          phi_method  = c("standard","cv"),
-                          mclust_model_names = NULL,
-                          mclust_perform_cv  = TRUE,...) {
-
-  type         <- toupper(type)
-  method_class <- toupper(method_class)
-  phi_method   <- match.arg(phi_method)
-  if (is.null(var_cols_std)) var_cols_std <- paste0("V", 1:nv)
-
-  if (type=="ANALYSIS" && resample_baseline) {
-    warning("resample_baseline only for SIMULATION/BOOTSTRAP; disabling.")
-    resample_baseline <- FALSE
-  }
-  if (resample_baseline) {
-    if (!type %in% c("SIMULATION","BOOTSTRAP"))
-      stop("resample_baseline=TRUE requires type='SIMULATION' or 'BOOTSTRAP'.")
-    if (is.null(resampled_baseline_sizes) ||
-        length(resampled_baseline_sizes)!=np)
-      stop("resampled_baseline_sizes must be length np.")
-  }
-
-  # read baseline
-  base_list <- process_hisea_input(baseline_input, type="std", nv=nv,
-                                   stock_col=stock_col, var_cols_std=var_cols_std)
-  if (length(base_list)!=np)
-    stop(sprintf("Baseline has %d stocks but np=%d.", length(base_list), np))
-  base_data <- do.call(rbind, base_list)
-  base_num  <- rep(seq_along(base_list), times=sapply(base_list,nrow))
-
-  if (!is.null(stocks_names) && length(stocks_names)==np)
-    stock_names_internal <- stocks_names
-  else
-    stock_names_internal <- paste0("Stock_", seq_len(np))
-
-  base_fac <- factor(base_num, levels=1:np, labels=stock_names_internal)
-
-  # allocate results
-  est_names <- c("RAW","COOK","COOKC","EM","ML")
-  all_res   <- array(NA_real_, dim=c(nsamps,np,length(est_names)),
-                     dimnames=list(NULL, stock_names_internal, est_names))
-
-  generic_colnames <- make.names(paste0("V",1:nv), unique=TRUE)
-  set.seed(seed_val)
-  full_mix_boot   <- NULL
-  final_model     <- NULL
-  final_metrics   <- NULL
-  final_Phi       <- NULL
-  final_mix_pc    <- NULL
-  final_mix_like  <- NULL
-
-  if (verbose) message("Running ",nsamps," x ",type," with ",method_class,
-                       " (phi=",phi_method,")")
-
-  for (i in seq_len(nsamps)) {
-    if (verbose && (i==1||i==nsamps||i%%max(1,floor(nsamps/10))==0))
-      message(" Iter ",i,"/",nsamps)
-
-    # baseline for this iter
-    if (resample_baseline) {
-      bl <- .resample_baseline_data_helper(base_list,
-                                          resampled_baseline_sizes,
-                                          stock_names_internal, nv)
-      bdata <- do.call(rbind,bl)
-      bnum  <- rep(seq_along(bl), times=sapply(bl,nrow))
-      bfac  <- factor(bnum, levels=1:np, labels=stock_names_internal)
-      if (nrow(bdata)==0 && sum(resampled_baseline_sizes)>0) {
-        warning("Iter ",i,": empty resampled baseline; skipping.")
-        all_res[i,,] <- NA; next
-      }
-    } else {
-      bdata <- base_data; bfac <- base_fac
-    }
-
-    # compute metrics & Phi
-    if (phi_method=="cv") {
-      cmv    <- get_cv_metrics_and_phi(bdata, bfac,
-                                       method_class,
-                                       np,nv,
-                                       stock_names_internal,
-                                       generic_colnames, folds=10,...)
-      quality <- cmv; iter_Phi <- as.matrix(cmv$phi_matrix)
-      # train final model on full baseline
-      mi <- train_model(bdata, bfac,
-                        method_class, np, nv,
-                        generic_colnames,...)
-    } else {
-      mi <- train_model(bdata, bfac,
-                        method_class, np, nv,
-                        generic_colnames,...)
-      prb <- predict_model(mi, bdata, method_class,
-                           stock_names_internal, generic_colnames)
-      cm  <- table(Predicted=factor(prb$class,
-                                    levels=1:np,
-                                    labels=stock_names_internal),
-                   Actual   =bfac)
-      acc <- sum(diag(cm))/sum(cm)
-      tot <- sum(cm)
-      pe  <- sum(rowSums(cm)*colSums(cm))/(tot^2)
-      kap <- if (abs(1-pe)>.Machine$double.eps) (acc-pe)/(1-pe) else NA_real_
-      quality    <- list(confusion_matrix=cm,
-                         accuracy=acc, kappa=kap)
-      iter_Phi   <- as.matrix(prop.table(cm, margin=2))
-    }
-
-    # invert or pseudo-invert Phi
-    iter_Phi <- as.matrix(iter_Phi)
-    iter_Phi <- matrix(as.numeric(iter_Phi),
-                                 nrow = nrow(iter_Phi),
-                                 ncol = ncol(iter_Phi))
-
-    phi_det <- tryCatch({
-      det(iter_Phi)
-    }, error = function(e) {
-      warning("Could not compute det(iter_Phi): ", e$message)
-      0
-    })
-
-    if (abs(phi_det) < 1e-12) {
-      inv_Phi <- MASS::ginv(iter_Phi)
-    } else {
-      inv_Phi <- solve(iter_Phi)
-    }
-
-    # store final run artifacts
-    if (i==1 || resample_baseline) {
-      final_model   <- mi$model
-      final_metrics <- quality
-      final_Phi     <- iter_Phi
-    }
-
-    # generate mixture
-    if (type=="SIMULATION") {
-      if (is.null(actual)) stop("'actual' needed for SIMULATION.")
-      mix_s <- simulate_mixture(base_list, actual, Nmix)
-    } else if (type=="ANALYSIS") {
-      mix_s <- process_hisea_input(mix_input, type="mix", nv=nv, var_cols_mix=var_cols_mix)
-    } else if (type=="BOOTSTRAP") {
-      if (i==1) {
-        full_mix_boot <-process_hisea_input(mix_input, type="mix", nv=nv, var_cols_mix=var_cols_mix)
-        if (nrow(full_mix_boot)==0)
-          stop("Bootstrap: mixture empty.")
-      }
-      idx   <- sample(seq_len(nrow(full_mix_boot)), replace=TRUE)
-      mix_s <- full_mix_boot[idx,,drop=FALSE]
-    } else stop("Unknown type: ",type)
-
-    if (nrow(mix_s)==0) {
-      warning("Iter ",i,": empty mixture; skipping.")
-      all_res[i,,] <- NA; next
-    }
-
-    # classify mixture
-    pr_m <- predict_model(mi, mix_s, method_class,
-                          stock_names_internal, generic_colnames)
-    mix_pc   <- pr_m$class
-    mix_like <- pr_m$likelihood
-    mix_like[is.na(mix_like)] <- 1/np
-    mix_like <- t(apply(mix_like,1,function(r) r/sum(r)))
-
-    if (i==1 || resample_baseline) {
-      final_mix_pc   <- mix_pc
-      final_mix_like <- mix_like
-    }
-
-    # HISEA estimators
-    raw   <- prop.table(tabulate(mix_pc,nbins=np))
-    ck    <- compute_cook_estimators(mix_pc, inv_Phi, np)
-    emv   <- estimate_millar(mix_pc, iter_Phi, np, verbose=FALSE, max_iter=200)
-    mlp   <- estimate_ml(mix_like, np, verbose=FALSE, max_iter=200)
-
-    all_res[i,,"RAW"]   <- raw
-    all_res[i,,"COOK"]  <- ck$cook
-    all_res[i,,"COOKC"] <- ck$cook_constrained
-    all_res[i,,"EM"]    <- emv
-    all_res[i,,"ML"]    <- mlp
-  }
-
-  # summary & optional CSV
-  actual_sum <- if (type=="SIMULATION") actual else NULL
-  summary_l <- create_hisea_summary_report(all_res,
-                                           actual_sum,
-                                           run_type=type)
-  if (export_csv) {
-    if (!dir.exists(output_dir)) dir.create(output_dir, recursive=TRUE)
-    suf <- paste0("_",method_class,"_",type)
-    write.csv(as.data.frame(summary_l$mean_estimates),
-              file.path(output_dir,paste0("mean",suf,".csv")),
-              row.names=FALSE)
-    write.csv(as.data.frame(summary_l$sd_estimates),
-              file.path(output_dir,paste0("sd",suf,".csv")),
-              row.names=FALSE)
-    if (!is.null(summary_l$mse_estimates)) {
-      write.csv(as.data.frame(summary_l$mse_estimates),
-                file.path(output_dir,paste0("rmse",suf,".csv")),
-                row.names=FALSE)
-    }
-    cmf <- final_metrics$confusion_matrix
-    if (!is.null(cmf)) {
-      write.csv(as.data.frame.matrix(cmf),
-                file.path(output_dir,paste0("confMat",suf,".csv")),
-                row.names=TRUE)
-    }
-  }
-
-  timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-  # save full return
-  out <- list(estimation_summary             = summary_l,
-              classification_model           = final_model,
-              baseline_classification_quality = final_metrics,
-              phi_matrix                     = final_Phi,
-              mixture_classification_details = list(
-                pseudo_classes = final_mix_pc,
-                likelihoods    = final_mix_like
-              ))
-  save(out, file=file.path(output_dir,
-                           paste0("result_", method_class, "_", type, "_", timestamp,".rda")))
-  if (verbose) message("run_hisea_all() done.")
-  summary_l
 }

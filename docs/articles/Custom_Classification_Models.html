@@ -72,7 +72,7 @@ Hanke</h4>
 Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:alex.hanke@dfo-mpo.ca" class="email">alex.hanke@dfo-mpo.ca</a>
       </address>
                   
-            <h4 data-toc-skip class="date">2025-12-09</h4>
+            <h4 data-toc-skip class="date">2026-03-15</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/SostheneA/RHISEA/blob/HEAD/vignettes/Custom_Classification_Models.Rmd"><code>vignettes/Custom_Classification_Models.Rmd</code></a></small>
       <div class="d-none name"><code>Custom_Classification_Models.Rmd</code></div>
@@ -177,10 +177,10 @@ the workflow.</p>
 <span></span>
 <span><span class="co"># Load baseline and mixture data</span></span>
 <span><span class="va">baseline_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"baseline.rda"</span>, package <span class="op">=</span> <span class="st">"RHISEA"</span><span class="op">)</span></span>
-<span><span class="va">mixture_file</span>  <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mixture.rda"</span>,  package <span class="op">=</span> <span class="st">"RHISEA"</span><span class="op">)</span></span>
+<span><span class="va">mixture_file</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"mixture.rda"</span>, package <span class="op">=</span> <span class="st">"RHISEA"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">baseline_file</span><span class="op">)</span>  <span class="co"># loads `baseline` data.frame</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">mixture_file</span><span class="op">)</span>   <span class="co"># loads `mixture` data.frame</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">baseline_file</span><span class="op">)</span> <span class="co"># loads `baseline` data.frame</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/load.html" class="external-link">load</a></span><span class="op">(</span><span class="va">mixture_file</span><span class="op">)</span> <span class="co"># loads `mixture` data.frame</span></span>
 <span></span>
 <span><span class="co"># Prepare baseline data</span></span>
 <span><span class="va">baseline</span><span class="op">$</span><span class="va">population</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">baseline</span><span class="op">$</span><span class="va">population</span><span class="op">)</span></span>
@@ -194,29 +194,33 @@ the workflow.</p>
 <span><span class="va">get_cv_results_lda</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">formula</span>, <span class="va">k</span> <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span>  <span class="va">folds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/createDataPartition.html" class="external-link">createFolds</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span>, k <span class="op">=</span> <span class="va">k</span>, list <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="va">all_predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">all_probabilities</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                              dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">folds</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">all_probabilities</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>,</span>
+<span>    nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">folds</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">test_idx</span> <span class="op">&lt;-</span> <span class="va">folds</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
 <span>    <span class="va">train_data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">test_idx</span>, <span class="op">]</span></span>
 <span>    <span class="va">test_data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">test_idx</span>, <span class="op">]</span></span>
-<span>    </span>
+<span></span>
 <span>    <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/MASS/man/lda.html" class="external-link">lda</a></span><span class="op">(</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">train_data</span><span class="op">)</span></span>
 <span>    <span class="va">pred</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">test_data</span><span class="op">)</span></span>
 <span>    <span class="va">all_predictions</span><span class="op">[</span><span class="va">test_idx</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">pred</span><span class="op">$</span><span class="va">class</span></span>
 <span>    <span class="va">all_probabilities</span><span class="op">[</span><span class="va">test_idx</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="va">pred</span><span class="op">$</span><span class="va">posterior</span></span>
 <span>  <span class="op">}</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="va">conf_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>Predicted <span class="op">=</span> <span class="va">all_predictions</span>, Actual <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span></span>
 <span>  <span class="va">phi_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="va">conf_matrix</span>, margin <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>confusion_matrix <span class="op">=</span> <span class="va">conf_matrix</span>,</span>
-<span>       phi_matrix <span class="op">=</span> <span class="va">phi_matrix</span>,</span>
-<span>       predictions <span class="op">=</span> <span class="va">all_predictions</span>,</span>
-<span>       probabilities <span class="op">=</span> <span class="va">all_probabilities</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    confusion_matrix <span class="op">=</span> <span class="va">conf_matrix</span>,</span>
+<span>    phi_matrix <span class="op">=</span> <span class="va">phi_matrix</span>,</span>
+<span>    predictions <span class="op">=</span> <span class="va">all_predictions</span>,</span>
+<span>    probabilities <span class="op">=</span> <span class="va">all_probabilities</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Run CV and get phi matrix</span></span>
@@ -279,11 +283,13 @@ the workflow.</p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">results_long</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Method</span>, y <span class="op">=</span> <span class="va">Proportion</span>, fill <span class="op">=</span> <span class="va">Stock</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"LDA Stock Proportion Estimates"</span>,</span>
-<span>       y <span class="op">=</span> <span class="st">"Estimated Proportion"</span>,</span>
-<span>       x <span class="op">=</span> <span class="st">"Estimation Method"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"LDA Stock Proportion Estimates"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Estimated Proportion"</span>,</span>
+<span>    x <span class="op">=</span> <span class="st">"Estimation Method"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">45</span>, hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Custom_Classification_Models_files/figure-html/lda-1.png" alt="LDA classification results for mixed stock analysis" width="700"></p>
+<p><img src="Custom_Classification_Models_files/figure-html/lda-1.png" class="r-plt" alt="LDA classification results for mixed stock analysis" width="700"></p>
 <hr>
 </div>
 <div class="section level2">
@@ -298,28 +304,32 @@ method.</p>
 <span><span class="va">get_cv_results_rf</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">formula</span>, <span class="va">k</span> <span class="op">=</span> <span class="fl">10</span>, <span class="va">ntree</span> <span class="op">=</span> <span class="fl">500</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span>  <span class="va">folds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/createDataPartition.html" class="external-link">createFolds</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span>, k <span class="op">=</span> <span class="va">k</span>, list <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="va">all_predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">all_probabilities</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                              dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">folds</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">all_probabilities</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>,</span>
+<span>    nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">folds</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">test_idx</span> <span class="op">&lt;-</span> <span class="va">folds</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
 <span>    <span class="va">train_data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">test_idx</span>, <span class="op">]</span></span>
 <span>    <span class="va">test_data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">test_idx</span>, <span class="op">]</span></span>
-<span>    </span>
+<span></span>
 <span>    <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html" class="external-link">randomForest</a></span><span class="op">(</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">train_data</span>, ntree <span class="op">=</span> <span class="va">ntree</span><span class="op">)</span></span>
 <span>    <span class="va">all_predictions</span><span class="op">[</span><span class="va">test_idx</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">test_data</span><span class="op">)</span></span>
 <span>    <span class="va">all_probabilities</span><span class="op">[</span><span class="va">test_idx</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">test_data</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span>
 <span>  <span class="op">}</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="va">conf_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>Predicted <span class="op">=</span> <span class="va">all_predictions</span>, Actual <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span></span>
 <span>  <span class="va">phi_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="va">conf_matrix</span>, margin <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>confusion_matrix <span class="op">=</span> <span class="va">conf_matrix</span>,</span>
-<span>       phi_matrix <span class="op">=</span> <span class="va">phi_matrix</span>,</span>
-<span>       predictions <span class="op">=</span> <span class="va">all_predictions</span>,</span>
-<span>       probabilities <span class="op">=</span> <span class="va">all_probabilities</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    confusion_matrix <span class="op">=</span> <span class="va">conf_matrix</span>,</span>
+<span>    phi_matrix <span class="op">=</span> <span class="va">phi_matrix</span>,</span>
+<span>    predictions <span class="op">=</span> <span class="va">all_predictions</span>,</span>
+<span>    probabilities <span class="op">=</span> <span class="va">all_probabilities</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Run CV and get phi matrix</span></span>
@@ -371,11 +381,13 @@ method.</p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">results_long</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Method</span>, y <span class="op">=</span> <span class="va">Proportion</span>, fill <span class="op">=</span> <span class="va">Stock</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Random Forest Stock Proportion Estimates"</span>,</span>
-<span>       y <span class="op">=</span> <span class="st">"Estimated Proportion"</span>,</span>
-<span>       x <span class="op">=</span> <span class="st">"Estimation Method"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"Random Forest Stock Proportion Estimates"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Estimated Proportion"</span>,</span>
+<span>    x <span class="op">=</span> <span class="st">"Estimation Method"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">45</span>, hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Custom_Classification_Models_files/figure-html/rf-1.png" alt="Random Forest classification results for mixed stock analysis" width="700"></p>
+<p><img src="Custom_Classification_Models_files/figure-html/rf-1.png" class="r-plt" alt="Random Forest classification results for mixed stock analysis" width="700"></p>
 <hr>
 </div>
 <div class="section level2">
@@ -390,40 +402,48 @@ permutation tests.</p>
 <span><span class="va">get_cv_results_ctree</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span>, <span class="va">formula</span>, <span class="va">k</span> <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
 <span>  <span class="va">folds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/caret/man/createDataPartition.html" class="external-link">createFolds</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span>, k <span class="op">=</span> <span class="va">k</span>, list <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="va">all_predictions</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">)</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">all_probabilities</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>, nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>                              dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">folds</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">all_probabilities</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="cn">NA</span>,</span>
+<span>    nrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_along</a></span><span class="op">(</span><span class="va">folds</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">test_idx</span> <span class="op">&lt;-</span> <span class="va">folds</span><span class="op">[[</span><span class="va">i</span><span class="op">]</span><span class="op">]</span></span>
 <span>    <span class="va">train_data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="op">-</span><span class="va">test_idx</span>, <span class="op">]</span></span>
 <span>    <span class="va">test_data</span> <span class="op">&lt;-</span> <span class="va">data</span><span class="op">[</span><span class="va">test_idx</span>, <span class="op">]</span></span>
-<span>    </span>
+<span></span>
 <span>    <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/party/man/ctree.html" class="external-link">ctree</a></span><span class="op">(</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">train_data</span><span class="op">)</span></span>
 <span>    <span class="va">pred_probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">test_data</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span>
 <span>    <span class="va">pred_probs_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="va">pred_probs</span><span class="op">)</span></span>
 <span>    <span class="va">all_predictions</span><span class="op">[</span><span class="va">test_idx</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">test_data</span><span class="op">)</span></span>
 <span>    <span class="va">all_probabilities</span><span class="op">[</span><span class="va">test_idx</span>, <span class="op">]</span> <span class="op">&lt;-</span> <span class="va">pred_probs_matrix</span></span>
 <span>  <span class="op">}</span></span>
-<span>  </span>
+<span></span>
 <span>  <span class="va">conf_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span>Predicted <span class="op">=</span> <span class="va">all_predictions</span>, Actual <span class="op">=</span> <span class="va">data</span><span class="op">$</span><span class="va">population</span><span class="op">)</span></span>
 <span>  <span class="va">phi_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/proportions.html" class="external-link">prop.table</a></span><span class="op">(</span><span class="va">conf_matrix</span>, margin <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>confusion_matrix <span class="op">=</span> <span class="va">conf_matrix</span>,</span>
-<span>       phi_matrix <span class="op">=</span> <span class="va">phi_matrix</span>,</span>
-<span>       predictions <span class="op">=</span> <span class="va">all_predictions</span>,</span>
-<span>       probabilities <span class="op">=</span> <span class="va">all_probabilities</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>    confusion_matrix <span class="op">=</span> <span class="va">conf_matrix</span>,</span>
+<span>    phi_matrix <span class="op">=</span> <span class="va">phi_matrix</span>,</span>
+<span>    predictions <span class="op">=</span> <span class="va">all_predictions</span>,</span>
+<span>    probabilities <span class="op">=</span> <span class="va">all_probabilities</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="co"># Run CV and get phi matrix</span></span>
 <span><span class="va">ctree_cv</span> <span class="op">&lt;-</span> <span class="fu">get_cv_results_ctree</span><span class="op">(</span><span class="va">baseline</span>, <span class="va">formula</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Train full CTREE model on baseline</span></span>
-<span><span class="va">ctree_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/party/man/ctree.html" class="external-link">ctree</a></span><span class="op">(</span><span class="va">formula</span>, data <span class="op">=</span> <span class="va">baseline</span>,</span>
-<span>                     controls <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/party/man/ctree_control.html" class="external-link">ctree_control</a></span><span class="op">(</span>mincriterion <span class="op">=</span> <span class="fl">0.95</span>,</span>
-<span>                                              minsplit <span class="op">=</span> <span class="fl">20</span>,</span>
-<span>                                              minbucket <span class="op">=</span> <span class="fl">7</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">ctree_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/party/man/ctree.html" class="external-link">ctree</a></span><span class="op">(</span><span class="va">formula</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">baseline</span>,</span>
+<span>  controls <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/pkg/party/man/ctree_control.html" class="external-link">ctree_control</a></span><span class="op">(</span></span>
+<span>    mincriterion <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>    minsplit <span class="op">=</span> <span class="fl">20</span>,</span>
+<span>    minbucket <span class="op">=</span> <span class="fl">7</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Predict classes and posterior probabilities for mixture</span></span>
 <span><span class="va">ctree_probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">ctree_model</span>, <span class="va">mix_data_prepared</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span>
@@ -464,7 +484,7 @@ permutation tests.</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Visualize tree and results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ctree_model</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Custom_Classification_Models_files/figure-html/ctree-1.png" alt="CTREE classification results for mixed stock analysis" width="700"></p>
+<p><img src="Custom_Classification_Models_files/figure-html/ctree-1.png" class="r-plt" alt="CTREE classification results for mixed stock analysis" width="700"></p>
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results_long</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/reshape2/man/melt.html" class="external-link">melt</a></span><span class="op">(</span><span class="va">ctree_results</span><span class="op">$</span><span class="va">mean_estimates</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">results_long</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stock"</span>, <span class="st">"Method"</span>, <span class="st">"Proportion"</span><span class="op">)</span></span>
@@ -472,11 +492,13 @@ permutation tests.</p>
 <span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">results_long</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">Method</span>, y <span class="op">=</span> <span class="va">Proportion</span>, fill <span class="op">=</span> <span class="va">Stock</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_bar</a></span><span class="op">(</span>stat <span class="op">=</span> <span class="st">"identity"</span>, position <span class="op">=</span> <span class="st">"dodge"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"CTREE Stock Proportion Estimates"</span>,</span>
-<span>       y <span class="op">=</span> <span class="st">"Estimated Proportion"</span>,</span>
-<span>       x <span class="op">=</span> <span class="st">"Estimation Method"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span></span>
+<span>    title <span class="op">=</span> <span class="st">"CTREE Stock Proportion Estimates"</span>,</span>
+<span>    y <span class="op">=</span> <span class="st">"Estimated Proportion"</span>,</span>
+<span>    x <span class="op">=</span> <span class="st">"Estimation Method"</span></span>
+<span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>axis.text.x <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>angle <span class="op">=</span> <span class="fl">45</span>, hjust <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Custom_Classification_Models_files/figure-html/ctree-2.png" alt="CTREE classification results for mixed stock analysis" width="700"></p>
+<p><img src="Custom_Classification_Models_files/figure-html/ctree-2.png" class="r-plt" alt="CTREE classification results for mixed stock analysis" width="700"></p>
 <hr>
 </div>
 <div class="section level2">
@@ -505,11 +527,11 @@ package.</p>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Sosthene Akia, Alex Hanke.</p>
+  <p>Developed by Sosthene A. V. Akia, Alex Hanke.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

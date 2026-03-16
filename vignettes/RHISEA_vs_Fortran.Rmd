@@ -10,9 +10,9 @@ author:
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\\VignetteIndexEntry{Verifying compatibility: RHISEA (R) vs FORTRAN HISEA}
-  %\\VignetteEngine{knitr::rmarkdown}
-  %\\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Comprehensive Guide to the RHISEA Package for Mixed-Stock Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -55,14 +55,14 @@ We store data in `inst/extdata/` to ensure users can reproduce the analysis afte
 
 ```{r load-data}
 baseline_file <- system.file("extdata", "baseline.rda", package = "RHISEA")
-mixture_file  <- system.file("extdata", "mixture.rda",  package = "RHISEA")
+mixture_file <- system.file("extdata", "mixture.rda", package = "RHISEA")
 
-load(baseline_file)  # loads `baseline` data.frame
-load(mixture_file)   # loads `mixture` data.frame
+load(baseline_file) # loads `baseline` data.frame
+load(mixture_file) # loads `mixture` data.frame
 
 # Convert baseline and mixture into HISEA file formats (.std and .mix)
-write_std_from_dataframe(df=baseline, stock_col = "population", var_cols = c("d13c", "d18o"))
-write_mix_from_dataframe(df=mixture, var_cols = c("d13c_ukn", "d18o_ukn"))
+write_std_from_dataframe(df = baseline, stock_col = "population", var_cols = c("d13c", "d18o"))
+write_mix_from_dataframe(df = mixture, var_cols = c("d13c_ukn", "d18o_ukn"))
 ```
 
 ---
@@ -70,10 +70,10 @@ write_mix_from_dataframe(df=mixture, var_cols = c("d13c_ukn", "d18o_ukn"))
 # 2. Define global parameters for simulation and analysis
 
 ```{r params}
-np <- 2     # Number of populations (stocks)
-nv <- 2     # Number of isotopic variables
-Nsamps <- 1000  # Number of baseline resamples per simulation
-Nmix <- 100     # Number of mixture individuals per simulation
+np <- 2 # Number of populations (stocks)
+nv <- 2 # Number of isotopic variables
+Nsamps <- 1000 # Number of baseline resamples per simulation
+Nmix <- 100 # Number of mixture individuals per simulation
 stock_labels <- c("East", "West")
 resample_baseline <- FALSE
 resampled_baseline_sizes <- c(50, 50)
@@ -122,10 +122,16 @@ write_mix <- function(filepath, data) {
 
 # Read estimator results from Fortran output files, returns numeric vector of length 2 or NA
 read_fort_estimator <- function(file_path) {
-  if (!file.exists(file_path)) return(c(NA, NA))
+  if (!file.exists(file_path)) {
+    return(c(NA, NA))
+  }
   line <- readLines(file_path, warn = FALSE)[1]
   vals <- as.numeric(unlist(strsplit(trimws(line), "\\s+")))
-  if (length(vals) == 2) return(vals) else return(c(NA, NA))
+  if (length(vals) == 2) {
+    return(vals)
+  } else {
+    return(c(NA, NA))
+  }
 }
 
 # Generate Poisson distributed baseline stock data for simulation
@@ -145,11 +151,11 @@ We simulate 50 datasets, run R estimators and Fortran executable, then store res
 # For reproducible parallel RNG streams
 RNGkind("L'Ecuyer-CMRG")
 set.seed(42)
-n_sim <- 50
+n_sim <- if (identical(Sys.getenv("NOT_CRAN"), "true")) 50 else 2
 
-results <- list()     # R LDA results
-results2 <- list()    # R LDA_MASS results
-est_wide_comparisons <- vector("list", 5)  # 5 estimators to compare
+results <- list() # R LDA results
+results2 <- list() # R LDA_MASS results
+est_wide_comparisons <- vector("list", 5) # 5 estimators to compare
 est_long_comparisons <- vector("list", 5)
 
 for (j in 1:5) {
@@ -169,7 +175,17 @@ for (i in 2:n_sim) {
 
 # 5. Main simulation loop
 
-```{r simulation-loop}
+```{r simulation-loop, eval = (Sys.info()[['sysname']] == "Windows" && file.exists(system.file("bin/hisea.exe", package = "RHISEA")))}
+exe_path <- system.file("bin/hisea.exe", package = "RHISEA")
+
+work_dir <- tempdir()
+old_dir <- setwd(work_dir)
+
+on.exit({
+  unlink(list.files(work_dir, pattern = "\\.(std|mix|out|xlsx|rda)$|^fort\\."), force = TRUE)
+  setwd(old_dir) 
+}, add = TRUE)
+
 for (i in 1:n_sim) {
   cat("\n--- Simulation ", i, " ---\n")
 
@@ -200,7 +216,7 @@ for (i in 1:n_sim) {
   write_mix(mixture_mix_file, mixture_data)
 
   # Run Fortran HISEA executable
-  system("hisea.exe", wait = TRUE)
+  system2(exe_path, wait = TRUE, stdout = FALSE)
   out_file <- sprintf("hisea%02d.out", i)
   if (file.exists("hisea.out")) file.rename("hisea.out", out_file)
 
@@ -398,7 +414,7 @@ ggplot(all_long, aes(x = Method, y = Value, fill = Method)) +
 # 11. Diagnostics: Alert if large divergence detected
 
 ```{r diagnostics}
-threshold <- 0.05  # 5% difference threshold
+threshold <- 0.05 # 5% difference threshold
 max_diffs <- sapply(est_wide_comparisons, function(df) max(abs(df$R - df$Fortran), na.rm = TRUE))
 
 if (any(max_diffs > threshold)) {
@@ -412,7 +428,15 @@ if (any(max_diffs > threshold)) {
 } else {
   message("No large divergences detected between R and Fortran estimators.")
 }
+
 ```
+
+
+```{r delete, echo=FALSE}
+unlink(c("*.rda", "*.std", "*.mix", "*.ctr", "*.out", "*.xlsx", "fort.*","*.ctl", "*.exe"), force = TRUE)
+unlink("Result-folder", recursive = TRUE, force = TRUE)
+```
+
 
 ---
 

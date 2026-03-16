@@ -10,15 +10,15 @@ ordvec(num, upper)
 \item{num}{Integer, the number of ordered values to generate.}
 
 \item{upper}{Numeric, the maximum value for the scaled output. The generated values
-will be in the approximate range (0, \code{upper}].}
+will be in the approximate range (0, `upper`].}
 }
 \value{
-A numeric vector of length \code{num}, containing ordered values scaled
-approximately between 0 and \code{upper}.
+A numeric vector of length `num`, containing ordered values scaled
+        approximately between 0 and `upper`.
 }
 \description{
-Produces an ordered vector of \code{num} random values, scaled to be approximately
-between 0 and \code{upper}. This function can be used as a basis for certain types
+Produces an ordered vector of `num` random values, scaled to be approximately
+between 0 and `upper`. This function can be used as a basis for certain types
 of random sampling schemes. The logic is similar to generating order statistics
 from an exponential distribution.
 }

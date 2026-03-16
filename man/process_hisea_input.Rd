@@ -10,7 +10,8 @@ process_hisea_input(
   nv = NULL,
   stock_col = NULL,
   var_cols_mix = NULL,
-  var_cols_std = NULL
+  var_cols_std = NULL,
+  stocks_names = NULL
 )
 }
 \arguments{
@@ -26,8 +27,6 @@ process_hisea_input(
 
 \item{var_cols_std}{Variables for standard data}
 
-\item{out_path}{Output path}
-
 \item{stocks_names}{Stock names}
 }
 \value{
@@ -35,5 +34,19 @@ Processed data
 }
 \description{
 Process HISEA Input Data
+}
+\examples{
+# Essential: load the data first
+data(baseline)
+
+# Preparing baseline data for HISEA logic
+processed <- process_hisea_input(
+  input = baseline,
+  type = "std",
+  nv = 2,
+  stock_col = "population",
+  var_cols_std = c("d13c", "d18o")
+)
+
 }
 \keyword{internal}

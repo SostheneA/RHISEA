@@ -21,4 +21,23 @@ None
 \description{
 Write Standard Data to File
 }
+\examples{
+# Load baseline data
+data(baseline)
+
+# Define a temporary path
+tmp_std <- tempfile(fileext = ".std")
+
+# Export to HISEA format
+write_std_from_dataframe(
+  df = baseline,
+  stock_col = "population",
+  var_cols_std = c("d13c", "d18o"),
+  file_path = tmp_std
+)
+
+# Check if file was created
+file.exists(tmp_std)
+
+}
 \keyword{internal}

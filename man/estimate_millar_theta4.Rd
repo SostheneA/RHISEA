@@ -30,9 +30,10 @@ Numeric value of the estimated theta4 parameter
 This function estimates the theta4 parameter using the Millar method.
 }
 \examples{
-\dontrun{
-pred_classes <- c(1, 2, 1, 2)
-phi_mat <- matrix(c(0.8, 0.2, 0.2, 0.8), 2, 2)
-theta4 <- estimate_millar_theta4(pred_classes, phi_mat, np = 2)
-}
+preds <- c(1, 1, 2, 1, 2)
+phi_mat <- matrix(c(0.9, 0.1, 0.1, 0.9), 2, 2)
+
+theta4 <- estimate_millar_theta4(preds, phi_mat, np = 2)
+print(theta4)
+
 }

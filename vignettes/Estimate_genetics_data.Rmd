@@ -8,10 +8,11 @@ author:
   email: "alex.hanke@dfo-mpo.ca"
   affiliation: Fisheries and Oceans Canada
 date: "`r Sys.Date()`"
-output:
-  html_document:
-    df_print: paged
-vignette: "%\\VignetteIndexEntry{Estimate_genetics_data} %\\VignetteEngine{knitr::rmarkdown} %\\VignetteEncoding{UTF-8}\n"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Comprehensive Guide to the RHISEA Package for Mixed-Stock Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
@@ -33,7 +34,8 @@ library(reshape2)
 library(ggplot2)
 library(RHISEA)
 library(tidyverse)
-
+library(readr)
+library(data.table)
 library(adegenet)
 library(readit)
 library(data.table)
@@ -123,8 +125,8 @@ assign.kfold(
 Cross-validation outputs are summarized to quantify classification accuracy across scenarios.
 
 ```{r cross-validation-summary}
-accuMC <- accuracy.MC(dir = "Result-folder/")      # Monte Carlo accuracy
-accuKF <- accuracy.kfold(dir = "Result-folder2/")  # K-fold accuracy
+accuMC <- accuracy.MC(dir = "Result-folder/") # Monte Carlo accuracy
+accuKF <- accuracy.kfold(dir = "Result-folder2/") # K-fold accuracy
 
 # Quick inspection of accuracy objects
 str(accuMC)
@@ -156,7 +158,7 @@ NonGeneticUnknown <- read.csv(
 
 Two assignment models are illustrated: naive Bayes using genetic data and a decision tree using integrated data.
 
-```{r assignment_tests_naives_Bayes}
+```{r assignment_tests_naives_Bayes, fig.alt = "Assignment using genetic data and naive Bayes"}
 # 1. Assignment using genetic data and naive Bayes
 assign.X(
   x1 = YourGenepopRd,
@@ -164,11 +166,10 @@ assign.X(
   dir = "Result-folder3/",
   model = "naiveBayes"
 )
-
 ```
 
 
-```{r assignment_tests_decision_tree}
+```{r assignment_tests_decision_tree, fig.alt = "Assignment using integrated data and decision tree"}
 # 2. Assignment using integrated data and decision tree
 assign.X(
   x1 = YourIntegrateData,
@@ -205,8 +206,8 @@ Individual-level assignment probabilities are then extracted from the decision-t
 
 ```{r lda-classes-probs}
 # Read assignment results from integrated-data decision tree model
-LDA_assign <- data.table(
-  readit(.data = "Result-folder4/AssignmentResult.txt")
+LDA_assign <- data.table::as.data.table(
+  read.table( "Result-folder4/AssignmentResult.txt",header = TRUE)
 )
 
 # Convert predicted populations to integer class labels
@@ -236,7 +237,18 @@ results_LDA <- run_hisea_estimates(
 print(results_LDA$mean_estimates)
 print(results_LDA$sd_estimates)
 
+
 ```
+
+```{r delete, echo=FALSE}
+unlink("Result-folder", recursive = TRUE, force = TRUE)
+unlink("Result-folder2", recursive = TRUE, force = TRUE)
+unlink("Result-folder3", recursive = TRUE, force = TRUE)
+unlink("Result-folder4", recursive = TRUE, force = TRUE)
+unlink("rf_results_4Mod", recursive = TRUE, force = TRUE)
+unlink(c("*.rda", "*.std", "*.mix", "*.ctr", "*.out", "*.xlsx", "fort.*"), force = TRUE)
+```
+
 
 This workflow demonstrates how genetic classification output from an external, widely used assignment framework (for example, individual probability classification with the assignPOP package) can be directly integrated into RHISEA, enabling mixed-stock estimation that explicitly accounts for both assignment uncertainty and baseline misclassification.
 

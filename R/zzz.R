@@ -7,8 +7,10 @@
     options(repos = c(CRAN = "https://cloud.r-project.org"))
   }
 
-  pkgs <- c("caret", "MASS", "nnet", "e1071", "randomForest",
-            "xgboost", "mclust", "class",  "kknn")
+  pkgs <- c(
+    "caret", "MASS", "nnet", "e1071", "randomForest",
+    "xgboost", "mclust", "class", "kknn"
+  )
 
   missing_pkgs <- pkgs[!sapply(pkgs, requireNamespace, quietly = TRUE)]
   if (length(missing_pkgs) > 0) {
@@ -32,10 +34,13 @@
 
 #' @keywords internal
 .onAttach <- function(libname, pkgname) {
-  tryCatch({
-    .required_pkgs()
-    packageStartupMessage("RHISEA loaded successfully")
-  }, error = function(e) {
-    warning("Error loading required packages: ", e$message)
-  })
+  tryCatch(
+    {
+      .required_pkgs()
+      packageStartupMessage("RHISEA loaded successfully")
+    },
+    error = function(e) {
+      warning("Error loading required packages: ", e$message)
+    }
+  )
 }

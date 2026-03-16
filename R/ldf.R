@@ -14,17 +14,27 @@
 #'                 baseline (training) data for one population/stock.
 #'                 Each matrix should have observations as rows and variables as columns.
 #'
+#' @examples
+#' # Create dummy baseline data for 2 stocks with 2 variables (isotopes)
+#' # Stock A
+#' s1 <- matrix(c(-10, 2, -11, 2.1, -10.5, 2.2), ncol = 2)
+#' colnames(s1) <- c("d13c", "d18o")
+#' # Stock B
+#' s2 <- matrix(c(-15, 5, -16, 5.1, -15.5, 5.2), ncol = 2)
+#' colnames(s2) <- c("d13c", "d18o")
+#'
+#' baseline_list <- list(StockA = s1, StockB = s2)
+#'
+#' # Compute coefficients
+#' ldf_coeffs <- compute_ldf_coefficients(baseline_list)
+#' print(ldf_coeffs)
+#'
 #' @return A numeric matrix of LDF coefficients. Rows correspond to populations,
 #'         and columns correspond to variables followed by the constant term.
 #'         The dimensions are (np x (nv + 1)).
+#'
 #' @export
-#' @examples
-#' # Create dummy baseline data for 2 stocks with 2 variables
-#' stock1_data <- matrix(rnorm(20, mean = 0), ncol = 2)
-#' stock2_data <- matrix(rnorm(20, mean = 1), ncol = 2)
-#' baseline_list <- list(StockA = stock1_data, StockB = stock2_data) # Named list
-#' ldf_coeffs <- compute_ldf_coefficients(baseline_list)
-#' print(ldf_coeffs)
+#'
 compute_ldf_coefficients <- function(baseline) {
   # --- Input Validation and Basic Setup ---
   if (!is.list(baseline) || length(baseline) < 2) {
@@ -44,7 +54,7 @@ compute_ldf_coefficients <- function(baseline) {
   }
   if (NV == 0) stop("Number of variables (NV) is zero. Check baseline data structure.")
 
-  NP <- length(baseline)   # Number of populations (stocks)
+  NP <- length(baseline) # Number of populations (stocks)
 
   # Combine all baseline data into a single matrix
   VARBLE <- do.call(rbind, baseline)
@@ -137,19 +147,27 @@ compute_ldf_coefficients <- function(baseline) {
     # Using condition number or relative eigenvalue check is more robust than just det()
     warning("Pooled covariance matrix (SIGMA) is singular or near-singular. LDF coefficients may be unstable or invalid.", call. = FALSE)
     # Attempting generalized inverse as a fallback, though HISEA Fortran would likely stop.
-    SIGMA_INV <- tryCatch({
-      MASS::ginv(SIGMA) # Use generalized inverse from MASS package
-    }, error = function(e_ginv) {
-      stop(paste("Error inverting SIGMA with solve() and ginv():", conditionMessage(e_ginv),
-                 "Consider checking for collinear variables or small group sizes relative to Nvar."))
-    })
+    SIGMA_INV <- tryCatch(
+      {
+        MASS::ginv(SIGMA) # Use generalized inverse from MASS package
+      },
+      error = function(e_ginv) {
+        stop(paste(
+          "Error inverting SIGMA with solve() and ginv():", conditionMessage(e_ginv),
+          "Consider checking for collinear variables or small group sizes relative to Nvar."
+        ))
+      }
+    )
     warning("Used generalized inverse for SIGMA due to singularity.", call. = FALSE)
   } else {
-    SIGMA_INV <- tryCatch({
-      solve(SIGMA)
-    }, error = function(e_solve) {
-      stop(paste("Error inverting pooled covariance matrix SIGMA with solve():", conditionMessage(e_solve)))
-    })
+    SIGMA_INV <- tryCatch(
+      {
+        solve(SIGMA)
+      },
+      error = function(e_solve) {
+        stop(paste("Error inverting pooled covariance matrix SIGMA with solve():", conditionMessage(e_solve)))
+      }
+    )
   }
 
   # Intermediate calculation: MEANS %*% SIGMA_INV
@@ -164,7 +182,7 @@ compute_ldf_coefficients <- function(baseline) {
   # LDF_j(x) = (mean_j^T * SIGMA_INV * x) - 0.5 * (mean_j^T * SIGMA_INV * mean_j)
   # (Assuming equal priors, log(prior_j) term is omitted or absorbed into constant later if needed)
   for (j in 1:NP) {
-    coefs[j, 1:NV] <- WORK[j, ]                     # Coefficients for variables x1, ..., xNV
+    coefs[j, 1:NV] <- WORK[j, ] # Coefficients for variables x1, ..., xNV
     coefs[j, NV + 1] <- -0.5 * sum(WORK[j, ] * MEANS[j, ]) # Constant term C_j0
   }
 
@@ -188,6 +206,23 @@ compute_ldf_coefficients <- function(baseline) {
 #' @param type Character, indicates the type of run (e.g., "S" for simulation).
 #'             This parameter is from HISEA Fortran and affects a condition for processing,
 #'             though its impact here is minor if `freq` are positive. Default "S".
+#'
+#' @examples
+#' # 1. Prepare coefficients
+#' s1 <- matrix(rnorm(20, mean = -10), ncol = 2)
+#' s2 <- matrix(rnorm(20, mean = -15), ncol = 2)
+#' coefs <- compute_ldf_coefficients(list(StockA = s1, StockB = s2))
+#'
+#' # 2. Prepare unknown samples (mixture)
+#' unknown_samples <- matrix(rnorm(10, mean = -12), ncol = 2)
+#' colnames(unknown_samples) <- c("Var1", "Var2")
+#'
+#' # 3. Classify
+#' results <- classify_samples(samples = unknown_samples, coefs = coefs)
+#'
+#' # Check predictions and probabilities
+#' print(results$class)
+#' print(results$likelihood)
 #'
 #' @return A list containing:
 #'         \item{class}{An integer vector of predicted class labels (1 to NP) for each sample.}
@@ -219,16 +254,18 @@ classify_samples <- function(samples, coefs, freq = NULL, type = "S") {
     stop("'coefs' must be a numeric matrix of LDF coefficients.")
   }
 
-  NV_samples <- ncol(samples)  # Number of variables in the samples
-  NV_coefs <- ncol(coefs) - 1  # Number of variables expected by LDF coefficients
+  NV_samples <- ncol(samples) # Number of variables in the samples
+  NV_coefs <- ncol(coefs) - 1 # Number of variables expected by LDF coefficients
 
   if (NV_samples != NV_coefs) {
-    stop(paste("Number of variables in 'samples' (", NV_samples,
-               ") does not match number of variable coefficients in 'coefs' (", NV_coefs, ")."))
+    stop(paste(
+      "Number of variables in 'samples' (", NV_samples,
+      ") does not match number of variable coefficients in 'coefs' (", NV_coefs, ")."
+    ))
   }
 
-  NP <- nrow(coefs)           # Number of populations
-  N_samples <- nrow(samples)  # Number of samples to classify
+  NP <- nrow(coefs) # Number of populations
+  N_samples <- nrow(samples) # Number of samples to classify
 
   if (N_samples == 0) { # Handle empty samples input
     return(list(
@@ -276,10 +313,14 @@ classify_samples <- function(samples, coefs, freq = NULL, type = "S") {
   if (any(freq <= 0) && toupper(substr(type, 1, 1)) != "S") {
     ignored_indices <- which(freq <= 0)
     classifications[ignored_indices] <- 0 # HISEA Fortran convention for ignored/unclassified
-    likelihoods[ignored_indices, ] <- 0   # Zero out likelihoods for these samples
-    warning(paste(length(ignored_indices),
-                  "samples had freq <= 0 and type was not 'S'; their classifications set to 0 and likelihoods to zero."),
-            call. = FALSE)
+    likelihoods[ignored_indices, ] <- 0 # Zero out likelihoods for these samples
+    warning(
+      paste(
+        length(ignored_indices),
+        "samples had freq <= 0 and type was not 'S'; their classifications set to 0 and likelihoods to zero."
+      ),
+      call. = FALSE
+    )
   }
 
   return(list(
@@ -296,14 +337,25 @@ classify_samples <- function(samples, coefs, freq = NULL, type = "S") {
 #' @param predicted_class Integer vector of predictions
 #' @param true_labels Factor of true labels
 #' @param np Number of populations (levels)
+#'
+#' @examples
+#' # Simulated classification results
+#' # 4 individuals: 2 from Stock 1, 2 from Stock 2
+#' true_labels <- c(1, 1, 2, 2)
+#' predicted_class <- c(1, 2, 2, 2) # One error: individual 2 misclassified
+#'
+#' # Compute Phi matrix (2 stocks)
+#' phi_matrix <- get_phi(
+#'   predicted_class = predicted_class,
+#'   true_labels = true_labels,
+#'   np = 2
+#' )
+#'
+#' # The result shows the classification accuracy per stock
+#' print(phi_matrix)
+#'
 #' @return Matrix of phi values
 #' @export
-#' @examples
-#' \dontrun{
-#' pred <- c(1, 2, 1, 2)
-#' true <- c(1, 2, 1, 1)
-#' phi_matrix <- get_phi(pred, true, np = 2)
-#' }
 get_phi <- function(predicted_class, true_labels, np) {
   # --- Input Validation ---
   if (length(predicted_class) != length(true_labels)) {
@@ -314,7 +366,11 @@ get_phi <- function(predicted_class, true_labels, np) {
   }
   if (length(predicted_class) == 0) { # Handle empty input
     warning("'predicted_class' and 'true_labels' are empty. Returning an empty Phi matrix if np > 0, or error if np=0.", call. = FALSE)
-    if (np > 0) return(matrix(0, nrow = np, ncol = np)) else return(matrix(numeric(0),0,0))
+    if (np > 0) {
+      return(matrix(0, nrow = np, ncol = np))
+    } else {
+      return(matrix(numeric(0), 0, 0))
+    }
   }
   if (any(!is.finite(predicted_class)) || any(!is.finite(true_labels))) {
     stop("Predicted classes and true labels must contain only finite numeric values.")
@@ -326,20 +382,26 @@ get_phi <- function(predicted_class, true_labels, np) {
   valid_trues <- true_labels # true_labels should not contain 0 unless it's an error.
 
   if (length(valid_preds) > 0 && (max(valid_preds, na.rm = TRUE) > np || min(valid_preds, na.rm = TRUE) < 1)) {
-    stop(paste0("Some 'predicted_class' labels are outside the expected range [1, np] or are 0 incorrectly. Max: ",
-                max(predicted_class, na.rm=T), ", Min: ", min(predicted_class, na.rm=T)))
+    stop(paste0(
+      "Some 'predicted_class' labels are outside the expected range [1, np] or are 0 incorrectly. Max: ",
+      max(predicted_class, na.rm = T), ", Min: ", min(predicted_class, na.rm = T)
+    ))
   }
   if (length(valid_trues) > 0 && (max(valid_trues, na.rm = TRUE) > np || min(valid_trues, na.rm = TRUE) < 1)) {
-    stop(paste0("Some 'true_labels' are outside the expected range [1, np]. Max: ",
-                max(true_labels, na.rm=T), ", Min: ", min(true_labels, na.rm=T)))
+    stop(paste0(
+      "Some 'true_labels' are outside the expected range [1, np]. Max: ",
+      max(true_labels, na.rm = T), ", Min: ", min(true_labels, na.rm = T)
+    ))
   }
 
   # Use table for efficient cross-tabulation, ensuring all levels 1:np are present
   # This directly gives counts of (predicted_class, true_labels)
   # Rows of contingency_table are predicted_class, columns are true_labels
   # This matches HISEA's Phi definition where PHI(Assigned, True)
-  contingency_table <- table(factor(predicted_class, levels = 1:np),
-                             factor(true_labels, levels = 1:np))
+  contingency_table <- table(
+    factor(predicted_class, levels = 1:np),
+    factor(true_labels, levels = 1:np)
+  )
 
   # Convert counts to proportions by dividing each column by its sum (total in that true class)
   phi <- sweep(contingency_table, MARGIN = 2, STATS = colSums(contingency_table), FUN = "/")
@@ -375,7 +437,7 @@ get_phi <- function(predicted_class, true_labels, np) {
   # The table() function with factors as input should already produce named dimensions if factors have labels.
   # If true_labels and predicted_class were just numbers, dimnames would be those numbers.
   dim_names_default <- paste0("Stock", 1:np)
-  stock_names_for_phi <- tryCatch(levels(factor(true_labels, levels = 1:np, labels=dim_names_default)), error=function(e) dim_names_default)
+  stock_names_for_phi <- tryCatch(levels(factor(true_labels, levels = 1:np, labels = dim_names_default)), error = function(e) dim_names_default)
 
   rownames(phi) <- paste0("Assigned_", stock_names_for_phi)
   colnames(phi) <- paste0("True_", stock_names_for_phi)

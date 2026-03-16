@@ -21,7 +21,7 @@ print_hisea_summary(
 )
 }
 \arguments{
-\item{summary_report}{Output from code{create_hisea_summary_report}.}
+\item{summary_report}{Output from \code{create_hisea_summary_report}.}
 
 \item{nsamps}{Number of simulation/bootstrap replicates.}
 
@@ -47,6 +47,27 @@ print_hisea_summary(
 
 \item{nmix_simulated}{Integer, size of simulated mixture.}
 }
+\value{
+`data.frame` summary statistics (invisibly)
+}
 \description{
 Print HISEA Summary Report to Console and/or File
+}
+\examples{
+# 1. Prepare dummy summary data
+nsamps <- 10; np <- 2
+est_array <- array(runif(nsamps * np * 2), dim = c(nsamps, np, 2))
+dimnames(est_array) <- list(NULL, c("Stock1", "Stock2"), c("RAW", "ML"))
+rep <- create_hisea_summary_report(est_array, run_type = "SIMULATION")
+
+# 2. Print to console (using a temp file to avoid clutter)
+print_hisea_summary(
+  summary_report = rep,
+  nsamps = 10,
+  actual_proportions = c(0.5, 0.5),
+  stocks_names = c("Stock1", "Stock2"),
+  output_file = tempfile(fileext = ".txt"),
+  run_type = "SIMULATION"
+)
+
 }
