@@ -1,6 +1,10 @@
 # RHISEA
 
 > ***"An R package for flexible and reproducible mixed-stock analysis in fisheries and ecology"***
+# RHISEA <img src="man/figures/logo.png" align="right" height="139" />
+
+[![R-CMD-check](https://github.com/SostheneA/RHISEA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SostheneA/RHISEA/actions/workflows/R-CMD-check.yaml)
+[![R-universe status badge](https://sosthenea.r-universe.dev/badges/RHISEA)](https://sosthenea.r-universe.dev/RHISEA)
 
 RHISEA modernizes and extends HISEA with flexible, robust classification frameworks to estimate source contributions and assign individuals to their stock of origin, with rigorous uncertainty quantification.
 
