@@ -61,7 +61,7 @@ Mixed-stock analysis is a fundamental tool for fisheries science, allowing estim
 
 ## The Modern Workflow: RHISEA in R {#the-modern-workflow-RHISEA-in-r}
 
-RHISEA builds on the foundation of HISEA and brings mixed-stock analysis into the present:
+RHISEA builds on the foundation of HISEA and brings mixed-stock analysis into the present :
 
 ### Key Innovations
 
