@@ -1,6 +1,6 @@
 Package: RHISEA
 Type: Package
-Title: RHISEA: Modern Mixed-Stock Analysis with Flexible Classifiers
+Title: An R package for flexible and reproducible mixed-stock analysis in fisheries and ecology
 Version: 0.1.0
 Authors@R: 
     c(person("Sosthene", "A. V. Akia", 
@@ -13,7 +13,9 @@ Authors@R:
              comment = "Fisheries and Oceans Canada, St. Andrews Biological Station"))
 Maintainer: Sosthene A. V. Akia <sosthene.akia@dfo-mpo.gc.ca>
 Description: RHISEA modernizes Millar's HISEA (1987,1990) methodology for reproducible mixed-stock analysis. 
-    Supports multiple classifiers (LDA, RF, MCLUST, SVM, etc.) and estimators (EM, ML, COOK). 
+    RHISEA provides a flexible and reproducible framework for mixed-stock analysis in fisheries and ecology. 
+    Modernizes legacy workflows by integrating modern statistical classifiers (LDA, RF, MCLUST, SVM, etc.) 
+    and estimators (EM, ML, COOK). 
     Includes simulation frameworks, bootstrap resampling, and complete analysis workflows 
     for fisheries stock assessment and population structure inference.
 License: GPL-3
@@ -46,7 +48,7 @@ Suggests:
     readr,
     dplyr
 VignetteBuilder: knitr
-URL: https://github.com/SostheneA/RHISEA
+URL: https://github.com/SostheneA/RHISEA, https://sosthenea.github.io/RHISEA/
 BugReports: https://github.com/SostheneA/RHISEA/issues
 Config/testthat/edition: 3
 LazyData: true

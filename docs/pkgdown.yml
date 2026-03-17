@@ -9,7 +9,7 @@ articles:
   RHISEA_comprehensive_Guide: RHISEA_comprehensive_Guide.html
   RHISEA_data_type: RHISEA_data_type.html
   RHISEA_vs_Fortran: RHISEA_vs_Fortran.html
-last_built: 2026-03-17T00:53Z
+last_built: 2026-03-17T13:29Z
 urls:
-  reference: https://github.com/SostheneA/RHISEA/reference
-  article: https://github.com/SostheneA/RHISEA/articles
+  reference: https://sosthenea.github.io/RHISEA/reference
+  article: https://sosthenea.github.io/RHISEA/articles

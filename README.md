@@ -1,7 +1,6 @@
-# RHISEA
+# RHISEA <img src="man/figures/logo.png" align="right" height="139" />
 
 > ***"An R package for flexible and reproducible mixed-stock analysis in fisheries and ecology"***
-# RHISEA <img src="man/figures/logo.png" align="right" height="139" />
 
 [![R-CMD-check](https://github.com/SostheneA/RHISEA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/SostheneA/RHISEA/actions/workflows/R-CMD-check.yaml)
 [![R-universe status badge](https://sosthenea.r-universe.dev/badges/RHISEA)](https://sosthenea.r-universe.dev/RHISEA)
@@ -48,7 +47,7 @@ citation("RHISEA")
 ```
 
 
-# From HISEA FORTRAN to RHISEA: Modern Mixed-Stock Analysis in R
+## From HISEA FORTRAN to RHISEA: Modern Mixed-Stock Analysis in R
 
 Mixed-stock analysis is a fundamental tool for fisheries science, allowing estimation of the contributions of source populations to mixture samples (e.g., fisheries catches). The original HISEA program, implemented in FORTRAN, pioneered this approach with a robust statistical framework and introduced several estimators (Θ₁ to Θ₅) for stock proportion inference.
 
@@ -61,10 +60,6 @@ Mixed-stock analysis is a fundamental tool for fisheries science, allowing estim
 
 
 ## The Modern Workflow: RHISEA in R {#the-modern-workflow-RHISEA-in-r}
-
-RHISEA builds on the foundation of HISEA and brings mixed-stock analysis into the present:
-
-## The Modern Workflow: RHISEA in R
 
 RHISEA builds on the foundation of HISEA and brings mixed-stock analysis into the present:
 
