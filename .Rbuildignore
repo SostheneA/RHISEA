@@ -12,3 +12,4 @@
 ^\.Rprofile$
 ^CONTRIBUTING\.md$
 ^vignettes/precompile\.R$
+^vignettes/*\.Rmd\.orig$

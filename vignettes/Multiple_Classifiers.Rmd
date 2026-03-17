@@ -10,9 +10,9 @@ author:
 date: "2026-03-16"
 output: rmarkdown::html_vignette
 vignette: >
-  %\\VignetteIndexEntry{Comparing built-in classification methods in RHISEA for mixed-stock analysis}
-  %\\VignetteEngine{knitr::rmarkdown}
-  %\\VignetteEncoding{UTF-8}
+  %\VignetteIndexEntry{Comparing built-in classification methods in RHISEA for mixed-stock analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 
