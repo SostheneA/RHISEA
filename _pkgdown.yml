@@ -1,8 +1,6 @@
-url: https://github.com/SostheneA/RHISEA
-
+url: https://sosthenea.github.io/RHISEA/
 template:
   bootstrap: 5
-
 figures:
   contents:
     - logo.png
