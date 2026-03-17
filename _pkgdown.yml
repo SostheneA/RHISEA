@@ -3,9 +3,15 @@ url: https://github.com/SostheneA/RHISEA
 template:
   bootstrap: 5
 
+figures:
+  contents:
+    - logo.png
+
 home:
   title: "RHISEA"
   description: "RHISEA: An R package for flexible and reproducible mixed-stock analysis in fisheries and ecology"
+  sidebar:
+    structure: [links, license, community, citation, dev]
 
 navbar:
   structure:
