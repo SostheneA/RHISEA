@@ -1,15 +1,25 @@
 url: https://sosthenea.github.io/RHISEA/
+
 template:
   bootstrap: 5
-figures:
-  contents:
-    - logo.png
 
 home:
   title: "RHISEA"
   description: "RHISEA: An R package for flexible and reproducible mixed-stock analysis in fisheries and ecology"
-  sidebar:
-    structure: [links, license, community, citation, dev]
+  strip_header: false
+
+sidebar:
+  structure: [links, license, community, citation, dev]
+  components:
+    dev:
+      title: "Dev status"
+      contents:
+        - name: R-CMD-check
+          url: https://github.com/SostheneA/RHISEA/actions/workflows/R-CMD-check.yaml
+          img: https://github.com/SostheneA/RHISEA/actions/workflows/R-CMD-check.yaml/badge.svg
+        - name: R-universe
+          url: https://sosthenea.r-universe.dev/RHISEA
+          img: https://sosthenea.r-universe.dev/badges/RHISEA
 
 navbar:
   structure:
