@@ -72,7 +72,7 @@ Hanke</h4>
 Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:alex.hanke@dfo-mpo.ca" class="email">alex.hanke@dfo-mpo.ca</a>
       </address>
                   
-            <h4 data-toc-skip class="date">2026-03-15</h4>
+            <h4 data-toc-skip class="date">2026-03-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/SostheneA/RHISEA/blob/HEAD/vignettes/Multiple_Classifiers.Rmd"><code>vignettes/Multiple_Classifiers.Rmd</code></a></small>
       <div class="d-none name"><code>Multiple_Classifiers.Rmd</code></div>
@@ -330,15 +330,15 @@ and logs errors if any occur.</p>
 <span><span class="va">performance_summary</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html" class="external-link">map_dfr</a></span><span class="op">(</span><span class="va">rda_files</span>, <span class="va">extract_metrics_from_rda</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">performance_summary</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##                               Model Accuracy Kappa</span></span>
-<span><span class="co">## 1      ANN_ANALYSIS_20260315_003040    0.890 0.780</span></span>
-<span><span class="co">## 2      KNN_ANALYSIS_20260315_002713    0.940 0.880</span></span>
-<span><span class="co">## 3      LDA_ANALYSIS_20260315_001144    0.937 0.873</span></span>
-<span><span class="co">## 4 LDA_MASS_ANALYSIS_20260315_001212    0.937 0.873</span></span>
-<span><span class="co">## 5      MLR_ANALYSIS_20260315_003545    0.937 0.873</span></span>
-<span><span class="co">## 6       NB_ANALYSIS_20260315_003448    0.947 0.893</span></span>
-<span><span class="co">## 7      QDA_ANALYSIS_20260315_001238    0.943 0.887</span></span>
-<span><span class="co">## 8       RF_ANALYSIS_20260315_002038    0.963 0.927</span></span>
-<span><span class="co">## 9      SVM_ANALYSIS_20260315_002223    0.953 0.907</span></span></code></pre>
+<span><span class="co">## 1      ANN_ANALYSIS_20260316_174132    0.940 0.880</span></span>
+<span><span class="co">## 2      KNN_ANALYSIS_20260316_173620    0.940 0.880</span></span>
+<span><span class="co">## 3      LDA_ANALYSIS_20260316_171959    0.937 0.873</span></span>
+<span><span class="co">## 4 LDA_MASS_ANALYSIS_20260316_172032    0.937 0.873</span></span>
+<span><span class="co">## 5      MLR_ANALYSIS_20260316_174840    0.927 0.853</span></span>
+<span><span class="co">## 6       NB_ANALYSIS_20260316_174722    0.947 0.893</span></span>
+<span><span class="co">## 7      QDA_ANALYSIS_20260316_172103    0.937 0.873</span></span>
+<span><span class="co">## 8       RF_ANALYSIS_20260316_172923    0.967 0.933</span></span>
+<span><span class="co">## 9      SVM_ANALYSIS_20260316_173120    0.953 0.907</span></span></code></pre>
 <hr>
 </div>
 <div class="section level2">
@@ -355,7 +355,11 @@ and logs errors if any occur.</p>
 <span>    x <span class="op">=</span> <span class="st">"Classifier Model"</span>, y <span class="op">=</span> <span class="st">"Accuracy"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Multiple_Classifiers_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="Accuracy and Kappa for Each Model" width="700"></p>
+<div class="figure">
+<img src="figure/unnamed-chunk-5-1.png" alt="Accuracy and Kappa for Each Model"><p class="caption">
+plot of chunk unnamed-chunk-5
+</p>
+</div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">performance_summary</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/reorder.factor.html" class="external-link">reorder</a></span><span class="op">(</span><span class="va">Model</span>, <span class="va">Kappa</span><span class="op">)</span>, y <span class="op">=</span> <span class="va">Kappa</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_bar.html" class="external-link">geom_col</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"darkorange"</span><span class="op">)</span> <span class="op">+</span></span>
@@ -365,7 +369,11 @@ and logs errors if any occur.</p>
 <span>    x <span class="op">=</span> <span class="st">"Classifier Model"</span>, y <span class="op">=</span> <span class="st">"Kappa"</span></span>
 <span>  <span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="Multiple_Classifiers_files/figure-html/unnamed-chunk-5-2.png" class="r-plt" alt="Accuracy and Kappa for Each Model" width="700"></p>
+<div class="figure">
+<img src="figure/unnamed-chunk-5-2.png" alt="Accuracy and Kappa for Each Model"><p class="caption">
+plot of chunk unnamed-chunk-5
+</p>
+</div>
 <hr>
 </div>
 <div class="section level2">

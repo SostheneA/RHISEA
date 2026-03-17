@@ -83,15 +83,30 @@ Must sum to 1 and have the same length as `baseline_data_list`.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Dummy baseline data</span></span></span>
-<span class="r-in"><span><span class="va">stock1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span> <span class="op">*</span> <span class="fl">2</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># Assuming 2 variables</span></span></span>
-<span class="r-in"><span><span class="va">stock2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">30</span> <span class="op">*</span> <span class="fl">2</span>, mean <span class="op">=</span> <span class="fl">2</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="co"># Assuming 2 variables</span></span></span>
-<span class="r-in"><span><span class="va">baseline_list_ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">stock1</span>, <span class="va">stock2</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">true_props_ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.4</span><span class="op">)</span> <span class="co"># 60% from stock1, 40% from stock2</span></span></span>
-<span class="r-in"><span><span class="va">mixture_N_ex</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
-<span class="r-in"><span><span class="co"># simulated_sample_ex &lt;- simulate_mixture(baseline_list_ex, true_props_ex, mixture_N_ex)</span></span></span>
-<span class="r-in"><span><span class="co"># print(head(simulated_sample_ex))</span></span></span>
-<span class="r-in"><span><span class="co"># print(nrow(simulated_sample_ex)) # Should be close to 100</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># 1. Prepare dummy baseline data for 2 stocks</span></span></span>
+<span class="r-in"><span><span class="va">stock1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">40</span>, mean <span class="op">=</span> <span class="fl">0</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">stock2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">60</span>, mean <span class="op">=</span> <span class="fl">2</span>, sd <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">baseline_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>StockA <span class="op">=</span> <span class="va">stock1</span>, StockB <span class="op">=</span> <span class="va">stock2</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 2. Set true proportions and mixture size</span></span></span>
+<span class="r-in"><span><span class="va">true_props</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.6</span>, <span class="fl">0.4</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">n_mix</span> <span class="op">&lt;-</span> <span class="fl">100</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 3. Generate the synthetic mixture</span></span></span>
+<span class="r-in"><span><span class="va">simulated_sample</span> <span class="op">&lt;-</span> <span class="fu">simulate_mixture</span><span class="op">(</span><span class="va">baseline_list</span>, <span class="va">true_props</span>, <span class="va">n_mix</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 4. Verify output</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">simulated_sample</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            [,1]         [,2]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,]  1.6007598  1.201167182</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,]  0.4326778 -0.001062756</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] -0.4968519 -0.866606890</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] -0.2724399  1.508721847</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] -1.5738221 -1.206355025</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [6,]  3.1837559  2.258213780</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">simulated_sample</span><span class="op">)</span> <span class="co"># Should be 100</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 100</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

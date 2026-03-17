@@ -56,6 +56,7 @@ reference:
       - write_std_from_dataframe
       - process_hisea_input
       - baseline
+      - mixture
 
   - title: 'Estimators and Algorithms'
     desc: |

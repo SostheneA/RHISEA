@@ -11,3 +11,4 @@
 ^vignettes/\.build\.timestamp$
 ^\.Rprofile$
 ^CONTRIBUTING\.md$
+^vignettes/precompile\.R$

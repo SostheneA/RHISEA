@@ -126,18 +126,24 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">baseline</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="co"># Minimal example (prints structure)</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="va">summary_rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_hisea_summary_report.html">create_hisea_summary_report</a></span><span class="op">(</span><span class="va">results_array</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu">print_hisea_summary</span><span class="op">(</span><span class="va">summary_rep</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">baseline</span><span class="op">)</span> <span class="co"># Shows data structure</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> Classes 'data.table' and 'data.frame':	300 obs. of  3 variables:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ d13c      : num  -7.99 -8.23 -7.99 -7.32 -9.01 -8.19 -8.48 -8.42 -8.02 -7.9 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ d18o      : num  -0.46 -0.58 -0.89 -1.06 -0.89 -1.25 -0.27 -0.72 -0.74 -0.51 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  $ population: Factor w/ 2 levels "East","West": 1 1 1 1 1 1 1 1 1 1 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, ".internal.selfref")=&lt;externalptr&gt; </span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># 1. Prepare dummy summary data</span></span></span>
+<span class="r-in"><span><span class="va">nsamps</span> <span class="op">&lt;-</span> <span class="fl">10</span>; <span class="va">np</span> <span class="op">&lt;-</span> <span class="fl">2</span></span></span>
+<span class="r-in"><span><span class="va">est_array</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">nsamps</span> <span class="op">*</span> <span class="va">np</span> <span class="op">*</span> <span class="fl">2</span><span class="op">)</span>, dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">nsamps</span>, <span class="va">np</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">est_array</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="cn">NULL</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stock1"</span>, <span class="st">"Stock2"</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"RAW"</span>, <span class="st">"ML"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">rep</span> <span class="op">&lt;-</span> <span class="fu"><a href="create_hisea_summary_report.html">create_hisea_summary_report</a></span><span class="op">(</span><span class="va">est_array</span>, run_type <span class="op">=</span> <span class="st">"SIMULATION"</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in create_hisea_summary_report(est_array, run_type = "SIMULATION"):</span> could not find function "create_hisea_summary_report"</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 2. Print to console (using a temp file to avoid clutter)</span></span></span>
+<span class="r-in"><span><span class="fu">print_hisea_summary</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  summary_report <span class="op">=</span> <span class="va">rep</span>,</span></span>
+<span class="r-in"><span>  nsamps <span class="op">=</span> <span class="fl">10</span>,</span></span>
+<span class="r-in"><span>  actual_proportions <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  stocks_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Stock1"</span>, <span class="st">"Stock2"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  output_file <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>fileext <span class="op">=</span> <span class="st">".txt"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  run_type <span class="op">=</span> <span class="st">"SIMULATION"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in print_hisea_summary(summary_report = rep, nsamps = 10, actual_proportions = c(0.5,     0.5), stocks_names = c("Stock1", "Stock2"), output_file = tempfile(fileext = ".txt"),     run_type = "SIMULATION"):</span> 'summary_report' must be a list.</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

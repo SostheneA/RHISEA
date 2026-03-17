@@ -195,45 +195,74 @@ Supported estimators: RAW, Cook, Constrained Cook, EM (Millar), Maximum Likeliho
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with:</p><dl><dt>estimation_summary</dt>
-<dd><p>Summary table with mean, SD, and RMSE of estimates.</p></dd>
+    <p>A list of length 8 containing the statistical summary of the estimation
+(the same as the `estimation_summary` element in the saved file):</p><dl><dt>mean_estimates</dt>
+<dd><p>Matrix [np x nsamps] of mean estimated proportions.</p></dd>
+
+  <dt>sd_estimates</dt>
+<dd><p>Standard deviations of the estimates.</p></dd>
+
+  <dt>mse_estimates</dt>
+<dd><p>Mean Squared Error (if applicable).</p></dd>
+
+  <dt>var_emp</dt>
+<dd><p>Empirical variance of the estimates.</p></dd>
+
+  <dt>covar_ml</dt>
+<dd><p>Maximum Likelihood covariance matrix.</p></dd>
+
+  <dt>cor_ml</dt>
+<dd><p>Correlation matrix.</p></dd>
+
+  <dt>covar_inv_ml</dt>
+<dd><p>Inverse of the covariance matrix.</p></dd>
+
+  <dt>det_covar_ml</dt>
+<dd><p>Determinant of the covariance matrix (checks for singularity).</p></dd>
+
+
+</dl></div>
+    <div class="section level2">
+    <h2 id="saved-results-structure">Saved Results Structure<a class="anchor" aria-label="anchor" href="#saved-results-structure"></a></h2>
+
+
+<p>The function automatically saves a `.rda` file in `output_dir` containing a
+master list named `out`. This list includes:</p><dl><dt>estimation_summary</dt>
+<dd><p>The list of 8 statistical metrics described above.</p></dd>
 
   <dt>classification_model</dt>
-<dd><p>Final trained classifier object.</p></dd>
+<dd><p>The trained classifier object (e.g., LDA, RF).</p></dd>
 
   <dt>baseline_classification_quality</dt>
-<dd><p>Accuracy, Kappa, and per-class metrics.</p></dd>
+<dd><p>Accuracy, Kappa, and F1 scores.</p></dd>
 
   <dt>phi_matrix</dt>
-<dd><p>Estimated confusion matrix used in corrections.</p></dd>
+<dd><p>The confusion matrix used for bias correction.</p></dd>
 
   <dt>mixture_classification_details</dt>
-<dd><p>List with predicted pseudo-classes and likelihoods.</p></dd>
+<dd><p>Predicted classes and posterior probabilities.</p></dd>
 
 
-</dl><p>A `.rda` file of results is also saved in `output_dir`.</p>
-    </div>
-    <div class="section level2">
-    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code>compute_cook_estimators</code>, <code>estimate_millar</code>, <code>estimate_ml</code>,
-<code>get_cv_metrics_and_phi</code>, <code>train_model</code>, <code>predict_model</code>, <code>.resample_baseline_data_helper</code></p></div>
-    </div>
+</dl></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu">run_hisea_all</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  type <span class="op">=</span> <span class="st">"SIMULATION"</span>,</span></span>
-<span class="r-in"><span>  np <span class="op">=</span> <span class="fl">3</span>, nv <span class="op">=</span> <span class="fl">5</span>,</span></span>
-<span class="r-in"><span>  actual <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.2</span>, <span class="fl">0.3</span>, <span class="fl">0.5</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  Nmix <span class="op">=</span> <span class="fl">200</span>,</span></span>
-<span class="r-in"><span>  baseline_path <span class="op">=</span> <span class="st">"baseline.std"</span>,</span></span>
-<span class="r-in"><span>  method_class <span class="op">=</span> <span class="st">"RF"</span>,</span></span>
-<span class="r-in"><span>  resample_baseline <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>  resampled_baseline_sizes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">100</span>, <span class="fl">100</span>, <span class="fl">100</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  output_dir <span class="op">=</span> <span class="st">"results"</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">baseline</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">mixture</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">run_hisea_all</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  baseline_input <span class="op">=</span> <span class="va">baseline</span>,</span></span>
+<span class="r-in"><span>  mix_input      <span class="op">=</span> <span class="va">mixture</span>,</span></span>
+<span class="r-in"><span>  stock_col      <span class="op">=</span> <span class="st">"population"</span>,</span></span>
+<span class="r-in"><span>  var_cols_std   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d13c"</span>, <span class="st">"d18o"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  var_cols_mix   <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"d13c_ukn"</span>, <span class="st">"d18o_ukn"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  output_dir     <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  np <span class="op">=</span> <span class="fl">2</span>, nv <span class="op">=</span> <span class="fl">2</span>, nsamps <span class="op">=</span> <span class="fl">5</span>, Nmix <span class="op">=</span> <span class="fl">50</span>, method_class <span class="op">=</span> <span class="st">"LDA"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">res</span><span class="op">$</span><span class="va">mean_estimates</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               RAW      COOK     COOKC        EM        ML</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stock_1 0.3771111 0.3376263 0.3376263 0.3376264 0.3216781</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Stock_2 0.6228889 0.6623737 0.6623737 0.6623736 0.6783219</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

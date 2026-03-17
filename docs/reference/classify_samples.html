@@ -96,11 +96,29 @@ though its impact here is minor if `freq` are positive. Default "S".</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">baseline</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">ldf_coefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="compute_ldf_coefficients.html">compute_ldf_coefficients</a></span><span class="op">(</span><span class="va">baseline</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">classif</span> <span class="op">&lt;-</span> <span class="fu">classify_samples</span><span class="op">(</span><span class="va">baseline</span>, <span class="va">ldf_coefs</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># 1. Prepare coefficients</span></span></span>
+<span class="r-in"><span><span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">10</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">20</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">15</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">coefs</span> <span class="op">&lt;-</span> <span class="fu"><a href="compute_ldf_coefficients.html">compute_ldf_coefficients</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>StockA <span class="op">=</span> <span class="va">s1</span>, StockB <span class="op">=</span> <span class="va">s2</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 2. Prepare unknown samples (mixture)</span></span></span>
+<span class="r-in"><span><span class="va">unknown_samples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span>, mean <span class="op">=</span> <span class="op">-</span><span class="fl">12</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">unknown_samples</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Var1"</span>, <span class="st">"Var2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># 3. Classify</span></span></span>
+<span class="r-in"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu">classify_samples</span><span class="op">(</span>samples <span class="op">=</span> <span class="va">unknown_samples</span>, coefs <span class="op">=</span> <span class="va">coefs</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Check predictions and probabilities</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">class</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 1 2 1 1 1</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">likelihood</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>            StockA       StockB</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1,] 9.999962e-01 3.846787e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [2,] 5.018485e-05 9.999498e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [3,] 1.000000e+00 3.250438e-11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4,] 8.953844e-01 1.046156e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [5,] 8.083537e-01 1.916463e-01</span>
+<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

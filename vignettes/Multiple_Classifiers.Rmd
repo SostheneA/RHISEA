@@ -7,7 +7,7 @@ author:
   - name: "Alex Hanke"
     email: "alex.hanke@dfo-mpo.ca"
     affiliation: "Fisheries and Oceans Canada"
-date: "`r Sys.Date()`"
+date: "2026-03-16"
 output: rmarkdown::html_vignette
 vignette: >
   %\\VignetteIndexEntry{Comparing built-in classification methods in RHISEA for mixed-stock analysis}
@@ -15,10 +15,7 @@ vignette: >
   %\\VignetteEncoding{UTF-8}
 ---
 
-```{r setup, include=FALSE}
-options(rmarkdown.html_vignette.check_title = FALSE)
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
-```
+
 
 
 # Introduction
@@ -40,7 +37,8 @@ By running the provided **automated classifier comparison script**, you will be 
 
 # Setup and Required Libraries
 
-```{r}
+
+``` r
 library(RHISEA)
 library(RHISEA)
 library(writexl)
@@ -87,7 +85,8 @@ suppressPackageStartupMessages({
 
 # Load Baseline and Mixture Data
 
-```{r data}
+
+``` r
 # Load baseline and mixture data
 baseline_file <- system.file("extdata", "baseline.rda", package = "RHISEA")
 mixture_file <- system.file("extdata", "mixture.rda", package = "RHISEA")
@@ -102,7 +101,8 @@ The `baseline` dataset contains known stock samples labeled by population. The `
 
 # Define Analysis Parameters and Output Setup
 
-```{r}
+
+``` r
 np <- 2 # Number of populations/stocks
 nv <- 2 # Number of variables used (e.g., isotopes)
 Nsamps <- 1000 # Number of bootstrap samples for estimation
@@ -146,7 +146,8 @@ The script supports the following classifiers, all integrated in RHISEAâ€™s `run
 
 # Run Automated Classifier Comparison
 
-```{r, warning=FALSE}
+
+``` r
 # --- 3. Supported classifiers in run_hisea_all() ---
 models_to_run <- c(
   "LDA", # custom LDF
@@ -244,7 +245,8 @@ This loop runs each classifier, performs the mixed-stock analysis using RHISEAâ€
 
 # Summarize and Visualize Classifier Performance
 
-```{r}
+
+``` r
 # Load saved .rda result files from all models
 rda_files <- list.files(output_directory, pattern = "result_.*\\.rda$", recursive = TRUE, full.names = TRUE)
 
@@ -264,11 +266,25 @@ performance_summary <- purrr::map_dfr(rda_files, extract_metrics_from_rda)
 print(performance_summary)
 ```
 
+```
+##                               Model Accuracy Kappa
+## 1      ANN_ANALYSIS_20260316_174132    0.940 0.880
+## 2      KNN_ANALYSIS_20260316_173620    0.940 0.880
+## 3      LDA_ANALYSIS_20260316_171959    0.937 0.873
+## 4 LDA_MASS_ANALYSIS_20260316_172032    0.937 0.873
+## 5      MLR_ANALYSIS_20260316_174840    0.927 0.853
+## 6       NB_ANALYSIS_20260316_174722    0.947 0.893
+## 7      QDA_ANALYSIS_20260316_172103    0.937 0.873
+## 8       RF_ANALYSIS_20260316_172923    0.967 0.933
+## 9      SVM_ANALYSIS_20260316_173120    0.953 0.907
+```
+
 ---
 
 # Plot Accuracy and Kappa for Each Model
 
-```{r,fig.alt="Accuracy and Kappa for Each Model"}
+
+``` r
 library(ggplot2)
 
 ggplot(performance_summary, aes(x = reorder(Model, Accuracy), y = Accuracy)) +
@@ -279,7 +295,14 @@ ggplot(performance_summary, aes(x = reorder(Model, Accuracy), y = Accuracy)) +
     x = "Classifier Model", y = "Accuracy"
   ) +
   theme_minimal()
+```
 
+<div class="figure">
+<img src="figure/unnamed-chunk-5-1.png" alt="Accuracy and Kappa for Each Model"  />
+<p class="caption">plot of chunk unnamed-chunk-5</p>
+</div>
+
+``` r
 ggplot(performance_summary, aes(x = reorder(Model, Kappa), y = Kappa)) +
   geom_col(fill = "darkorange") +
   coord_flip() +
@@ -289,6 +312,11 @@ ggplot(performance_summary, aes(x = reorder(Model, Kappa), y = Kappa)) +
   ) +
   theme_minimal()
 ```
+
+<div class="figure">
+<img src="figure/unnamed-chunk-5-2.png" alt="Accuracy and Kappa for Each Model"  />
+<p class="caption">plot of chunk unnamed-chunk-5</p>
+</div>
 
 ---
 

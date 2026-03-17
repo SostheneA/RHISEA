@@ -72,7 +72,7 @@ Hanke</h4>
 Canada<br><a class="author_email" href="mailto:#"></a><a href="mailto:alex.hanke@dfo-mpo.ca" class="email">alex.hanke@dfo-mpo.ca</a>
       </address>
                   
-            <h4 data-toc-skip class="date">2026-03-15</h4>
+            <h4 data-toc-skip class="date">2026-03-16</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/SostheneA/RHISEA/blob/HEAD/vignettes/Estimate_genetics_data.Rmd"><code>vignettes/Estimate_genetics_data.Rmd</code></a></small>
       <div class="d-none name"><code>Estimate_genetics_data.Rmd</code></div>
@@ -147,11 +147,8 @@ baseline dataset.</p>
 <span><span class="co">#&gt;   Import a .CSV file.</span></span>
 <span><span class="co">#&gt;   4 additional variables detected.</span></span>
 <span><span class="co">#&gt;   Checking variable data type...</span></span>
-<span><span class="co">#&gt;    D1.2(integer)   D2.3(integer)   D3.4(integer)   D1.4(integer)  Are they correct? (enter Y/N): </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   New data set created!!</span></span>
-<span><span class="co">#&gt;   It has 90 observations by 1391 variables</span></span>
-<span><span class="co">#&gt;   including 693 loci(1386 alleles) plus 4 additional variables(4 columns)</span></span>
+<span><span class="co">#&gt;    D1.2(integer)   D2.3(integer)   D3.4(integer)   D1.4(integer)  please enter variable names for changing data type (separate names by a whitespace if multiple)</span></span>
+<span><span class="co">#&gt; Error in compile.data(YourGenepopRd, "https://raw.githubusercontent.com/alexkychen/assignPOP/master/inst/extdata/morphData.csv"): Please enter correct feature names.</span></span>
 <span></span>
 <span><span class="co"># Import morphometric data</span></span>
 <span><span class="va">morphdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span></span>
@@ -228,19 +225,19 @@ accuracy across scenarios.</p>
 <span><span class="co">#&gt;  $ train.inds       : Factor w/ 3 levels "0.5","0.7","0.9": 1 1 1 1 1 1 1 1 1 1 ...</span></span>
 <span><span class="co">#&gt;  $ train.loci       : Factor w/ 4 levels "0.1","0.25","0.5",..: 1 1 1 1 1 1 1 1 1 1 ...</span></span>
 <span><span class="co">#&gt;  $ iters            : Factor w/ 30 levels "1","10","11",..: 1 2 3 4 5 6 7 8 9 10 ...</span></span>
-<span><span class="co">#&gt;  $ assign.rate.all  : num  0.667 0.778 0.622 0.6 0.778 ...</span></span>
-<span><span class="co">#&gt;  $ assign.rate.pop_A: num  0.8 0.533 0.533 0.4 0.6 ...</span></span>
-<span><span class="co">#&gt;  $ assign.rate.pop_B: num  0.267 0.8 0.4 0.6 0.8 ...</span></span>
-<span><span class="co">#&gt;  $ assign.rate.pop_C: num  0.933 1 0.933 0.8 0.933 ...</span></span>
+<span><span class="co">#&gt;  $ assign.rate.all  : num  0.711 0.667 0.6 0.622 0.6 ...</span></span>
+<span><span class="co">#&gt;  $ assign.rate.pop_A: num  0.533 0.267 0.4 0.467 0.467 ...</span></span>
+<span><span class="co">#&gt;  $ assign.rate.pop_B: num  0.667 0.8 0.467 0.533 0.333 ...</span></span>
+<span><span class="co">#&gt;  $ assign.rate.pop_C: num  0.933 0.933 0.933 0.867 1 ...</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">accuKF</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 'data.frame':    48 obs. of  7 variables:</span></span>
 <span><span class="co">#&gt;  $ KF               : Factor w/ 3 levels "3","4","5": 1 1 1 2 2 2 2 3 3 3 ...</span></span>
 <span><span class="co">#&gt;  $ fold             : Factor w/ 5 levels "1","2","3","4",..: 1 2 3 1 2 3 4 1 2 3 ...</span></span>
 <span><span class="co">#&gt;  $ train.loci       : Factor w/ 4 levels "0.1","0.25","0.5",..: 1 1 1 1 1 1 1 1 1 1 ...</span></span>
-<span><span class="co">#&gt;  $ assign.rate.all  : num  0.533 0.467 0.533 0.458 0.75 ...</span></span>
-<span><span class="co">#&gt;  $ assign.rate.pop_A: num  0.3 0.3 0.6 0.25 0.625 ...</span></span>
-<span><span class="co">#&gt;  $ assign.rate.pop_B: num  0.4 0.3 0.3 0.25 0.625 ...</span></span>
-<span><span class="co">#&gt;  $ assign.rate.pop_C: num  0.9 0.8 0.7 0.875 1 ...</span></span></code></pre></div>
+<span><span class="co">#&gt;  $ assign.rate.all  : num  0.667 0.733 0.333 0.522 0.652 ...</span></span>
+<span><span class="co">#&gt;  $ assign.rate.pop_A: num  0.7 0.6 0.4 0.25 0.625 ...</span></span>
+<span><span class="co">#&gt;  $ assign.rate.pop_B: num  0.3 0.6 0.2 0.5 0.429 ...</span></span>
+<span><span class="co">#&gt;  $ assign.rate.pop_C: num  1 1 0.4 0.857 0.875 ...</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="assignment-of-unknown-individuals">Assignment of unknown individuals<a class="anchor" aria-label="anchor" href="#assignment-of-unknown-individuals"></a>
@@ -279,11 +276,8 @@ and integrated data with different classifiers.</p>
 <span><span class="co">#&gt;   Import a .CSV file.</span></span>
 <span><span class="co">#&gt;   4 additional variables detected.</span></span>
 <span><span class="co">#&gt;   Checking variable data type...</span></span>
-<span><span class="co">#&gt;    D1.2(integer)   D2.3(integer)   D3.4(integer)   D1.4(integer)  Are they correct? (enter Y/N): </span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   New data set created!!</span></span>
-<span><span class="co">#&gt;   It has 30 observations by 1839 variables</span></span>
-<span><span class="co">#&gt;   including 1000 loci(1834 alleles) plus 4 additional variables(4 columns)</span></span>
+<span><span class="co">#&gt;    D1.2(integer)   D2.3(integer)   D3.4(integer)   D1.4(integer)  please enter variable names for changing data type (separate names by a whitespace if multiple)</span></span>
+<span><span class="co">#&gt; Error in compile.data(YourGenepopUnknown, "https://raw.githubusercontent.com/alexkychen/assignPOP/master/inst/extdata/morphDataX.csv"): Please enter correct feature names.</span></span>
 <span></span>
 <span><span class="co"># Non-genetic data only</span></span>
 <span><span class="va">NonGeneticUnknown</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.csv</a></span><span class="op">(</span></span>
@@ -307,7 +301,11 @@ and a decision tree using integrated data.</p>
 <span><span class="co">#&gt;   Performing PCA on genetic data for dimensionality reduction...</span></span>
 <span><span class="co">#&gt;   Assignment test is done! See results in your designated folder.</span></span>
 <span><span class="co">#&gt;   Predicted populations and probabilities are saved in [AssignmentResult.txt]</span></span></code></pre></div>
-<p><img src="Estimate_genetics_data_files/figure-html/assignment_tests_naives_Bayes-1.png" class="r-plt" alt="Assignment using genetic data and naive Bayes" width="672"></p>
+<div class="figure">
+<img src="figure/assignment_tests_naives_Bayes-1.png" alt="Assignment using genetic data and naive Bayes"><p class="caption">
+plot of chunk assignment_tests_naives_Bayes
+</p>
+</div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 2. Assignment using integrated data and decision tree</span></span>
 <span><span class="fu">assign.X</span><span class="op">(</span></span>
@@ -323,7 +321,11 @@ and a decision tree using integrated data.</p>
 <span><span class="co">#&gt;   Performing PCA on concatenated genetic and non-genetic data...</span></span>
 <span><span class="co">#&gt;   Assignment test is done! See results in your designated folder.</span></span>
 <span><span class="co">#&gt;   Predicted populations and probabilities are saved in [AssignmentResult.txt]</span></span></code></pre></div>
-<p><img src="Estimate_genetics_data_files/figure-html/assignment_tests_decision_tree-1.png" class="r-plt" alt="Assignment using integrated data and decision tree" width="672"></p>
+<div class="figure">
+<img src="figure/assignment_tests_decision_tree-1.png" alt="Assignment using integrated data and decision tree"><p class="caption">
+plot of chunk assignment_tests_decision_tree
+</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="from-assignment-matrices-to-rhisea-inputs">From assignment matrices to RHISEA inputs<a class="anchor" aria-label="anchor" href="#from-assignment-matrices-to-rhisea-inputs"></a>
@@ -340,16 +342,16 @@ converted to the <code>phi_matrix</code> format expected by
 <span><span class="co">#&gt;  Mean </span></span>
 <span><span class="co">#&gt;        assignment</span></span>
 <span><span class="co">#&gt; origin  pop_A pop_B pop_C</span></span>
-<span><span class="co">#&gt;   pop_A  0.58  0.42  0.01</span></span>
-<span><span class="co">#&gt;   pop_B  0.37  0.53  0.10</span></span>
-<span><span class="co">#&gt;   pop_C  0.03  0.06  0.91</span></span>
+<span><span class="co">#&gt;   pop_A  0.57  0.42  0.01</span></span>
+<span><span class="co">#&gt;   pop_B  0.39  0.52  0.09</span></span>
+<span><span class="co">#&gt;   pop_C  0.02  0.06  0.92</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  Standard Deviation </span></span>
 <span><span class="co">#&gt;        assignment</span></span>
 <span><span class="co">#&gt; origin  pop_A pop_B pop_C</span></span>
-<span><span class="co">#&gt;   pop_A  0.24  0.24  0.03</span></span>
-<span><span class="co">#&gt;   pop_B  0.25  0.26  0.12</span></span>
-<span><span class="co">#&gt;   pop_C  0.05  0.11  0.11</span></span>
+<span><span class="co">#&gt;   pop_A  0.24  0.23  0.04</span></span>
+<span><span class="co">#&gt;   pop_B  0.24  0.26  0.11</span></span>
+<span><span class="co">#&gt;   pop_C  0.05  0.09  0.11</span></span>
 <span></span>
 <span><span class="co"># Example confusion matrix (phi matrix) constructed from assignment results</span></span>
 <span><span class="va">AM_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -398,15 +400,15 @@ proportions using bootstrap resampling.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">results_LDA</span><span class="op">$</span><span class="va">mean_estimates</span><span class="op">)</span></span>
-<span><span class="co">#&gt;             RAW       COOK     COOKC           EM        ML</span></span>
-<span><span class="co">#&gt; pop_A 0.3340000 -2.3213333 0.1083403 6.744857e-05 0.2809635</span></span>
-<span><span class="co">#&gt; pop_B 0.3656667  3.5306667 0.6302499 9.999326e-01 0.4167697</span></span>
-<span><span class="co">#&gt; pop_C 0.3003333  0.6333333 0.2614099 0.000000e+00 0.3022668</span></span>
+<span><span class="co">#&gt;             RAW      COOK     COOKC           EM        ML</span></span>
+<span><span class="co">#&gt; pop_A 0.3294333 -2.185200 0.1036895 8.443711e-05 0.2795586</span></span>
+<span><span class="co">#&gt; pop_B 0.3679333  3.348933 0.6128743 9.999156e-01 0.4172419</span></span>
+<span><span class="co">#&gt; pop_C 0.3026333  0.770000 0.2834362 0.000000e+00 0.3031994</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">results_LDA</span><span class="op">$</span><span class="va">sd_estimates</span><span class="op">)</span></span>
-<span><span class="co">#&gt;              RAW     COOK     COOKC           EM         ML</span></span>
-<span><span class="co">#&gt; pop_A 0.08349234 4.815653 0.2648184 0.0008091922 0.08644330</span></span>
-<span><span class="co">#&gt; pop_B 0.08920801 5.567898 0.4656863 0.0008091922 0.10049481</span></span>
-<span><span class="co">#&gt; pop_C 0.08618188 2.995381 0.3936336 0.0000000000 0.09596643</span></span></code></pre></div>
+<span><span class="co">#&gt;              RAW     COOK     COOKC         EM         ML</span></span>
+<span><span class="co">#&gt; pop_A 0.08345044 4.660601 0.2621710 0.00108754 0.08646360</span></span>
+<span><span class="co">#&gt; pop_B 0.08617321 5.406886 0.4706756 0.00108754 0.09765233</span></span>
+<span><span class="co">#&gt; pop_C 0.08385893 2.949391 0.4073490 0.00000000 0.09197509</span></span></code></pre></div>
 <p>This workflow demonstrates how genetic classification output from an
 external, widely used assignment framework (for example, individual
 probability classification with the assignPOP package) can be directly
